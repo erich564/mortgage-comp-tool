@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -16,6 +15,7 @@ import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
+import Report from './Report';
 
 function App() {
   const [age, setAge] = React.useState('');
@@ -91,7 +91,7 @@ function App() {
           <Button variant="contained">Compare</Button>
           </Item>
           <Item>
-            abc123
+            <Report></Report>
           </Item>
         </Stack>
     </LocalizationProvider>
