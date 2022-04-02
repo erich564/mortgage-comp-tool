@@ -17,78 +17,112 @@ import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import Report from './Report';
 
-function App() {
-  const [age, setAge] = React.useState('');
-  const [value, setValue] = React.useState(null);
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
+export default function App() {
+  const [state, setState] = React.useState({
+    term: '',
+    type: '',
+    interestRate: '',
+    disbursementDate: null,
+    roi: '',
+  });
 
-  const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  }));
+  const handleChange = e => {
+    const value = e.target.value;
+    setState({
+      ...state,
+      [e.target.name]: value
+    });
+  }
 
   return (
     <LocalizationProvider dateAdapter={DateAdapter}>
-      
+        <CssBaseline />
         <Stack spacing={2} style={{margin: 15}}>
           <Item>
-          <br />
-          <CssBaseline />
-          Loan origination date
-          
-          <DatePicker
-            label="Basic example"
-            value={value}
-            onChange={(newValue) => {
-              setValue(newValue);
-            }}
-            renderInput={(params) => <TextField {...params} />}
-          />
-          <br />
-          <FormControl sx={{  minWidth: 150 }}>
-            <InputLabel>Type</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={age}
-              label="Age"
-              onChange={handleChange}
-              defaultValue={2}
-            >
-              <MenuItem value={1}>15-year fixed</MenuItem>
-              <MenuItem value={2}>30-year fixed</MenuItem>
-              <MenuItem value={3}>10/1 ARM</MenuItem>
-              <MenuItem value={4}>7/1 ARM</MenuItem>
-              <MenuItem value={5}>5/1 ARM</MenuItem>
-              <MenuItem value={6}>3/1 ARM</MenuItem>
-            </Select>
-          </FormControl>
-          <br />
-          <TextField
-            margin="normal"
-            required
-            id="interest"
-            label="Interest Rate"
-            name="interest"
-            autoComplete="interest"
-          />
-          <br />
-          <TextField
-            margin="normal"
-            required
-            id="term"
-            label="Term"
-            name="term"
-            autoComplete="term"
-          />
-          <br /><br />
-          <Button variant="contained">Compare</Button>
+            <Box sx={{display: 'inline-block'}}>
+              <br />
+              <DatePicker
+                label="Disbursement Date"
+                value={state.disbursementDate}
+                name="disbursementDate"
+                onChange={m => setState({...state, 'disbursementDate': m})}
+                renderInput={params => <TextField {...params} />}
+              />
+              <br />
+              <TextField
+                margin="normal"
+                required
+                value={state.interestRate}
+                name="interestRate"
+                onChange={handleChange}
+                label="Interest Rate"
+                fullWidth
+              />
+              <br />
+              <FormControl sx={{minWidth: 150}} margin="normal" fullWidth>
+                <InputLabel>Term</InputLabel>
+                <Select
+                  label="Term"
+                  value={state.term}
+                  name="term"
+                  onChange={handleChange}
+                  defaultValue=""
+                >
+                  <MenuItem value={1}>40 years</MenuItem>
+                  <MenuItem value={2}>30 years</MenuItem>
+                  <MenuItem value={3}>20 years</MenuItem>
+                  <MenuItem value={4}>15 years</MenuItem>
+                  <MenuItem value={5}>10 years</MenuItem>
+                </Select>
+              </FormControl>
+              <br />
+              <FormControl sx={{minWidth: 150}} margin="normal" fullWidth>
+                <InputLabel>Type</InputLabel>
+                <Select
+                  value={state.type}
+                  label="Type"
+                  name="type"
+                  onChange={handleChange}
+                  defaultValue=""
+                >
+                  <MenuItem value={1}>Fixed-rate</MenuItem>
+                  <MenuItem value={2}>10/1 ARM</MenuItem>
+                  <MenuItem value={3}>7/1 ARM</MenuItem>
+                  <MenuItem value={4}>5/1 ARM</MenuItem>
+                  <MenuItem value={5}>3/1 ARM</MenuItem>
+                </Select>
+              </FormControl>
+              <br />
+              <TextField
+                margin="normal"
+                label="Adjusted Interest Rate"
+                name="interestRateAdjusted"
+                value={state.interestRateAdjusted}
+                onChange={handleChange}
+                fullWidth
+              />
+              <br />
+              <TextField
+                required
+                margin="normal"
+                label="ROI"
+                name="roi"
+                value={state.roi}
+                onChange={handleChange}
+                fullWidth
+              />
+            </Box>
+            <br /><br />
+            <Button variant="contained">Compare</Button>
+            <br /><br />
           </Item>
           <Item>
             <Report></Report>
@@ -97,5 +131,3 @@ function App() {
     </LocalizationProvider>
   );
 }
-
-export default App;

@@ -32,11 +32,6 @@ while (p > 0) {
   date.add(1, 'month');
 }
 
-console.log(mortgage1.payments.map(payment => ({
-  x: payment.date,
-  y: payment.interest,
-})))
-
 function roundToTwo(num) {
   return +(Math.round(num + "e+2")  + "e-2");
 }
@@ -97,12 +92,10 @@ const options = {
   },
 };
 
-function Report() {
+export default function Report() {
   return (
     <Container>
       <HighchartsReact highcharts={Highcharts} options={options} />
     </Container>
   );
 }
-
-export default Report;
