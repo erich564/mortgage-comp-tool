@@ -32,6 +32,7 @@ export default function App() {
     interestRate: '',
     disbursementDate: null,
     roi: '',
+    interestRateAdjusted: '',
   });
 
   const handleChange = e => {
@@ -74,7 +75,7 @@ export default function App() {
                   value={state.term}
                   name="term"
                   onChange={handleChange}
-                  defaultValue=""
+                  //defaultValue=""
                 >
                   <MenuItem value={1}>40 years</MenuItem>
                   <MenuItem value={2}>30 years</MenuItem>
@@ -91,7 +92,7 @@ export default function App() {
                   label="Type"
                   name="type"
                   onChange={handleChange}
-                  defaultValue=""
+                  //defaultValue=""
                 >
                   <MenuItem value={1}>Fixed-rate</MenuItem>
                   <MenuItem value={2}>10/1 ARM</MenuItem>
