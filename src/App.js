@@ -14,6 +14,10 @@ import DatePicker from '@mui/lab/DatePicker';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+import FormLabel from '@mui/material/FormLabel';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import RadioGroup from '@mui/material/RadioGroup';
+import Radio from '@mui/material/Radio';
 import { styled } from '@mui/material/styles';
 import Report from './Report';
 
@@ -27,12 +31,15 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function App() {
   const [state, setState] = React.useState({
-    term: '',
+    purchaseOrRefinance: '',
+    loanAmount: '',
+    term: 2,
     type: '',
     interestRate: '',
     disbursementDate: null,
     roi: '',
     interestRateAdjusted: '',
+    closingCosts: '',
   });
 
   const handleChange = e => {
@@ -48,6 +55,23 @@ export default function App() {
         <CssBaseline />
         <Stack spacing={2} style={{margin: 15}}>
           <Item>
+            <FormControl> 
+              <FormLabel sx={{
+                "&.Mui-focused": {
+                  color: "rgba(0, 0, 0, 0.6)"
+                }
+              }}>Are you purchasing a home or refinancing?</FormLabel>
+              <RadioGroup
+                row
+                name="purchaseOrRefinance"
+                value={state.purchaseOrRefinance}
+                onChange={handleChange}
+              >
+                <FormControlLabel value="purchasing" control={<Radio />} label="Purchasing" />
+                <FormControlLabel value="refinancing" control={<Radio />} label="Refinancing" />
+              </RadioGroup>
+            </FormControl>
+            <br />
             <Box sx={{display: 'inline-block'}}>
               <br />
               <DatePicker
@@ -56,6 +80,16 @@ export default function App() {
                 name="disbursementDate"
                 onChange={m => setState({...state, 'disbursementDate': m})}
                 renderInput={params => <TextField {...params} />}
+              />
+              <br />
+              <TextField
+                margin="normal"
+                required
+                value={state.loanAmount}
+                name="loanAmount"
+                onChange={handleChange}
+                label="Loan Amount"
+                fullWidth
               />
               <br />
               <TextField
@@ -75,7 +109,6 @@ export default function App() {
                   value={state.term}
                   name="term"
                   onChange={handleChange}
-                  //defaultValue=""
                 >
                   <MenuItem value={1}>40 years</MenuItem>
                   <MenuItem value={2}>30 years</MenuItem>
@@ -92,7 +125,6 @@ export default function App() {
                   label="Type"
                   name="type"
                   onChange={handleChange}
-                  //defaultValue=""
                 >
                   <MenuItem value={1}>Fixed-rate</MenuItem>
                   <MenuItem value={2}>10/1 ARM</MenuItem>
@@ -107,6 +139,15 @@ export default function App() {
                 label="Adjusted Interest Rate"
                 name="interestRateAdjusted"
                 value={state.interestRateAdjusted}
+                onChange={handleChange}
+                fullWidth
+              />
+              <br />
+              <TextField
+                margin="normal"
+                label="Closing Costs"
+                name="closingCosts"
+                value={state.closingCosts}
                 onChange={handleChange}
                 fullWidth
               />
