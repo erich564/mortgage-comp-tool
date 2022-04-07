@@ -44,31 +44,31 @@ const createMortgage = obj => {
   return obj;
 };
 
-let mortgage1 = createMortgage({
-  name: 'Mortgage 1',
-  interestRate: .0275,
-  balance: 417000,
-  disbursementDate: moment('2016-10-19'), // use to calc per diem interest
-  term: 360,
-  firstPaymentDate: moment('2016-12-01'),
-  type: '7/1 ARM',
-  rateAdjust: {
-    interestRate: .06,
-    adjustDate: moment('2023-12-01'),
-  },
-  doItemizeInterest: false,
-  closingCosts: 2250,
-});
-let mortgage2 = createMortgage({
-  name: 'Mortgage 2',
-  interestRate: .05,
-  balance: 500000,
-  disbursementDate: moment('2022-04-02'),
-  term: 360,
-  firstPaymentDate: moment('2022-06-01'),
-  doItemizeInterest: false,
-  closingCosts: 2250,
-});
+// let mortgage1 = createMortgage({
+//   name: 'Mortgage 1',
+//   interestRate: .0275,
+//   balance: 417000,
+//   disbursementDate: moment('2016-10-19'), // use to calc per diem interest
+//   term: 360,
+//   firstPaymentDate: moment('2016-12-01'),
+//   type: '7/1 ARM',
+//   rateAdjust: {
+//     interestRate: .06,
+//     adjustDate: moment('2023-12-01'),
+//   },
+//   doItemizeInterest: false,
+//   closingCosts: 2250,
+// });
+// let mortgage2 = createMortgage({
+//   name: 'Mortgage 2',
+//   interestRate: .05,
+//   balance: 500000,
+//   disbursementDate: moment('2022-04-02'),
+//   term: 360,
+//   firstPaymentDate: moment('2022-06-01'),
+//   doItemizeInterest: false,
+//   closingCosts: 2250,
+// });
 
 // let mortgage1 = createMortgage({
 //   name: 'Mortgage 1',
@@ -105,25 +105,25 @@ let mortgage2 = createMortgage({
 //   closingCosts: 2250,
 // });
 
-// ishaan's
-// let mortgage1 = createMortgage({
-//   name: 'Mortgage 1',
-//   interestRate: .02625,
-//   balance: 519400,
-//   disbursementDate: moment('2020-07-10'),
-//   term: 360,
-//   firstPaymentDate: moment('2020-09-01'),
-//   doItemizeInterest: false,
-// });
-// let mortgage2 = createMortgage({
-//   name: 'Mortgage 2',
-//   interestRate: .025,
-//   balance: 1500000,
-//   //disbursementDate: moment('2022-01-01'),
-//   term: 360,
-//   firstPaymentDate: moment('2022-01-01'),
-//   doItemizeInterest: false,
-// });
+/*ishaan's*/
+let mortgage1 = createMortgage({
+  name: 'Mortgage 1',
+  interestRate: .02625,
+  balance: 519400,
+  disbursementDate: moment('2020-07-10'),
+  term: 360,
+  firstPaymentDate: moment('2020-09-01'),
+  doItemizeInterest: false,
+});
+let mortgage2 = createMortgage({
+  name: 'Mortgage 2',
+  interestRate: .025,
+  balance: 1500000,
+  //disbursementDate: moment('2022-01-01'),
+  term: 360,
+  firstPaymentDate: moment('2022-01-01'),
+  doItemizeInterest: false,
+});
 
 /**
  * Builds amortization schedule for a given mortgage, with each payments principal
@@ -294,7 +294,9 @@ const createAmortizationChartOptions = m => ({
   tooltip: {
     shared: true,
     crosshairs: true,
-    xDateFormat: '%b %Y',
+    //xDateFormat: '%b %Y',
+    xDateFormat: '%m-%Y',
+    headerFormat: '{point.key}<br/>',
     valuePrefix: "$",
     valueDecimals: 2,
   },
@@ -310,7 +312,7 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
   },
   series: [
     {
-      name: '(M2 - M1) Net Worth',
+      name: 'NW Difference',
       data: comparison.map(c => ({
         x: c.unixTimeMs,
         y: Math.round(c.difference),
@@ -322,7 +324,6 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
         x: nw.unixTimeMs,
         y: Math.round(nw.netWorth),
       })),
-      visible: false,
     },
     {
       name: 'M1 Cash',
@@ -346,7 +347,6 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
         x: nw.unixTimeMs,
         y: Math.round(nw.netWorth),
       })),
-      visible: false,
     },
     {
       name: 'M2 Cash',
@@ -377,10 +377,11 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
     }
   },
   tooltip: {
+    headerFormat: '{point.key}<br/>',
     shared: true,
     //split: true,
     crosshairs: true,
-    xDateFormat: '%b %Y',
+    xDateFormat: '%m-%Y',
     valuePrefix: "$",
     valueDecimals: 0,
   },
