@@ -7,13 +7,14 @@ import moment from 'moment'
  * @typedef {import('moment').Moment} Moment
  */
 
+ 
 /**
  * Convert annual rate to monthly rate (with monthly compounding).
  */
-const calcMonthlyTvm = tvm => Math.pow(1 + tvm, 1 / 12) - 1;
+const calcMonthlyRoi = n => Math.pow(1 + n, 1 / 12) - 1;
 
-const tvm = .07; // % gain per year (time-value of money)
-const monthlyTvm = calcMonthlyTvm(tvm);
+const roi = .07; // % gain per year (return on investment)
+const monthlyRoi = calcMonthlyRoi(roi);
 
 const marginalTaxRate = .37;
 
@@ -21,11 +22,11 @@ const marginalTaxRate = .37;
  * 
  * @param {number} p Remaining principal for the loan.
  * @param {number} i Monthly interest rate.
- * @param {number} term Remaining months for the loan.
+ * @param {number} t Remaining months for the loan. (term)
  * @returns Monthly loan payment amount.
  */
-const calcMonthlyPayment = (p, i, term) => {
-  const x = Math.pow(1 + i, term);
+const calcMonthlyPayment = (p, i, t) => {
+  const x = Math.pow(1 + i, t);
   return roundToTwo(p * (i * x)/(x - 1));
 };
 
@@ -60,23 +61,48 @@ let mortgage1 = createMortgage({
 });
 let mortgage2 = createMortgage({
   name: 'Mortgage 2',
-  interestRate: .045,
-  balance: 550000,
+  interestRate: .05,
+  balance: 500000,
   disbursementDate: moment('2022-04-02'),
   term: 360,
   firstPaymentDate: moment('2022-06-01'),
   doItemizeInterest: false,
   closingCosts: 2250,
-})
+});
 
 // let mortgage1 = createMortgage({
 //   name: 'Mortgage 1',
-//   interestRate: .05,
-//   balance: 417000,
-//   disbursementDate: moment('2016-10-19'), // use to calc per diem interest
+//   interestRate: .0425,
+//   balance: 500000,
+//   disbursementDate: moment('2022-04-02'), // use to calc per diem interest
 //   term: 360,
-//   firstPaymentDate: moment('2016-12-01'),
+//   firstPaymentDate: moment('2022-06-01'),
+//   rateAdjust: {
+//     interestRate: .075,
+//     adjustDate: moment('2029-06-01'),
+//   },
 //   doItemizeInterest: true,
+//   closingCosts: 2250,
+// });
+// let mortgage1 = createMortgage({
+//   name: 'Mortgage 1',
+//   interestRate: .04,
+//   balance: 500000,
+//   disbursementDate: moment('2022-04-02'), // use to calc per diem interest
+//   term: 180,
+//   firstPaymentDate: moment('2022-06-01'),
+//   doItemizeInterest: true,
+//   closingCosts: 2250,
+// });
+// let mortgage2 = createMortgage({
+//   name: 'Mortgage 2',
+//   interestRate: .0475,
+//   balance: 500000,
+//   disbursementDate: moment('2022-04-02'),
+//   term: 360,
+//   firstPaymentDate: moment('2022-06-01'),
+//   doItemizeInterest: true,
+//   closingCosts: 2250,
 // });
 
 // ishaan's
@@ -100,7 +126,8 @@ let mortgage2 = createMortgage({
 // });
 
 /**
- * 
+ * Builds amortization schedule for a given mortgage, with each payments principal
+ * and interest portions.
  * @param {} m Mortgage
  */
 const buildAmortizationSchedule = m => {
@@ -135,20 +162,35 @@ const buildAmortizationSchedule = m => {
 const compareMortgages = (m1, m2) => {
   let m1n = 0;
   let m2n = 0;
+  const m1PayLen = m1.payments.length;
+  const m2PayLen = m2.payments.length;
 
   // fast-forward m1 payment schedule to first payment date of m2
   while (m1.payments[m1n] && !m1.payments[m1n].date.isSame(m2.firstPaymentDate))
     m1n++;
 
-  const m1PayLen = m1.payments.length;
-  const m2PayLen = m2.payments.length;
-  let m1Cash = 0;
-  let m2Cash = roundToTwo(m2.balance - m1.payments[m1n].startingBalance - m2.closingCosts);
+  const isRefi = m1n !== 0;
+  let m1Cash;
+  let m2Cash;
   let m1Equity = 0;
-  let m2Equity = -m2Cash;
-  let m1PrevCash = null;
-  let m2PrevCash = null;
+  let m2Equity;
+
+  if (isRefi) {
+    m1Cash = 0;
+    m2Cash = roundToTwo(m2.balance - m1.payments[m1n].startingBalance - m2.closingCosts);
+    m2Equity = -m2Cash;
+  }
+  else {
+    m1Cash = -m1.closingCosts;
+    m2Cash = -m2.closingCosts;
+    m2Equity = 0;
+  }
+
+  let m1PrevCash;
+  let m2PrevCash;
   let netWorthDifferences = [];
+  let m1Payment = m1.monthlyPayment;
+  let m2Payment = m2.monthlyPayment;
 
   while (m1n < m1PayLen || m2n < m2PayLen) {
     const date = m1n < m1PayLen
@@ -162,8 +204,10 @@ const compareMortgages = (m1, m2) => {
     let m2NetWorth;
 
     if (m1n < m1PayLen) {
-      const accruedInt = m1PrevCash === null ? 0 : m1PrevCash * monthlyTvm;
-      m1Cash = m1Cash - m1.monthlyPayment + accruedInt;
+      if (m1.rateAdjust && date.isSame(m1.rateAdjust.adjustDate))
+        m1Payment = m1.rateAdjust.monthlyPayment;
+      const accruedInt = m1PrevCash === undefined ? 0 : m1PrevCash * monthlyRoi;
+      m1Cash = m1Cash - m1Payment + accruedInt;
       if (m1.doItemizeInterest)
         m1Cash += m1.payments[m1n].interest * marginalTaxRate;
       m1Equity += m1.payments[m1n].principal;
@@ -179,8 +223,10 @@ const compareMortgages = (m1, m2) => {
     }
 
     if (m2n < m2PayLen) {
-      const accruedInt = m2PrevCash === null ? 0 : m2PrevCash * monthlyTvm;
-      m2Cash = m2Cash - m2.monthlyPayment + accruedInt;
+      if (m2.rateAdjust && date.isSame(m2.rateAdjust.adjustDate))
+        m2Payment = m2.rateAdjust.monthlyPayment;
+      const accruedInt = m2PrevCash === undefined ? 0 : m2PrevCash * monthlyRoi;
+      m2Cash = m2Cash - m2Payment + accruedInt;
       if (m2.doItemizeInterest)
         m2Cash += m2.payments[m2n].interest * marginalTaxRate;
       m2Equity += m2.payments[m2n].principal;
@@ -213,6 +259,9 @@ const createAmortizationChartOptions = m => ({
   title: {
     text: m.name + ' Amortization schedule'
   },
+  // time : {
+  //   moment: moment,
+  // },
   series: [
     {
       name: 'Principal',
