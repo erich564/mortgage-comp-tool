@@ -145,7 +145,7 @@ const buildAmortizationSchedule = m => {
       principal: prin,
       interest: int,
       date: date.clone(),
-      nativeDate: date.toDate(),
+      unixTimeMs: date.valueOf(),
       startingBalance: bStart,
       remainingBalance: bEnd,
     });
@@ -193,13 +193,9 @@ const compareMortgages = (m1, m2) => {
   let m2Payment = m2.monthlyPayment;
 
   while (m1n < m1PayLen || m2n < m2PayLen) {
-    const date = m1n < m1PayLen
-      ? m1.payments[m1n].date.clone() : m2.payments[m2n].date.clone();
-    const nativeDate = date.toDate();
-    const dates = {
-      date: date,
-      nativeDate: nativeDate,
-    };
+    const eitherPayment = m1n < m1PayLen ? m1.payments[m1n] : m2.payments[m2n];
+    const date = eitherPayment.date;
+    const unixTimeMs = eitherPayment.unixTimeMs;
     let m1NetWorth;
     let m2NetWorth;
 
@@ -213,7 +209,7 @@ const compareMortgages = (m1, m2) => {
       m1Equity += m1.payments[m1n].principal;
       m1NetWorth = m1Cash + m1Equity;
       m1.netWorth.push({
-        ...dates,
+        unixTimeMs,
         cash: m1Cash,
         equity: m1Equity,
         netWorth: m1NetWorth,
@@ -232,7 +228,7 @@ const compareMortgages = (m1, m2) => {
       m2Equity += m2.payments[m2n].principal;
       m2NetWorth = m2Cash + m2Equity;
       m2.netWorth.push({
-        ...dates,
+        unixTimeMs,
         cash: m2Cash,
         equity: m2Equity,
         netWorth: m2NetWorth,
@@ -243,7 +239,7 @@ const compareMortgages = (m1, m2) => {
 
     if (m1NetWorth && m2NetWorth) {
       netWorthDifferences.push({
-        ...dates,
+        unixTimeMs,
         difference: m2NetWorth - m1NetWorth,
       });
     }
@@ -252,6 +248,14 @@ const compareMortgages = (m1, m2) => {
   return netWorthDifferences;
 };
 
+Highcharts.setOptions({
+  lang: {
+      thousandsSep: ','
+  }
+});
+
+const yAxisLabelFormat = '${value:,.0f}';
+
 const createAmortizationChartOptions = m => ({
   chart: {
     type: 'spline',
@@ -259,30 +263,24 @@ const createAmortizationChartOptions = m => ({
   title: {
     text: m.name + ' Amortization schedule'
   },
-  // time : {
-  //   moment: moment,
-  // },
   series: [
     {
       name: 'Principal',
       data: m.payments.map(payment => ({
-        x: payment.nativeDate,
+        x: payment.unixTimeMs,
         y: payment.principal,
       })),
     },
     {
       name: 'Interest',
       data: m.payments.map(payment => ({
-        x: payment.nativeDate,
+        x: payment.unixTimeMs,
         y: payment.interest,
       })),
     }
   ],
   xAxis: {
     type: 'datetime',
-    // dateTimeLabelFormats: {
-    //   day: '%d %b %Y' //eg 01 Jan 2016
-    // }
     // min: minDate.valueOf(),
   },
   yAxis: {
@@ -290,31 +288,22 @@ const createAmortizationChartOptions = m => ({
       text: null
     },
     labels: {
-      format: '${value}'
+      format: yAxisLabelFormat,
     }
   },
   tooltip: {
     shared: true,
-    //split: true,
     crosshairs: true,
-    //xDateFormat: '%Y-%m-%d',
-    xDateFormat: '%M',
+    xDateFormat: '%b %Y',
     valuePrefix: "$",
     valueDecimals: 2,
-    // pointFormatter: function() { 
-    //   return '<span style="color:' + this.series.color + ';">●</span> ' + this.series.name + ': <b>' + this.y + '</b><br/>'; 
-    // },
-    // formatter: function () {
-    //   return this.points.reduce(function (s, point) {
-    //     return s + '<br/>' + point.series.name + ': ' + point.y;
-    //   }, '<b>' + this.x + '</b>');
-    // },
   },
 });
 
 const createComparisonChartOptions = (comparison, m1, m2) => ({
   chart: {
     type: 'spline',
+    zoomType: 'x',
   },
   title: {
     text: 'Mortgages Compared'
@@ -323,89 +312,77 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
     {
       name: '(M2 - M1) Net Worth',
       data: comparison.map(c => ({
-        x: c.nativeDate,
-        y: c.difference,
+        x: c.unixTimeMs,
+        y: Math.round(c.difference),
       })),
     },
     {
       name: 'M1 Net Worth',
       data: m1.netWorth.map(nw => ({
-        x: nw.nativeDate,
-        y: nw.netWorth,
+        x: nw.unixTimeMs,
+        y: Math.round(nw.netWorth),
       })),
       visible: false,
     },
     {
       name: 'M1 Cash',
       data: m1.netWorth.map(nw => ({
-        x: nw.nativeDate,
-        y: nw.cash,
+        x: nw.unixTimeMs,
+        y: Math.round(nw.cash),
       })),
       visible: false,
     },
     {
       name: 'M1 Equity',
       data: m1.netWorth.map(nw => ({
-        x: nw.nativeDate,
-        y: nw.equity,
+        x: nw.unixTimeMs,
+        y: Math.round(nw.equity),
       })),
       visible: false,
     },
     {
       name: 'M2 Net Worth',
       data: m2.netWorth.map(nw => ({
-        x: nw.nativeDate,
-        y: nw.netWorth,
+        x: nw.unixTimeMs,
+        y: Math.round(nw.netWorth),
       })),
       visible: false,
     },
     {
       name: 'M2 Cash',
       data: m2.netWorth.map(nw => ({
-        x: nw.nativeDate,
-        y: nw.cash,
+        x: nw.unixTimeMs,
+        y: Math.round(nw.cash),
       })),
       visible: false,
     },
     {
       name: 'M2 Equity',
       data: m2.netWorth.map(nw => ({
-        x: nw.nativeDate,
-        y: nw.equity,
+        x: nw.unixTimeMs,
+        y: Math.round(nw.equity),
       })),
       visible: false,
     },
   ],
   xAxis: {
     type: 'datetime',
-    // dateTimeLabelFormats: {
-    //   day: '%d %b %Y' //eg 01 Jan 2016
-    // }
   },
   yAxis: {
     title: {
       text: null
     },
     labels: {
-      format: '${value}'
+      format: yAxisLabelFormat,
     }
   },
   tooltip: {
     shared: true,
     //split: true,
     crosshairs: true,
-    //xDateFormat: '%Y-%m-%d',
-    xDateFormat: '%M',
+    xDateFormat: '%b %Y',
     valuePrefix: "$",
-    valueDecimals: 2,
-    // pointFormatter: function() { 
-    //   return '<span style="color:' + this.series.color + ';">●</span> ' + this.series.name + ': <b>' + this.y + '</b><br/>'; 
-    // },
-    // formatter: function () {
-    //   return this.points.reduce(function (s, point) {
-    //     return s + '<br/>' + point.series.name + ': ' + point.y;
-    //   }, '<b>' + this.x + '</b>');
-    // },
+    valueDecimals: 0,
   },
 });
 
