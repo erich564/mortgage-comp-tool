@@ -44,31 +44,31 @@ const createMortgage = obj => {
   return obj;
 };
 
-// let mortgage1 = createMortgage({
-//   name: 'Mortgage 1',
-//   interestRate: .0275,
-//   balance: 417000,
-//   disbursementDate: moment('2016-10-19'), // use to calc per diem interest
-//   term: 360,
-//   firstPaymentDate: moment('2016-12-01'),
-//   type: '7/1 ARM',
-//   rateAdjust: {
-//     interestRate: .06,
-//     adjustDate: moment('2023-12-01'),
-//   },
-//   doItemizeInterest: false,
-//   closingCosts: 2250,
-// });
-// let mortgage2 = createMortgage({
-//   name: 'Mortgage 2',
-//   interestRate: .05,
-//   balance: 500000,
-//   disbursementDate: moment('2022-04-02'),
-//   term: 360,
-//   firstPaymentDate: moment('2022-06-01'),
-//   doItemizeInterest: false,
-//   closingCosts: 2250,
-// });
+let mortgage1 = createMortgage({
+  name: 'Mortgage 1',
+  interestRate: .0275,
+  balance: 417000,
+  disbursementDate: moment('2016-10-19'), // use to calc per diem interest
+  term: 360,
+  firstPaymentDate: moment('2016-12-01'),
+  type: '7/1 ARM',
+  rateAdjust: {
+    interestRate: .06,
+    adjustDate: moment('2023-12-01'),
+  },
+  doItemizeInterest: false,
+  closingCosts: 2250,
+});
+let mortgage2 = createMortgage({
+  name: 'Mortgage 2',
+  interestRate: .05,
+  balance: 500000,
+  disbursementDate: moment('2022-04-02'),
+  term: 360,
+  firstPaymentDate: moment('2022-06-01'),
+  doItemizeInterest: false,
+  closingCosts: 2250,
+});
 
 // let mortgage1 = createMortgage({
 //   name: 'Mortgage 1',
@@ -106,24 +106,24 @@ const createMortgage = obj => {
 // });
 
 /*ishaan's*/
-let mortgage1 = createMortgage({
-  name: 'Mortgage 1',
-  interestRate: .02625,
-  balance: 519400,
-  disbursementDate: moment('2020-07-10'),
-  term: 360,
-  firstPaymentDate: moment('2020-09-01'),
-  doItemizeInterest: false,
-});
-let mortgage2 = createMortgage({
-  name: 'Mortgage 2',
-  interestRate: .025,
-  balance: 1500000,
-  //disbursementDate: moment('2022-01-01'),
-  term: 360,
-  firstPaymentDate: moment('2022-01-01'),
-  doItemizeInterest: false,
-});
+// let mortgage1 = createMortgage({
+//   name: 'Mortgage 1',
+//   interestRate: .02625,
+//   balance: 519400,
+//   disbursementDate: moment('2020-07-10'),
+//   term: 360,
+//   firstPaymentDate: moment('2020-09-01'),
+//   doItemizeInterest: false,
+// });
+// let mortgage2 = createMortgage({
+//   name: 'Mortgage 2',
+//   interestRate: .025,
+//   balance: 1500000,
+//   //disbursementDate: moment('2022-01-01'),
+//   term: 360,
+//   firstPaymentDate: moment('2022-01-01'),
+//   doItemizeInterest: false,
+// });
 
 /**
  * Builds amortization schedule for a given mortgage, with each payments principal
@@ -256,9 +256,18 @@ Highcharts.setOptions({
 
 const yAxisLabelFormat = '${value:,.0f}';
 
-const createAmortizationChartOptions = m => ({
+const createAmortizationChartOptions = (m, minDate, maxDate) => ({
   chart: {
     type: 'spline',
+  },
+  plotOptions:{
+    series: {
+      states: {
+        hover: {
+          lineWidthPlus: 0,
+        }
+      }
+    }
   },
   title: {
     text: m.name + ' Amortization schedule'
@@ -281,7 +290,8 @@ const createAmortizationChartOptions = m => ({
   ],
   xAxis: {
     type: 'datetime',
-    // min: minDate.valueOf(),
+    min: minDate,
+    max: maxDate,
   },
   yAxis: {
     title: {
@@ -302,10 +312,19 @@ const createAmortizationChartOptions = m => ({
   },
 });
 
-const createComparisonChartOptions = (comparison, m1, m2) => ({
+const createComparisonChartOptions = (comparison, m1, m2, minDate, maxDate) => ({
   chart: {
     type: 'spline',
     zoomType: 'x',
+  },
+  plotOptions:{
+    series: {
+      states: {
+        hover: {
+          lineWidthPlus: 0,
+        }
+      }
+    }
   },
   title: {
     text: 'Mortgages Compared'
@@ -326,8 +345,23 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
       })),
     },
     {
+      name: 'M2 Net Worth',
+      data: m2.netWorth.map(nw => ({
+        x: nw.unixTimeMs,
+        y: Math.round(nw.netWorth),
+      })),
+    },
+    {
       name: 'M1 Cash',
       data: m1.netWorth.map(nw => ({
+        x: nw.unixTimeMs,
+        y: Math.round(nw.cash),
+      })),
+      visible: false,
+    },
+    {
+      name: 'M2 Cash',
+      data: m2.netWorth.map(nw => ({
         x: nw.unixTimeMs,
         y: Math.round(nw.cash),
       })),
@@ -342,21 +376,6 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
       visible: false,
     },
     {
-      name: 'M2 Net Worth',
-      data: m2.netWorth.map(nw => ({
-        x: nw.unixTimeMs,
-        y: Math.round(nw.netWorth),
-      })),
-    },
-    {
-      name: 'M2 Cash',
-      data: m2.netWorth.map(nw => ({
-        x: nw.unixTimeMs,
-        y: Math.round(nw.cash),
-      })),
-      visible: false,
-    },
-    {
       name: 'M2 Equity',
       data: m2.netWorth.map(nw => ({
         x: nw.unixTimeMs,
@@ -367,6 +386,8 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
   ],
   xAxis: {
     type: 'datetime',
+    //min: minDate,
+    //max: maxDate,
   },
   yAxis: {
     title: {
@@ -392,11 +413,29 @@ buildAmortizationSchedule(mortgage2);
 const comparison = compareMortgages(mortgage1, mortgage2);
 
 export default function Report() {
+  let minDate = moment.min(mortgage1.firstPaymentDate, mortgage2.firstPaymentDate);
+  let maxDate = moment.max(
+    mortgage1.firstPaymentDate.clone().add(mortgage1.term, 'months'),
+    mortgage2.firstPaymentDate.clone().add(mortgage2.term, 'months')
+  );
+
+  const diff = maxDate.diff(minDate, 'days');
+  const margin = .01;
+  const padding = diff * margin;
+  minDate.subtract(padding, 'days');
+  maxDate.add(padding, 'days');
+  minDate = minDate.valueOf();
+  maxDate = maxDate.valueOf();
+
+
   return (
     <Container>
-      <HighchartsReact highcharts={Highcharts} options={createAmortizationChartOptions(mortgage1)} />
-      <HighchartsReact highcharts={Highcharts} options={createAmortizationChartOptions(mortgage2)} />
-      <HighchartsReact highcharts={Highcharts} options={createComparisonChartOptions(comparison, mortgage1, mortgage2)} />
+      <HighchartsReact highcharts={Highcharts}
+        options={createAmortizationChartOptions(mortgage1, minDate, maxDate)} />
+      <HighchartsReact highcharts={Highcharts}
+        options={createAmortizationChartOptions(mortgage2, minDate, maxDate)} />
+      <HighchartsReact highcharts={Highcharts}
+        options={createComparisonChartOptions(comparison, mortgage1, mortgage2, minDate, maxDate)} />
     </Container>
   );
 }
