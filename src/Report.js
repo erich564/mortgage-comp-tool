@@ -312,7 +312,7 @@ const createAmortizationChartOptions = (m, minDate, maxDate) => ({
   },
 });
 
-const createComparisonChartOptions = (comparison, m1, m2, minDate, maxDate) => ({
+const createComparisonChartOptions = (comparison, m1, m2) => ({
   chart: {
     type: 'spline',
     zoomType: 'x',
@@ -386,8 +386,6 @@ const createComparisonChartOptions = (comparison, m1, m2, minDate, maxDate) => (
   ],
   xAxis: {
     type: 'datetime',
-    //min: minDate,
-    //max: maxDate,
   },
   yAxis: {
     title: {
@@ -413,12 +411,12 @@ buildAmortizationSchedule(mortgage2);
 const comparison = compareMortgages(mortgage1, mortgage2);
 
 export default function Report() {
-  let minDate = moment.min(mortgage1.firstPaymentDate, mortgage2.firstPaymentDate);
+
+  let minDate = moment.min(mortgage1.firstPaymentDate, mortgage2.firstPaymentDate).clone();
   let maxDate = moment.max(
     mortgage1.firstPaymentDate.clone().add(mortgage1.term, 'months'),
     mortgage2.firstPaymentDate.clone().add(mortgage2.term, 'months')
   );
-
   const diff = maxDate.diff(minDate, 'days');
   const margin = .01;
   const padding = diff * margin;
@@ -427,7 +425,6 @@ export default function Report() {
   minDate = minDate.valueOf();
   maxDate = maxDate.valueOf();
 
-
   return (
     <Container>
       <HighchartsReact highcharts={Highcharts}
@@ -435,7 +432,7 @@ export default function Report() {
       <HighchartsReact highcharts={Highcharts}
         options={createAmortizationChartOptions(mortgage2, minDate, maxDate)} />
       <HighchartsReact highcharts={Highcharts}
-        options={createComparisonChartOptions(comparison, mortgage1, mortgage2, minDate, maxDate)} />
+        options={createComparisonChartOptions(comparison, mortgage1, mortgage2)} />
     </Container>
   );
 }
