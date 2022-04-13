@@ -19,7 +19,7 @@ const marginalTaxRate = 0.37;
 
 // round to 2 decimal places
 // eslint-disable-next-line prefer-template
-const roundToTwo = num => +(Math.round(num + 'e+2') + 'e-2');
+const roundToTwo = num => +(Math.round(+`${num}e+2`) + 'e-2');
 
 /**
  *
@@ -131,7 +131,7 @@ const mortgage2 = createMortgage({
 /**
  * Builds amortization schedule for a given mortgage, with each payments principal
  * and interest portions.
- * @param {} m Mortgage
+ * @param {} obj Mortgage
  */
 const buildAmortizationSchedule = obj => {
   const m = obj;
@@ -417,10 +417,10 @@ buildAmortizationSchedule(mortgage2);
 const comparison = compareMortgages(mortgage1, mortgage2);
 
 export default function Report() {
-  let minDate = moment
+  const minDate = moment
     .min(mortgage1.firstPaymentDate, mortgage2.firstPaymentDate)
     .clone();
-  let maxDate = moment.max(
+  const maxDate = moment.max(
     mortgage1.firstPaymentDate.clone().add(mortgage1.term, 'months'),
     mortgage2.firstPaymentDate.clone().add(mortgage2.term, 'months')
   );
@@ -429,18 +429,26 @@ export default function Report() {
   const padding = diff * margin;
   minDate.subtract(padding, 'days');
   maxDate.add(padding, 'days');
-  minDate = minDate.valueOf();
-  maxDate = maxDate.valueOf();
+  const minDateMs = minDate.valueOf();
+  const maxDateMs = maxDate.valueOf();
 
   return (
     <Container>
       <HighchartsReact
         highcharts={Highcharts}
-        options={createAmortizationChartOptions(mortgage1, minDate, maxDate)}
+        options={createAmortizationChartOptions(
+          mortgage1,
+          minDateMs,
+          maxDateMs
+        )}
       />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createAmortizationChartOptions(mortgage2, minDate, maxDate)}
+        options={createAmortizationChartOptions(
+          mortgage2,
+          minDateMs,
+          maxDateMs
+        )}
       />
       <HighchartsReact
         highcharts={Highcharts}

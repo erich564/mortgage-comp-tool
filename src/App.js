@@ -87,6 +87,7 @@ export default function App() {
             <DatePicker
               label="Disbursement Date"
               value={state.disbursementDate}
+              // @ts-ignore
               name="disbursementDate"
               onChange={m => setState({ ...state, disbursementDate: m })}
               renderInput={params => <TextField {...params} />}
