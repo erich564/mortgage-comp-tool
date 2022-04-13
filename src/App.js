@@ -5,20 +5,19 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  InputLabel,
-  MenuItem,
   Paper,
   Radio,
   RadioGroup,
-  Select,
   Stack,
   TextField,
+  Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import * as React from 'react';
+import { useState } from 'react';
 import './App.css';
+import MortgageForm from './MortgageForm';
 import Report from './Report';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -29,16 +28,9 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function App() {
-  const [state, setState] = React.useState({
+  const [state, setState] = useState({
     purchaseOrRefinance: '',
-    loanAmount: '',
-    term: 2,
-    type: '',
-    interestRate: '',
-    disbursementDate: null,
     roi: '',
-    interestRateAdjusted: '',
-    closingCosts: '',
   });
 
   const handleChange = e => {
@@ -52,8 +44,22 @@ export default function App() {
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <CssBaseline />
       <Stack spacing={2} style={{ margin: 15 }}>
-        <Item>
+        <Box sx={{ display: 'inline-block', textAlign: 'center' }}>
+          <Typography variant="h4" component="div" gutterBottom>
+            Mortgage Comparison Tool
+          </Typography>
           <FormControl>
+            <br />
+            <TextField
+              required
+              margin="normal"
+              label="ROI"
+              name="roi"
+              value={state.roi}
+              onChange={handleChange}
+              fullWidth
+            />
+            <br />
             <FormLabel
               sx={{
                 '&.Mui-focused': {
@@ -82,103 +88,15 @@ export default function App() {
             </RadioGroup>
           </FormControl>
           <br />
-          <Box sx={{ display: 'inline-block' }}>
-            <br />
-            <DatePicker
-              label="Disbursement Date"
-              value={state.disbursementDate}
-              // @ts-ignore
-              name="disbursementDate"
-              onChange={m => setState({ ...state, disbursementDate: m })}
-              renderInput={params => <TextField {...params} />}
-            />
-            <br />
-            <TextField
-              margin="normal"
-              required
-              value={state.loanAmount}
-              name="loanAmount"
-              onChange={handleChange}
-              label="Loan Amount"
-              fullWidth
-            />
-            <br />
-            <TextField
-              margin="normal"
-              required
-              value={state.interestRate}
-              name="interestRate"
-              onChange={handleChange}
-              label="Interest Rate"
-              fullWidth
-            />
-            <br />
-            <FormControl sx={{ minWidth: 150 }} margin="normal" fullWidth>
-              <InputLabel>Term</InputLabel>
-              <Select
-                label="Term"
-                value={state.term}
-                name="term"
-                onChange={handleChange}
-              >
-                <MenuItem value={1}>40 years</MenuItem>
-                <MenuItem value={2}>30 years</MenuItem>
-                <MenuItem value={3}>20 years</MenuItem>
-                <MenuItem value={4}>15 years</MenuItem>
-                <MenuItem value={5}>10 years</MenuItem>
-              </Select>
-            </FormControl>
-            <br />
-            <FormControl sx={{ minWidth: 150 }} margin="normal" fullWidth>
-              <InputLabel>Type</InputLabel>
-              <Select
-                value={state.type}
-                label="Type"
-                name="type"
-                onChange={handleChange}
-              >
-                <MenuItem value={1}>Fixed-rate</MenuItem>
-                <MenuItem value={2}>10/1 ARM</MenuItem>
-                <MenuItem value={3}>7/1 ARM</MenuItem>
-                <MenuItem value={4}>5/1 ARM</MenuItem>
-                <MenuItem value={5}>3/1 ARM</MenuItem>
-              </Select>
-            </FormControl>
-            <br />
-            <TextField
-              margin="normal"
-              label="Adjusted Interest Rate"
-              name="interestRateAdjusted"
-              value={state.interestRateAdjusted}
-              onChange={handleChange}
-              fullWidth
-            />
-            <br />
-            <TextField
-              margin="normal"
-              label="Closing Costs"
-              name="closingCosts"
-              value={state.closingCosts}
-              onChange={handleChange}
-              fullWidth
-            />
-            <br />
-            <TextField
-              required
-              margin="normal"
-              label="ROI"
-              name="roi"
-              value={state.roi}
-              onChange={handleChange}
-              fullWidth
-            />
-          </Box>
+          <MortgageForm />
+          <MortgageForm />
           <br />
           <br />
           <Button variant="contained">Compare</Button>
           <br />
           <br />
-        </Item>
+        </Box>
+
         <Item>
           <Report />
         </Item>
