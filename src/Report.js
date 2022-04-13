@@ -7,38 +7,40 @@ import moment from 'moment';
  * @typedef {import('moment').Moment} Moment
  */
 
-
 /**
  * Convert annual rate to monthly rate (with monthly compounding).
  */
-const calcMonthlyRoi = n => (1 + n)**(1 / 12) - 1;
+const calcMonthlyRoi = n => (1 + n) ** (1 / 12) - 1;
 
-const roi = .07; // % gain per year (return on investment)
+const roi = 0.07; // % gain per year (return on investment)
 const monthlyRoi = calcMonthlyRoi(roi);
 
-const marginalTaxRate = .37;
+const marginalTaxRate = 0.37;
 
 // round to 2 decimal places
 // eslint-disable-next-line prefer-template
-const roundToTwo = num => +(Math.round(num + 'e+2')  + 'e-2');
+const roundToTwo = num => +(Math.round(num + 'e+2') + 'e-2');
 
 /**
- * 
+ *
  * @param {number} p Remaining principal for the loan.
  * @param {number} i Monthly interest rate.
  * @param {number} t Remaining months for the loan. (term)
  * @returns Monthly loan payment amount.
  */
 const calcMonthlyPayment = (p, i, t) => {
-  const x = (1 + i)**t;
-  return roundToTwo(p * (i * x)/(x - 1));
+  const x = (1 + i) ** t;
+  return roundToTwo((p * (i * x)) / (x - 1));
 };
-
 
 const createMortgage = obj => {
   const m = obj;
   m.monthlyInterestRate = obj.interestRate / 12;
-  m.monthlyPayment = calcMonthlyPayment(obj.balance, obj.monthlyInterestRate, obj.term);
+  m.monthlyPayment = calcMonthlyPayment(
+    obj.balance,
+    obj.monthlyInterestRate,
+    obj.term
+  );
   m.payments = [];
   m.netWorth = [];
   m.closingCosts ??= 0;
@@ -47,14 +49,14 @@ const createMortgage = obj => {
 
 const mortgage1 = createMortgage({
   name: 'Mortgage 1',
-  interestRate: .0275,
+  interestRate: 0.0275,
   balance: 417000,
   disbursementDate: moment('2016-10-19'), // use to calc per diem interest
   term: 360,
   firstPaymentDate: moment('2016-12-01'),
   type: '7/1 ARM',
   rateAdjust: {
-    interestRate: .06,
+    interestRate: 0.06,
     adjustDate: moment('2023-12-01'),
   },
   doItemizeInterest: false,
@@ -62,7 +64,7 @@ const mortgage1 = createMortgage({
 });
 const mortgage2 = createMortgage({
   name: 'Mortgage 2',
-  interestRate: .05,
+  interestRate: 0.05,
   balance: 500000,
   disbursementDate: moment('2022-04-02'),
   term: 360,
@@ -154,7 +156,8 @@ const buildAmortizationSchedule = obj => {
     date.add(1, 'month');
     if (m.rateAdjust && date.isSame(m.rateAdjust.adjustDate)) {
       intRate = m.rateAdjust.interestRate / 12;
-      const t = m.term - m.rateAdjust.adjustDate.diff(m.firstPaymentDate, 'months');
+      const t =
+        m.term - m.rateAdjust.adjustDate.diff(m.firstPaymentDate, 'months');
       payment = calcMonthlyPayment(b, intRate, t);
       m.rateAdjust.monthlyPayment = payment;
     }
@@ -179,10 +182,11 @@ const compareMortgages = (m1, m2) => {
 
   if (isRefi) {
     m1Cash = 0;
-    m2Cash = roundToTwo(m2.balance - m1.payments[m1n].startingBalance - m2.closingCosts);
+    m2Cash = roundToTwo(
+      m2.balance - m1.payments[m1n].startingBalance - m2.closingCosts
+    );
     m2Equity = -m2Cash;
-  }
-  else {
+  } else {
     m1Cash = -m1.closingCosts;
     m2Cash = -m2.closingCosts;
     m2Equity = 0;
@@ -196,8 +200,8 @@ const compareMortgages = (m1, m2) => {
 
   while (m1n < m1PayLen || m2n < m2PayLen) {
     const eitherPayment = m1n < m1PayLen ? m1.payments[m1n] : m2.payments[m2n];
-    const {date} = eitherPayment;
-    const {unixTimeMs} = eitherPayment;
+    const { date } = eitherPayment;
+    const { unixTimeMs } = eitherPayment;
     let m1NetWorth;
     let m2NetWorth;
 
@@ -252,8 +256,8 @@ const compareMortgages = (m1, m2) => {
 
 Highcharts.setOptions({
   lang: {
-      thousandsSep: ','
-  }
+    thousandsSep: ',',
+  },
 });
 
 const yAxisLabelFormat = '${value:,.0f}';
@@ -267,9 +271,9 @@ const createAmortizationChartOptions = (m, minDate, maxDate) => ({
       states: {
         hover: {
           lineWidthPlus: 0,
-        }
-      }
-    }
+        },
+      },
+    },
   },
   title: {
     text: `${m.name} Amortization schedule`,
@@ -288,7 +292,7 @@ const createAmortizationChartOptions = (m, minDate, maxDate) => ({
         x: payment.unixTimeMs,
         y: payment.interest,
       })),
-    }
+    },
   ],
   xAxis: {
     type: 'datetime',
@@ -297,11 +301,11 @@ const createAmortizationChartOptions = (m, minDate, maxDate) => ({
   },
   yAxis: {
     title: {
-      text: null
+      text: null,
     },
     labels: {
       format: yAxisLabelFormat,
-    }
+    },
   },
   tooltip: {
     shared: true,
@@ -309,7 +313,7 @@ const createAmortizationChartOptions = (m, minDate, maxDate) => ({
     // xDateFormat: '%b %Y',
     xDateFormat: '%m-%Y',
     headerFormat: '{point.key}<br/>',
-    valuePrefix: "$",
+    valuePrefix: '$',
     valueDecimals: 2,
   },
 });
@@ -319,17 +323,17 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
     type: 'spline',
     zoomType: 'x',
   },
-  plotOptions:{
+  plotOptions: {
     series: {
       states: {
         hover: {
           lineWidthPlus: 0,
-        }
-      }
-    }
+        },
+      },
+    },
   },
   title: {
-    text: 'Mortgages Compared'
+    text: 'Mortgages Compared',
   },
   series: [
     {
@@ -391,11 +395,11 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
   },
   yAxis: {
     title: {
-      text: null
+      text: null,
     },
     labels: {
       format: yAxisLabelFormat,
-    }
+    },
   },
   tooltip: {
     headerFormat: '{point.key}<br/>',
@@ -403,7 +407,7 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
     // split: true,
     crosshairs: true,
     xDateFormat: '%m-%Y',
-    valuePrefix: "$",
+    valuePrefix: '$',
     valueDecimals: 0,
   },
 });
@@ -413,14 +417,15 @@ buildAmortizationSchedule(mortgage2);
 const comparison = compareMortgages(mortgage1, mortgage2);
 
 export default function Report() {
-
-  let minDate = moment.min(mortgage1.firstPaymentDate, mortgage2.firstPaymentDate).clone();
+  let minDate = moment
+    .min(mortgage1.firstPaymentDate, mortgage2.firstPaymentDate)
+    .clone();
   let maxDate = moment.max(
     mortgage1.firstPaymentDate.clone().add(mortgage1.term, 'months'),
     mortgage2.firstPaymentDate.clone().add(mortgage2.term, 'months')
   );
   const diff = maxDate.diff(minDate, 'days');
-  const margin = .01;
+  const margin = 0.01;
   const padding = diff * margin;
   minDate.subtract(padding, 'days');
   maxDate.add(padding, 'days');
@@ -429,12 +434,18 @@ export default function Report() {
 
   return (
     <Container>
-      <HighchartsReact highcharts={Highcharts}
-        options={createAmortizationChartOptions(mortgage1, minDate, maxDate)} />
-      <HighchartsReact highcharts={Highcharts}
-        options={createAmortizationChartOptions(mortgage2, minDate, maxDate)} />
-      <HighchartsReact highcharts={Highcharts}
-        options={createComparisonChartOptions(comparison, mortgage1, mortgage2)} />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={createAmortizationChartOptions(mortgage1, minDate, maxDate)}
+      />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={createAmortizationChartOptions(mortgage2, minDate, maxDate)}
+      />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={createComparisonChartOptions(comparison, mortgage1, mortgage2)}
+      />
     </Container>
   );
 }
