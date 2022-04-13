@@ -131,7 +131,7 @@ const mortgage2 = createMortgage({
 /**
  * Builds amortization schedule for a given mortgage, with each payments principal
  * and interest portions.
- * @param {} obj Mortgage
+ * @param obj Mortgage
  */
 const buildAmortizationSchedule = obj => {
   const m = obj;
