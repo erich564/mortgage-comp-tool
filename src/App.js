@@ -1,7 +1,6 @@
 import './App.css';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
 import * as React from 'react';
@@ -43,12 +42,11 @@ export default function App() {
   });
 
   const handleChange = e => {
-    const value = e.target.value;
     setState({
       ...state,
-      [e.target.name]: value
+      [e.target.name]: e.target.value,
     });
-  }
+  };
 
   return (
     <LocalizationProvider dateAdapter={DateAdapter}>
@@ -167,7 +165,7 @@ export default function App() {
             <br /><br />
           </Item>
           <Item>
-            <Report></Report>
+            <Report />
           </Item>
         </Stack>
     </LocalizationProvider>

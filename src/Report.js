@@ -1,22 +1,26 @@
 import Container from '@mui/material/Container';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import moment from 'moment'
+import moment from 'moment';
 
 /**
  * @typedef {import('moment').Moment} Moment
  */
 
- 
+
 /**
  * Convert annual rate to monthly rate (with monthly compounding).
  */
-const calcMonthlyRoi = n => Math.pow(1 + n, 1 / 12) - 1;
+const calcMonthlyRoi = n => (1 + n)**(1 / 12) - 1;
 
 const roi = .07; // % gain per year (return on investment)
 const monthlyRoi = calcMonthlyRoi(roi);
 
 const marginalTaxRate = .37;
+
+// round to 2 decimal places
+// eslint-disable-next-line prefer-template
+const roundToTwo = num => +(Math.round(num + 'e+2')  + 'e-2');
 
 /**
  * 
@@ -26,25 +30,22 @@ const marginalTaxRate = .37;
  * @returns Monthly loan payment amount.
  */
 const calcMonthlyPayment = (p, i, t) => {
-  const x = Math.pow(1 + i, t);
+  const x = (1 + i)**t;
   return roundToTwo(p * (i * x)/(x - 1));
 };
 
-// round to 2 decimal places
-const roundToTwo = num => {
-  return +(Math.round(num + 'e+2')  + 'e-2');
-};
 
 const createMortgage = obj => {
-  obj.monthlyInterestRate = obj.interestRate / 12;
-  obj.monthlyPayment = calcMonthlyPayment(obj.balance, obj.monthlyInterestRate, obj.term);
-  obj.payments = [];
-  obj.netWorth = [];
-  obj.closingCosts ??= 0;
-  return obj;
+  const m = obj;
+  m.monthlyInterestRate = obj.interestRate / 12;
+  m.monthlyPayment = calcMonthlyPayment(obj.balance, obj.monthlyInterestRate, obj.term);
+  m.payments = [];
+  m.netWorth = [];
+  m.closingCosts ??= 0;
+  return m;
 };
 
-let mortgage1 = createMortgage({
+const mortgage1 = createMortgage({
   name: 'Mortgage 1',
   interestRate: .0275,
   balance: 417000,
@@ -59,7 +60,7 @@ let mortgage1 = createMortgage({
   doItemizeInterest: false,
   closingCosts: 2250,
 });
-let mortgage2 = createMortgage({
+const mortgage2 = createMortgage({
   name: 'Mortgage 2',
   interestRate: .05,
   balance: 500000,
@@ -105,7 +106,7 @@ let mortgage2 = createMortgage({
 //   closingCosts: 2250,
 // });
 
-/*ishaan's*/
+/* ishaan's */
 // let mortgage1 = createMortgage({
 //   name: 'Mortgage 1',
 //   interestRate: .02625,
@@ -130,10 +131,11 @@ let mortgage2 = createMortgage({
  * and interest portions.
  * @param {} m Mortgage
  */
-const buildAmortizationSchedule = m => {
+const buildAmortizationSchedule = obj => {
+  const m = obj;
   let b = m.balance;
   let intRate = m.monthlyInterestRate;
-  let date = m.firstPaymentDate.clone();
+  const date = m.firstPaymentDate.clone();
   let payment = m.monthlyPayment;
   while (b > 0) {
     const int = roundToTwo(b * intRate);
@@ -188,14 +190,14 @@ const compareMortgages = (m1, m2) => {
 
   let m1PrevCash;
   let m2PrevCash;
-  let netWorthDifferences = [];
+  const netWorthDifferences = [];
   let m1Payment = m1.monthlyPayment;
   let m2Payment = m2.monthlyPayment;
 
   while (m1n < m1PayLen || m2n < m2PayLen) {
     const eitherPayment = m1n < m1PayLen ? m1.payments[m1n] : m2.payments[m2n];
-    const date = eitherPayment.date;
-    const unixTimeMs = eitherPayment.unixTimeMs;
+    const {date} = eitherPayment;
+    const {unixTimeMs} = eitherPayment;
     let m1NetWorth;
     let m2NetWorth;
 
@@ -260,7 +262,7 @@ const createAmortizationChartOptions = (m, minDate, maxDate) => ({
   chart: {
     type: 'spline',
   },
-  plotOptions:{
+  plotOptions: {
     series: {
       states: {
         hover: {
@@ -270,7 +272,7 @@ const createAmortizationChartOptions = (m, minDate, maxDate) => ({
     }
   },
   title: {
-    text: m.name + ' Amortization schedule'
+    text: `${m.name} Amortization schedule`,
   },
   series: [
     {
@@ -304,7 +306,7 @@ const createAmortizationChartOptions = (m, minDate, maxDate) => ({
   tooltip: {
     shared: true,
     crosshairs: true,
-    //xDateFormat: '%b %Y',
+    // xDateFormat: '%b %Y',
     xDateFormat: '%m-%Y',
     headerFormat: '{point.key}<br/>',
     valuePrefix: "$",
@@ -398,7 +400,7 @@ const createComparisonChartOptions = (comparison, m1, m2) => ({
   tooltip: {
     headerFormat: '{point.key}<br/>',
     shared: true,
-    //split: true,
+    // split: true,
     crosshairs: true,
     xDateFormat: '%m-%Y',
     valuePrefix: "$",
