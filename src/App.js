@@ -1,5 +1,3 @@
-import { DatePicker, LocalizationProvider } from '@mui/lab';
-import DateAdapter from '@mui/lab/AdapterMoment';
 import {
   Box,
   Button,
@@ -17,6 +15,8 @@ import {
   TextField,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import * as React from 'react';
 import './App.css';
 import Report from './Report';
@@ -49,7 +49,7 @@ export default function App() {
   };
 
   return (
-    <LocalizationProvider dateAdapter={DateAdapter}>
+    <LocalizationProvider dateAdapter={AdapterMoment}>
       <CssBaseline />
       <Stack spacing={2} style={{ margin: 15 }}>
         <Item>
