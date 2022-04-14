@@ -11,6 +11,7 @@ import {
   styled,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
+import MortgageTerm from './MortgageTerm';
 import MortgageType from './MortgageType';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -22,12 +23,12 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function MortgageForm({ handleMortgageChange, data }) {
+export default function MortgageForm({ handleMortgageChange, state }) {
   const handleChange = e => {
-    handleMortgageChange(data.id, e);
+    handleMortgageChange(state.id, e);
   };
   const handleDateChange = (e, key) => {
-    handleMortgageChange(data.id, e, key);
+    handleMortgageChange(state.id, e, key);
   };
 
   const skinnyWidth = '150px';
@@ -42,12 +43,12 @@ export default function MortgageForm({ handleMortgageChange, data }) {
           gutterBottom
           sx={{ textAlign: 'center' }}
         >
-          Mortgage {data.id}
+          Mortgage {state.id}
         </Typography>
 
         <DatePicker
           label="Start Date"
-          value={data.startDate}
+          value={state.startDate}
           views={['year', 'month']}
           onChange={m => {
             m.set('date', 1);
@@ -72,7 +73,7 @@ export default function MortgageForm({ handleMortgageChange, data }) {
         <TextField
           margin="normal"
           required
-          value={data.loanAmount}
+          value={state.loanAmount}
           name="loanAmount"
           onChange={handleChange}
           label="Loan Amount"
@@ -88,7 +89,7 @@ export default function MortgageForm({ handleMortgageChange, data }) {
         <TextField
           margin="normal"
           required
-          value={data.interestRate}
+          value={state.interestRate}
           name="interestRate"
           onChange={handleChange}
           label="Interest Rate"
@@ -108,23 +109,23 @@ export default function MortgageForm({ handleMortgageChange, data }) {
           <InputLabel>Term</InputLabel>
           <Select
             label="Term"
-            value={data.term}
+            value={state.term}
             name="term"
             sx={{ width: skinnyWidth }}
             onChange={handleChange}
           >
-            <MenuItem value={1}>40 years</MenuItem>
-            <MenuItem value={2}>30 years</MenuItem>
-            <MenuItem value={3}>20 years</MenuItem>
-            <MenuItem value={4}>15 years</MenuItem>
-            <MenuItem value={5}>10 years</MenuItem>
+            <MenuItem value={MortgageTerm._10_years}>10 years</MenuItem>
+            <MenuItem value={MortgageTerm._15_years}>15 years</MenuItem>
+            <MenuItem value={MortgageTerm._20_years}>20 years</MenuItem>
+            <MenuItem value={MortgageTerm._30_years}>30 years</MenuItem>
+            <MenuItem value={MortgageTerm._40_years}>40 years</MenuItem>
           </Select>
         </FormControl>
         <br />
         <FormControl sx={{ minWidth: 150 }} margin="normal">
           <InputLabel>Type</InputLabel>
           <Select
-            value={data.type}
+            value={state.type}
             label="Type"
             name="type"
             required
@@ -132,18 +133,20 @@ export default function MortgageForm({ handleMortgageChange, data }) {
             onChange={handleChange}
           >
             <MenuItem value={MortgageType.FixedRate}>Fixed-rate</MenuItem>
-            <MenuItem value={MortgageType.Arm10_1}>10/1 ARM</MenuItem>
-            <MenuItem value={MortgageType.Arm7_1}>7/1 ARM</MenuItem>
-            <MenuItem value={MortgageType.Arm5_1}>5/1 ARM</MenuItem>
-            <MenuItem value={MortgageType.Arm3_1}>3/1 ARM</MenuItem>
+            <MenuItem value={MortgageType._10_1_Arm}>10/1 ARM</MenuItem>
+            <MenuItem value={MortgageType._7_1_Arm}>7/1 ARM</MenuItem>
+            <MenuItem value={MortgageType._5_1_Arm}>5/1 ARM</MenuItem>
+            <MenuItem value={MortgageType._3_1_Arm}>3/1 ARM</MenuItem>
           </Select>
         </FormControl>
         <TextField
           margin="normal"
           label="Adj. Int. Rate"
           name="interestRateAdjusted"
-          value={data.interestRateAdjusted}
+          value={state.interestRateAdjusted}
           onChange={handleChange}
+          disabled={state.type === MortgageType.FixedRate}
+          required={state.type !== MortgageType.FixedRate}
           sx={{ input: { textAlign: 'right' }, width: skinnyWidth }}
           placeholder="6.75"
           InputProps={{
@@ -155,7 +158,7 @@ export default function MortgageForm({ handleMortgageChange, data }) {
           margin="normal"
           label="Closing Costs"
           name="closingCosts"
-          value={data.closingCosts}
+          value={state.closingCosts}
           onChange={handleChange}
           fullWidth
           placeholder="2000"

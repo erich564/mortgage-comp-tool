@@ -1,7 +1,7 @@
 export default {
   FixedRate: 'Fixed-rate',
-  Arm10_1: '10/1 ARM',
-  Arm7_1: '7/1 ARM',
-  Arm5_1: '5/1 ARM',
-  Arm3_1: '3/1 ARM',
+  _10_1_Arm: '10/1 ARM',
+  _7_1_Arm: '7/1 ARM',
+  _5_1_Arm: '5/1 ARM',
+  _3_1_Arm: '3/1 ARM',
 };

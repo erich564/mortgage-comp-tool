@@ -24,6 +24,7 @@
     "no-plusplus": "off",
     "no-template-curly-in-string": "off",
     "react/react-in-jsx-scope": "off",
-    "arrow-parens": "off"
+    "arrow-parens": "off",
+    "no-underscore-dangle": "off"
   }
 }

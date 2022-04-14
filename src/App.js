@@ -20,6 +20,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useState } from 'react';
 import './App.css';
 import MortgageForm from './MortgageForm';
+import MortgageTerm from './MortgageTerm';
 import Report from './Report';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -32,7 +33,7 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function App() {
   const mortgageTemplate = {
     loanAmount: '',
-    term: 2,
+    term: MortgageTerm._30_years,
     type: '',
     interestRate: '',
     startDate: null,
@@ -141,7 +142,7 @@ export default function App() {
             <MortgageForm
               key={m.id}
               handleMortgageChange={handleMortgageChange}
-              data={m}
+              state={m}
             />
           ))}
 
