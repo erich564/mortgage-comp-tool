@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useState } from 'react';
+import MortgageType from './MortgageType';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -139,11 +140,11 @@ export default function MortgageForm({ id }) {
             sx={{ width: skinnyWidth, mr: gutterWidth }}
             onChange={handleChange}
           >
-            <MenuItem value={1}>Fixed-rate</MenuItem>
-            <MenuItem value={2}>10/1 ARM</MenuItem>
-            <MenuItem value={3}>7/1 ARM</MenuItem>
-            <MenuItem value={4}>5/1 ARM</MenuItem>
-            <MenuItem value={5}>3/1 ARM</MenuItem>
+            <MenuItem value={MortgageType.FixedRate}>Fixed-rate</MenuItem>
+            <MenuItem value={MortgageType.Arm10_1}>10/1 ARM</MenuItem>
+            <MenuItem value={MortgageType.Arm7_1}>7/1 ARM</MenuItem>
+            <MenuItem value={MortgageType.Arm5_1}>5/1 ARM</MenuItem>
+            <MenuItem value={MortgageType.Arm3_1}>3/1 ARM</MenuItem>
           </Select>
         </FormControl>
         <TextField
