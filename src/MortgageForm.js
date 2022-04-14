@@ -11,7 +11,6 @@ import {
   styled,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import { useState } from 'react';
 import MortgageType from './MortgageType';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -23,23 +22,12 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function MortgageForm({ id }) {
-  const [state, setState] = useState({
-    loanAmount: '',
-    term: 2,
-    type: '',
-    interestRate: '',
-    startDate: null,
-    interestRateAdjusted: '',
-    closingCosts: '',
-  });
-
+export default function MortgageForm({ handleMortgageChange, data }) {
   const handleChange = e => {
-    const { name, value } = e.target;
-    setState({
-      ...state,
-      [name]: value,
-    });
+    handleMortgageChange(data.id, e);
+  };
+  const handleDateChange = (e, key) => {
+    handleMortgageChange(data.id, e, key);
   };
 
   const skinnyWidth = '150px';
@@ -54,16 +42,19 @@ export default function MortgageForm({ id }) {
           gutterBottom
           sx={{ textAlign: 'center' }}
         >
-          Mortgage {id}
+          Mortgage {data.id}
         </Typography>
 
         <DatePicker
           label="Start Date"
-          value={state.startDate}
+          value={data.startDate}
           views={['year', 'month']}
-          onChange={m => setState({ ...state, startDate: m.set('date', 1) })}
+          onChange={m => {
+            m.set('date', 1);
+            handleDateChange(m, 'startDate');
+          }}
           inputFormat="MM-DD-YYYY"
-          allowSameDateSelection
+          // allowSameDateSelection
           renderInput={params => (
             <TextField
               {...params}
@@ -81,7 +72,7 @@ export default function MortgageForm({ id }) {
         <TextField
           margin="normal"
           required
-          value={state.loanAmount}
+          value={data.loanAmount}
           name="loanAmount"
           onChange={handleChange}
           label="Loan Amount"
@@ -97,7 +88,7 @@ export default function MortgageForm({ id }) {
         <TextField
           margin="normal"
           required
-          value={state.interestRate}
+          value={data.interestRate}
           name="interestRate"
           onChange={handleChange}
           label="Interest Rate"
@@ -117,7 +108,7 @@ export default function MortgageForm({ id }) {
           <InputLabel>Term</InputLabel>
           <Select
             label="Term"
-            value={state.term}
+            value={data.term}
             name="term"
             sx={{ width: skinnyWidth }}
             onChange={handleChange}
@@ -133,7 +124,7 @@ export default function MortgageForm({ id }) {
         <FormControl sx={{ minWidth: 150 }} margin="normal">
           <InputLabel>Type</InputLabel>
           <Select
-            value={state.type}
+            value={data.type}
             label="Type"
             name="type"
             required
@@ -151,7 +142,7 @@ export default function MortgageForm({ id }) {
           margin="normal"
           label="Adj. Int. Rate"
           name="interestRateAdjusted"
-          value={state.interestRateAdjusted}
+          value={data.interestRateAdjusted}
           onChange={handleChange}
           sx={{ input: { textAlign: 'right' }, width: skinnyWidth }}
           placeholder="6.75"
@@ -164,7 +155,7 @@ export default function MortgageForm({ id }) {
           margin="normal"
           label="Closing Costs"
           name="closingCosts"
-          value={state.closingCosts}
+          value={data.closingCosts}
           onChange={handleChange}
           fullWidth
           placeholder="2000"

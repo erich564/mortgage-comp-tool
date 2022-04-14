@@ -30,20 +30,61 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function App() {
+  const mortgageTemplate = {
+    loanAmount: '',
+    term: 2,
+    type: '',
+    interestRate: '',
+    startDate: null,
+    interestRateAdjusted: '',
+    closingCosts: '',
+  };
+
   const [state, setState] = useState({
     purchaseOrRefinance: '',
     roi: '9',
     doItemize: true,
     marginalTaxRate: '40',
+    mortgages: [1, 2].map(n => ({
+      ...mortgageTemplate,
+      id: n,
+    })),
   });
 
   const handleChange = e => {
-    let { value } = e.target;
-    if (e.target.type === 'checkbox') value = e.target.checked;
+    const value =
+      e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setState({
       ...state,
       [e.target.name]: value,
     });
+  };
+
+  /**
+   *
+   * @param mortgageId
+   * @param data This could be an input event or a moment.
+   * @param key Key in state object.
+   */
+  const handleMortgageChange = (mortgageId, data, key) => {
+    const name = key ?? data.target.name;
+    let value;
+    if (key) {
+      value = data;
+    } else if (data.target.type === 'checkbox') {
+      value = data.target.checked;
+    } else {
+      value = data.target.value;
+    }
+
+    const newState = { ...state };
+    if (mortgageId !== undefined) {
+      newState.mortgages.find(m => m.id === mortgageId)[name] = value;
+    } else {
+      newState[name] = value;
+    }
+
+    setState(newState);
   };
 
   const handleSubmit = e => {
@@ -96,8 +137,13 @@ export default function App() {
           </FormControl>
 
           <br />
-          <MortgageForm id="1" />
-          <MortgageForm id="2" />
+          {state.mortgages.map(m => (
+            <MortgageForm
+              key={m.id}
+              handleMortgageChange={handleMortgageChange}
+              data={m}
+            />
+          ))}
 
           <br />
           <FormControl>
