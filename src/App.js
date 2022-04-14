@@ -38,10 +38,17 @@ export default function App() {
   });
 
   const handleChange = e => {
+    let { value } = e.target;
+    if (e.target.type === 'checkbox') value = e.target.checked;
     setState({
       ...state,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     });
+  };
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    console.log(state);
   };
 
   const percentWidth = '120px';
@@ -50,7 +57,11 @@ export default function App() {
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <CssBaseline />
       <Stack spacing={2} style={{ margin: 15 }}>
-        <Box sx={{ display: 'inline-block', textAlign: 'center' }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: 'inline-block', textAlign: 'center' }}
+        >
           <Typography variant="h4" component="div" gutterBottom>
             Mortgage Comparison Tool
           </Typography>
@@ -88,6 +99,7 @@ export default function App() {
           <MortgageForm id="1" />
           <MortgageForm id="2" />
 
+          <br />
           <FormControl>
             How much do you expect investments to make on average?
             <TextField
@@ -134,9 +146,12 @@ export default function App() {
               }}
             />
           </FormControl>
+
           <br />
           <br />
-          <Button variant="contained">Compare</Button>
+          <Button variant="contained" type="submit">
+            Compare
+          </Button>
           <br />
           <br />
         </Box>

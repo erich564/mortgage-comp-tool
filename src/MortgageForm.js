@@ -34,11 +34,10 @@ export default function MortgageForm({ id }) {
   });
 
   const handleChange = e => {
-    let { value } = e.target;
-    if (e.target.type === 'checkbox') value = e.target.checked;
+    const { name, value } = e.target;
     setState({
       ...state,
-      [e.target.name]: value,
+      [name]: value,
     });
   };
 
