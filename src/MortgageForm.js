@@ -48,7 +48,12 @@ export default function MortgageForm({ id }) {
   return (
     <Item>
       <Box sx={{ display: 'inline-block' }}>
-        <Typography variant="h5" component="div" gutterBottom>
+        <Typography
+          variant="h5"
+          component="div"
+          gutterBottom
+          sx={{ textAlign: 'center' }}
+        >
           Mortgage {id}
         </Typography>
 
@@ -84,6 +89,7 @@ export default function MortgageForm({ id }) {
           InputProps={{
             startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
+          InputLabelProps={{ required: false }}
         />
         <br />
         <TextField
@@ -103,6 +109,7 @@ export default function MortgageForm({ id }) {
           InputProps={{
             endAdornment: <InputAdornment position="end">%</InputAdornment>,
           }}
+          InputLabelProps={{ required: false }}
         />
         <FormControl sx={{ minWidth: 150 }} margin="normal">
           <InputLabel>Term</InputLabel>
@@ -127,6 +134,7 @@ export default function MortgageForm({ id }) {
             value={state.type}
             label="Type"
             name="type"
+            required
             sx={{ width: skinnyWidth, mr: gutterWidth }}
             onChange={handleChange}
           >

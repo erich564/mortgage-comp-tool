@@ -102,6 +102,7 @@ export default function App() {
               InputProps={{
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
+              InputLabelProps={{ required: false }}
             />
           </FormControl>
           <br />
