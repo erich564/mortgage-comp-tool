@@ -67,11 +67,13 @@ export default function MortgageForm({ id }) {
             <TextField
               {...params}
               margin="normal"
+              required
               inputProps={{
                 ...params.inputProps,
                 placeholder: 'mm-dd-yyyy',
               }}
               sx={{ width: skinnyWidth, mr: gutterWidth }}
+              InputLabelProps={{ required: false }}
             />
           )}
         />
