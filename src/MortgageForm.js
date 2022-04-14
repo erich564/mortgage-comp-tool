@@ -1,11 +1,13 @@
 import {
   Box,
   FormControl,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   TextField,
+  Typography,
   styled,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -13,43 +15,62 @@ import { useState } from 'react';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
-  textAlign: 'center',
+  textAlign: 'left',
   display: 'inline-block',
   padding: '30px',
   margin: '30px',
   color: theme.palette.text.secondary,
 }));
 
-export default function MortgageForm() {
+export default function MortgageForm({ id }) {
   const [state, setState] = useState({
     loanAmount: '',
     term: 2,
     type: '',
     interestRate: '',
-    disbursementDate: null,
+    startDate: null,
     interestRateAdjusted: '',
     closingCosts: '',
   });
 
   const handleChange = e => {
+    let { value } = e.target;
+    if (e.target.type === 'checkbox') value = e.target.checked;
     setState({
       ...state,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     });
   };
+
+  const skinnyWidth = '150px';
+  const gutterWidth = '24px';
+
   return (
     <Item>
       <Box sx={{ display: 'inline-block' }}>
-        <br />
+        <Typography variant="h5" component="div" gutterBottom>
+          Mortgage {id}
+        </Typography>
+
         <DatePicker
-          label="Disbursement Date"
-          value={state.disbursementDate}
-          // @ts-ignore
-          name="disbursementDate"
-          onChange={m => setState({ ...state, disbursementDate: m })}
-          renderInput={params => <TextField {...params} />}
+          label="Start Date"
+          value={state.startDate}
+          views={['year', 'month']}
+          onChange={m => setState({ ...state, startDate: m.set('date', 1) })}
+          inputFormat="MM-DD-YYYY"
+          allowSameDateSelection
+          renderInput={params => (
+            <TextField
+              {...params}
+              margin="normal"
+              inputProps={{
+                ...params.inputProps,
+                placeholder: 'mm-dd-yyyy',
+              }}
+              sx={{ width: skinnyWidth, mr: gutterWidth }}
+            />
+          )}
         />
-        <br />
         <TextField
           margin="normal"
           required
@@ -58,6 +79,11 @@ export default function MortgageForm() {
           onChange={handleChange}
           label="Loan Amount"
           fullWidth
+          placeholder="600000"
+          sx={{ width: skinnyWidth }}
+          InputProps={{
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+          }}
         />
         <br />
         <TextField
@@ -68,14 +94,23 @@ export default function MortgageForm() {
           onChange={handleChange}
           label="Interest Rate"
           fullWidth
+          sx={{
+            input: { textAlign: 'right' },
+            width: skinnyWidth,
+            mr: gutterWidth,
+          }}
+          placeholder="4.25"
+          InputProps={{
+            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+          }}
         />
-        <br />
-        <FormControl sx={{ minWidth: 150 }} margin="normal" fullWidth>
+        <FormControl sx={{ minWidth: 150 }} margin="normal">
           <InputLabel>Term</InputLabel>
           <Select
             label="Term"
             value={state.term}
             name="term"
+            sx={{ width: skinnyWidth }}
             onChange={handleChange}
           >
             <MenuItem value={1}>40 years</MenuItem>
@@ -86,12 +121,13 @@ export default function MortgageForm() {
           </Select>
         </FormControl>
         <br />
-        <FormControl sx={{ minWidth: 150 }} margin="normal" fullWidth>
+        <FormControl sx={{ minWidth: 150 }} margin="normal">
           <InputLabel>Type</InputLabel>
           <Select
             value={state.type}
             label="Type"
             name="type"
+            sx={{ width: skinnyWidth, mr: gutterWidth }}
             onChange={handleChange}
           >
             <MenuItem value={1}>Fixed-rate</MenuItem>
@@ -101,14 +137,17 @@ export default function MortgageForm() {
             <MenuItem value={5}>3/1 ARM</MenuItem>
           </Select>
         </FormControl>
-        <br />
         <TextField
           margin="normal"
-          label="Adjusted Interest Rate"
+          label="Adj. Int. Rate"
           name="interestRateAdjusted"
           value={state.interestRateAdjusted}
           onChange={handleChange}
-          fullWidth
+          sx={{ input: { textAlign: 'right' }, width: skinnyWidth }}
+          placeholder="6.75"
+          InputProps={{
+            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+          }}
         />
         <br />
         <TextField
@@ -118,6 +157,11 @@ export default function MortgageForm() {
           value={state.closingCosts}
           onChange={handleChange}
           fullWidth
+          placeholder="2000"
+          sx={{ width: skinnyWidth }}
+          InputProps={{
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+          }}
         />
       </Box>
     </Item>
