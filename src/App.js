@@ -16,12 +16,13 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import moment from 'moment';
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import './App.css';
 import MortgageForm from './MortgageForm';
 import MortgageTerm from './MortgageTerm';
 import MortgageType from './MortgageType';
-import Report from './Report';
+
+const Report = lazy(() => import('./Report'));
 
 export default function App() {
   // const mortgageTemplate = {
@@ -220,7 +221,11 @@ export default function App() {
           <br />
           <br />
         </Box>
-        {state.doShowReport && <Report />}
+        {state.doShowReport && (
+          <Suspense fallback={<p>Loading...</p>}>
+            <Report />
+          </Suspense>
+        )}
       </Stack>
     </LocalizationProvider>
   );
