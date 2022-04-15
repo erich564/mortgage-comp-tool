@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Checkbox,
-  CssBaseline,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -18,6 +17,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import moment from 'moment';
 import { Suspense, lazy, useState } from 'react';
 import './App.css';
+import Header from './Header';
 import MortgageForm from './MortgageForm';
 import MortgageTerm from './MortgageTerm';
 import MortgageType from './MortgageType';
@@ -116,7 +116,6 @@ export default function App() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
-      <CssBaseline />
       <Stack spacing={2} style={{ margin: 15 }}>
         <Box
           component="form"
@@ -126,6 +125,9 @@ export default function App() {
           <Typography variant="h4" component="div" gutterBottom>
             Mortgage Comparison Tool
           </Typography>
+          <br />
+          <Header />
+          <br />
           <br />
           <FormControl>
             <FormLabel
@@ -155,7 +157,6 @@ export default function App() {
               />
             </RadioGroup>
           </FormControl>
-
           <br />
           {state.mortgages.map(m => (
             <MortgageForm
@@ -164,7 +165,6 @@ export default function App() {
               state={m}
             />
           ))}
-
           <br />
           <FormControl>
             How much do you expect investments to make on average?
@@ -212,7 +212,6 @@ export default function App() {
               }}
             />
           </FormControl>
-
           <br />
           <br />
           <Button variant="contained" type="submit">
