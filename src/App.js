@@ -7,42 +7,56 @@ import {
   FormControlLabel,
   FormLabel,
   InputAdornment,
-  Paper,
   Radio,
   RadioGroup,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import moment from 'moment';
 import { useState } from 'react';
 import './App.css';
 import MortgageForm from './MortgageForm';
 import MortgageTerm from './MortgageTerm';
+import MortgageType from './MortgageType';
 import Report from './Report';
 
-const Item = styled(Paper)(({ theme }) => ({
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
-
 export default function App() {
+  // const mortgageTemplate = {
+  //   loanAmount: '',
+  //   term: MortgageTerm._30_years,
+  //   type: '',
+  //   interestRate: '',
+  //   startDate: null,
+  //   interestRateAdjusted: '',
+  //   closingCosts: '',
+  // };
+
+  // const [state, setState] = useState({
+  //   purchaseOrRefinance: '',
+  //   roi: '9',
+  //   doItemize: true,
+  //   marginalTaxRate: '40',
+  //   mortgages: [1, 2].map(n => ({
+  //     ...mortgageTemplate,
+  //     id: n,
+  //   })),
+  //   doGenerateReport: false,
+  // });
   const mortgageTemplate = {
-    loanAmount: '',
+    loanAmount: '417000',
     term: MortgageTerm._30_years,
-    type: '',
-    interestRate: '',
-    startDate: null,
-    interestRateAdjusted: '',
-    closingCosts: '',
+    type: MortgageType._7_1_Arm,
+    interestRate: 2.75,
+    startDate: moment(),
+    interestRateAdjusted: 5.75,
+    closingCosts: 2005,
   };
 
   const [state, setState] = useState({
-    purchaseOrRefinance: '',
+    purchaseOrRefinance: 'purchase',
     roi: '9',
     doItemize: true,
     marginalTaxRate: '40',
@@ -50,6 +64,7 @@ export default function App() {
       ...mortgageTemplate,
       id: n,
     })),
+    doShowReport: false,
   });
 
   const handleChange = e => {
@@ -90,7 +105,10 @@ export default function App() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    console.log(state);
+    setState({
+      ...state,
+      doShowReport: true,
+    });
   };
 
   const percentWidth = '120px';
@@ -202,10 +220,7 @@ export default function App() {
           <br />
           <br />
         </Box>
-
-        <Item>
-          <Report />
-        </Item>
+        {state.doShowReport && <Report />}
       </Stack>
     </LocalizationProvider>
   );
