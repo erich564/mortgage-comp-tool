@@ -1,4 +1,4 @@
-import { Container } from '@mui/material';
+import { Divider } from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
@@ -433,7 +433,9 @@ export default function Report() {
   const maxDateMs = maxDate.valueOf();
 
   return (
-    <Container>
+    <>
+      <Divider variant="middle" />
+      <br />
       <HighchartsReact
         highcharts={Highcharts}
         options={createAmortizationChartOptions(
@@ -454,6 +456,6 @@ export default function Report() {
         highcharts={Highcharts}
         options={createComparisonChartOptions(comparison, mortgage1, mortgage2)}
       />
-    </Container>
+    </>
   );
 }
