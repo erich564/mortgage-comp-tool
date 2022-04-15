@@ -16,7 +16,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import moment from 'moment';
 import { Suspense, lazy, useState } from 'react';
-import './App.css';
 import Header from './Header';
 import MortgageForm from './MortgageForm';
 import MortgageTerm from './MortgageTerm';
