@@ -12,8 +12,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import moment from 'moment';
 import { Suspense, lazy, useState } from 'react';
 import Header from './Header';
@@ -114,117 +112,115 @@ export default function App() {
   const percentWidth = '120px';
 
   return (
-    <LocalizationProvider dateAdapter={AdapterMoment}>
-      <Stack spacing={2} style={{ margin: 15 }}>
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ display: 'inline-block', textAlign: 'center' }}
-        >
-          <Typography variant="h4" component="div" gutterBottom>
-            Mortgage Comparison Tool
-          </Typography>
-          <br />
-          <Header />
-          <br />
-          <br />
-          <FormControl>
-            <FormLabel
-              sx={{
-                '&.Mui-focused': {
-                  color: 'rgba(0, 0, 0, 0.87)',
-                },
-              }}
-            >
-              Are you purchasing a home or refinancing?
-            </FormLabel>
-            <RadioGroup
-              row
-              name="purchaseOrRefinance"
-              value={state.purchaseOrRefinance}
-              onChange={handleChange}
-            >
-              <FormControlLabel
-                value="purchasing"
-                control={<Radio />}
-                label="Purchasing"
-              />
-              <FormControlLabel
-                value="refinancing"
-                control={<Radio />}
-                label="Refinancing"
-              />
-            </RadioGroup>
-          </FormControl>
-          <br />
-          {state.mortgages.map(m => (
-            <MortgageForm
-              key={m.id}
-              handleMortgageChange={handleMortgageChange}
-              state={m}
-            />
-          ))}
-          <br />
-          <FormControl>
-            How much do you expect investments to make on average?
-            <TextField
-              required
-              margin="normal"
-              label="ROI"
-              name="roi"
-              value={state.roi}
-              placeholder="9"
-              sx={{ input: { textAlign: 'right' }, width: percentWidth }}
-              onChange={handleChange}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              InputLabelProps={{ required: false }}
-            />
-          </FormControl>
-          <br />
-          <br />
-          <FormControl>
-            Will you be itemizing mortgage interest?
-            <br />
+    <Stack spacing={2} style={{ margin: 15 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: 'inline-block', textAlign: 'center' }}
+      >
+        <Typography variant="h4" component="div" gutterBottom>
+          Mortgage Comparison Tool
+        </Typography>
+        <br />
+        <Header />
+        <br />
+        <br />
+        <FormControl>
+          <FormLabel
+            sx={{
+              '&.Mui-focused': {
+                color: 'rgba(0, 0, 0, 0.87)',
+              },
+            }}
+          >
+            Are you purchasing a home or refinancing?
+          </FormLabel>
+          <RadioGroup
+            row
+            name="purchaseOrRefinance"
+            value={state.purchaseOrRefinance}
+            onChange={handleChange}
+          >
             <FormControlLabel
-              control={
-                <Checkbox
-                  checked={state.doItemize}
-                  onChange={handleChange}
-                  name="doItemize"
-                />
-              }
-              label="Itemize"
+              value="purchasing"
+              control={<Radio />}
+              label="Purchasing"
             />
-            <TextField
-              margin="normal"
-              label="Marginal Tax Rate"
-              name="marginalTaxRate"
-              value={state.marginalTaxRate}
-              onChange={handleChange}
-              sx={{ input: { textAlign: 'right' }, width: percentWidth }}
-              placeholder="40"
-              disabled={!state.doItemize}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
+            <FormControlLabel
+              value="refinancing"
+              control={<Radio />}
+              label="Refinancing"
             />
-          </FormControl>
+          </RadioGroup>
+        </FormControl>
+        <br />
+        {state.mortgages.map(m => (
+          <MortgageForm
+            key={m.id}
+            handleMortgageChange={handleMortgageChange}
+            state={m}
+          />
+        ))}
+        <br />
+        <FormControl>
+          How much do you expect investments to make on average?
+          <TextField
+            required
+            margin="normal"
+            label="ROI"
+            name="roi"
+            value={state.roi}
+            placeholder="9"
+            sx={{ input: { textAlign: 'right' }, width: percentWidth }}
+            onChange={handleChange}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+            }}
+            InputLabelProps={{ required: false }}
+          />
+        </FormControl>
+        <br />
+        <br />
+        <FormControl>
+          Will you be itemizing mortgage interest?
           <br />
-          <br />
-          <Button variant="contained" type="submit">
-            Compare
-          </Button>
-          <br />
-          <br />
-        </Box>
-        {state.doShowReport && (
-          <Suspense fallback={<p>Loading...</p>}>
-            <Report />
-          </Suspense>
-        )}
-      </Stack>
-    </LocalizationProvider>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.doItemize}
+                onChange={handleChange}
+                name="doItemize"
+              />
+            }
+            label="Itemize"
+          />
+          <TextField
+            margin="normal"
+            label="Marginal Tax Rate"
+            name="marginalTaxRate"
+            value={state.marginalTaxRate}
+            onChange={handleChange}
+            sx={{ input: { textAlign: 'right' }, width: percentWidth }}
+            placeholder="40"
+            disabled={!state.doItemize}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+            }}
+          />
+        </FormControl>
+        <br />
+        <br />
+        <Button variant="contained" type="submit">
+          Compare
+        </Button>
+        <br />
+        <br />
+      </Box>
+      {state.doShowReport && (
+        <Suspense fallback={<p>Loading...</p>}>
+          <Report />
+        </Suspense>
+      )}
+    </Stack>
   );
 }

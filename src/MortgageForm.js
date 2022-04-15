@@ -10,7 +10,8 @@ import {
   Typography,
   styled,
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import MortgageTerm from './MortgageTerm';
 import MortgageType from './MortgageType';
 
@@ -45,31 +46,32 @@ export default function MortgageForm({ handleMortgageChange, state }) {
         >
           Mortgage {state.id}
         </Typography>
-
-        <DatePicker
-          label="Start Date"
-          value={state.startDate}
-          views={['year', 'month']}
-          onChange={m => {
-            m.set('date', 1);
-            handleDateChange(m, 'startDate');
-          }}
-          inputFormat="MM-DD-YYYY"
-          // allowSameDateSelection
-          renderInput={params => (
-            <TextField
-              {...params}
-              margin="normal"
-              required
-              inputProps={{
-                ...params.inputProps,
-                placeholder: 'mm-dd-yyyy',
-              }}
-              sx={{ width: skinnyWidth, mr: gutterWidth }}
-              InputLabelProps={{ required: false }}
-            />
-          )}
-        />
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          <DatePicker
+            label="Start Date"
+            value={state.startDate}
+            views={['year', 'month']}
+            onChange={m => {
+              m.set('date', 1);
+              handleDateChange(m, 'startDate');
+            }}
+            inputFormat="MM-DD-YYYY"
+            // allowSameDateSelection
+            renderInput={params => (
+              <TextField
+                {...params}
+                margin="normal"
+                required
+                inputProps={{
+                  ...params.inputProps,
+                  placeholder: 'mm-dd-yyyy',
+                }}
+                sx={{ width: skinnyWidth, mr: gutterWidth }}
+                InputLabelProps={{ required: false }}
+              />
+            )}
+          />
+        </LocalizationProvider>
         <TextField
           margin="normal"
           required
