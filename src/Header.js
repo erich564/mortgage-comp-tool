@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-export default function App() {
+export default function Header({ handleSampleData }) {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -24,8 +24,8 @@ export default function App() {
         justifyContent="center"
       >
         <Button onClick={handleOpen}>What is this?</Button>
-        <Button>Sample Data 1</Button>
-        <Button>Sample Data 2</Button>
+        <Button onClick={() => handleSampleData(0)}>Sample Data 1</Button>
+        <Button onClick={() => handleSampleData(1)}>Sample Data 2</Button>
       </Stack>
 
       <Dialog fullWidth maxWidth="md" open={open} onClose={handleClose}>

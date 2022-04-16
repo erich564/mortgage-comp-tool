@@ -11,51 +11,6 @@ import {
   TextField,
 } from '@mui/material';
 import MortgageForm from './MortgageForm';
-import MortgageTerm from './MortgageTerm';
-
-// const mortgageTemplate = {
-//   loanAmount: '417000',
-//   term: MortgageTerm._30_years,
-//   type: MortgageType._7_1_Arm,
-//   interestRate: 2.75,
-//   startDate: moment(),
-//   interestRateAdjusted: 5.75,
-//   closingCosts: 2005,
-// };
-
-// const [state, setState] = useState({
-//   purchaseOrRefinance: 'purchase',
-//   roi: '9',
-//   doItemize: true,
-//   marginalTaxRate: '40',
-//   mortgages: [1, 2].map(n => ({
-//     ...mortgageTemplate,
-//     id: n,
-//   })),
-//   doShowReport: false,
-// });
-
-const mortgageTemplate = {
-  loanAmount: '',
-  term: MortgageTerm._30_years,
-  type: '',
-  interestRate: '',
-  startDate: null,
-  interestRateAdjusted: '',
-  closingCosts: '',
-};
-
-export const formDefaults = {
-  purchaseOrRefinance: '',
-  roi: '9',
-  doItemize: true,
-  marginalTaxRate: '40',
-  mortgages: [1, 2].map(n => ({
-    ...mortgageTemplate,
-    id: n,
-  })),
-  doGenerateReport: false,
-};
 
 const inputWidth = '120px';
 
@@ -89,12 +44,12 @@ export default function InputForm({
           onChange={handleChange}
         >
           <FormControlLabel
-            value="purchasing"
+            value="purchase"
             control={<Radio />}
             label="Purchasing"
           />
           <FormControlLabel
-            value="refinancing"
+            value="refinance"
             control={<Radio />}
             label="Refinancing"
           />

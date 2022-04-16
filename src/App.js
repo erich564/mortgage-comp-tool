@@ -1,13 +1,16 @@
 import { Stack, Typography } from '@mui/material';
 import { Suspense, lazy, useState } from 'react';
+import { formDefaults, sampleData } from './FormData';
 import Header from './Header';
-import InputForm, { formDefaults } from './InputForm';
+import InputForm from './InputForm';
 
 const Report = lazy(() => import('./Report'));
 
 export default function App() {
   const [formState, setFormState] = useState(formDefaults);
   const [doShowReport, setDoShowReport] = useState(false);
+
+  const handleSampleData = ndx => setFormState(sampleData[ndx]);
 
   const handleChange = e => {
     const value =
@@ -55,7 +58,7 @@ export default function App() {
       <Typography variant="h4" component="div">
         Mortgage Comparison Tool
       </Typography>
-      <Header />
+      <Header handleSampleData={handleSampleData} />
       <InputForm
         state={formState}
         handleChange={handleChange}
