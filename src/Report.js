@@ -4,6 +4,10 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
 import { memo } from 'react';
+import {
+  createAmortizationChartOptions,
+  createComparisonChartOptions,
+} from './ChartOptions';
 import { termToMonths } from './MortgageTerm';
 import { MortgageType, yearsUntilFirstAdjust } from './MortgageType';
 
@@ -290,158 +294,6 @@ const compareMortgages = (m1, m2) => {
 Highcharts.setOptions({
   lang: {
     thousandsSep: ',',
-  },
-});
-
-const yAxisLabelFormat = '${value:,.0f}';
-
-const createAmortizationChartOptions = (m, minDate, maxDate) => ({
-  chart: {
-    type: 'spline',
-  },
-  plotOptions: {
-    series: {
-      states: {
-        hover: {
-          lineWidthPlus: 0,
-        },
-      },
-    },
-  },
-  title: {
-    text: `${m.name} Amortization schedule`,
-  },
-  series: [
-    {
-      name: 'Principal',
-      data: m.payments.map(payment => ({
-        x: payment.unixTimeMs,
-        y: payment.principal,
-      })),
-    },
-    {
-      name: 'Interest',
-      data: m.payments.map(payment => ({
-        x: payment.unixTimeMs,
-        y: payment.interest,
-      })),
-    },
-  ],
-  xAxis: {
-    type: 'datetime',
-    min: minDate,
-    max: maxDate,
-  },
-  yAxis: {
-    title: {
-      text: null,
-    },
-    labels: {
-      format: yAxisLabelFormat,
-    },
-  },
-  tooltip: {
-    shared: true,
-    crosshairs: true,
-    // xDateFormat: '%b %Y',
-    xDateFormat: '%m-%Y',
-    headerFormat: '{point.key}<br/>',
-    valuePrefix: '$',
-    valueDecimals: 2,
-  },
-});
-
-const createComparisonChartOptions = (comparison, m1, m2) => ({
-  chart: {
-    type: 'spline',
-    zoomType: 'x',
-  },
-  plotOptions: {
-    series: {
-      states: {
-        hover: {
-          lineWidthPlus: 0,
-        },
-      },
-    },
-  },
-  title: {
-    text: 'Mortgages Compared',
-  },
-  series: [
-    {
-      name: 'NW Difference',
-      data: comparison.map(c => ({
-        x: c.unixTimeMs,
-        y: Math.round(c.difference),
-      })),
-    },
-    {
-      name: 'M1 Net Worth',
-      data: m1.netWorth.map(nw => ({
-        x: nw.unixTimeMs,
-        y: Math.round(nw.netWorth),
-      })),
-    },
-    {
-      name: 'M2 Net Worth',
-      data: m2.netWorth.map(nw => ({
-        x: nw.unixTimeMs,
-        y: Math.round(nw.netWorth),
-      })),
-    },
-    {
-      name: 'M1 Cash',
-      data: m1.netWorth.map(nw => ({
-        x: nw.unixTimeMs,
-        y: Math.round(nw.cash),
-      })),
-      visible: false,
-    },
-    {
-      name: 'M2 Cash',
-      data: m2.netWorth.map(nw => ({
-        x: nw.unixTimeMs,
-        y: Math.round(nw.cash),
-      })),
-      visible: false,
-    },
-    {
-      name: 'M1 Equity',
-      data: m1.netWorth.map(nw => ({
-        x: nw.unixTimeMs,
-        y: Math.round(nw.equity),
-      })),
-      visible: false,
-    },
-    {
-      name: 'M2 Equity',
-      data: m2.netWorth.map(nw => ({
-        x: nw.unixTimeMs,
-        y: Math.round(nw.equity),
-      })),
-      visible: false,
-    },
-  ],
-  xAxis: {
-    type: 'datetime',
-  },
-  yAxis: {
-    title: {
-      text: null,
-    },
-    labels: {
-      format: yAxisLabelFormat,
-    },
-  },
-  tooltip: {
-    headerFormat: '{point.key}<br/>',
-    shared: true,
-    // split: true,
-    crosshairs: true,
-    xDateFormat: '%m-%Y',
-    valuePrefix: '$',
-    valueDecimals: 0,
   },
 });
 
