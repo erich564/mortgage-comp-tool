@@ -12,21 +12,22 @@ import {
 import { termToMonths } from './MortgageTerm';
 import { MortgageType, yearsUntilFirstAdjust } from './MortgageType';
 
+const monthsPerYear = 12;
+
 /**
  * Convert annual rate to monthly rate (with monthly compounding).
  */
-const calcMonthlyRoi = n => (1 + n) ** (1 / 12) - 1;
+const calcMonthlyRoi = n => (1 + n) ** (1 / monthsPerYear) - 1;
 
-// round to 2 decimal places
+/** Round to 2 decimal places */
 // eslint-disable-next-line prefer-template
 const roundToTwo = num => +(Math.round(+`${num}e+2`) + 'e-2');
 
 /**
- *
+ * Calculate monthly loan payment amount
  * @param {number} p Remaining principal for the loan.
  * @param {number} i Monthly interest rate.
  * @param {number} t Remaining months for the loan. (term)
- * @returns Monthly loan payment amount.
  */
 const calcMonthlyPayment = (p, i, t) => {
   const x = (1 + i) ** t;
@@ -46,13 +47,14 @@ const transformState = reportState => {
     m.endDate = m.startDate.clone().add(m.term - 1, 'months');
     if (m.type !== MortgageType.FixedRate) {
       const years = yearsUntilFirstAdjust(m.type);
+      const intRate = m.interestRateAdjusted / 100;
       m.rateAdjust = {
-        interestRate: +m.interestRateAdjusted / 100,
-        monthlyInterestRate: +m.interestRateAdjusted / 100 / 12,
+        interestRate: intRate,
+        monthlyInterestRate: intRate / monthsPerYear,
         adjustDate: m.startDate.clone().add(years, 'years'),
       };
     }
-    m.monthlyInterestRate = m.interestRate / 12;
+    m.monthlyInterestRate = m.interestRate / monthsPerYear;
     m.monthlyPayment = calcMonthlyPayment(
       m.loanAmount,
       m.monthlyInterestRate,
