@@ -2,6 +2,7 @@ import { Divider } from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import moment from 'moment';
+import { memo } from 'react';
 
 /**
  * @typedef {import('moment').Moment} Moment
@@ -416,7 +417,7 @@ buildAmortizationSchedule(mortgage1);
 buildAmortizationSchedule(mortgage2);
 const comparison = compareMortgages(mortgage1, mortgage2);
 
-export default function Report({ state }) {
+function Report({ state }) {
   console.log(state);
   const minDate = moment
     .min(mortgage1.firstPaymentDate, mortgage2.firstPaymentDate)
@@ -460,3 +461,5 @@ export default function Report({ state }) {
     </>
   );
 }
+
+export default memo(Report);
