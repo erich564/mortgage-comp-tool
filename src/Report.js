@@ -7,6 +7,7 @@ import { memo } from 'react';
 import {
   createAmortizationChartOptions,
   createComparisonChartOptions,
+  createCumulativeChartOptions,
 } from './ChartOptions';
 import { termToMonths } from './MortgageTerm';
 import { MortgageType, yearsUntilFirstAdjust } from './MortgageType';
@@ -97,7 +98,8 @@ const createAmortizationSchedules = mortgages => {
     let b = m.loanAmount;
     let intRate = m.monthlyInterestRate;
     const date = m.startDate.clone();
-    let payment = m.monthlyPayment;
+    let { monthlyPayment } = m;
+    let prevPayment;
     while (b > 0) {
       const int = roundToTwo(b * intRate);
       let prin;
@@ -105,25 +107,37 @@ const createAmortizationSchedules = mortgages => {
       if (date.isSame(m.endDate)) {
         prin = b;
       } else {
-        prin = roundToTwo(payment - int);
+        prin = roundToTwo(monthlyPayment - int);
       }
       const bStart = roundToTwo(b);
       const bEnd = roundToTwo(bStart - prin);
       b = bEnd;
-      m.payments.push({
+      const cumPrin = roundToTwo(
+        prin + (prevPayment ? prevPayment.cumPrinciple : 0)
+      );
+      const cumInt = roundToTwo(
+        int + (prevPayment ? prevPayment.cumInterest : 0)
+      );
+      const cumPayments = roundToTwo(cumPrin + cumInt);
+      const payment = {
         principal: prin,
         interest: int,
         date: date.clone(),
         unixTimeMs: date.valueOf(),
         startingBalance: bStart,
         remainingBalance: bEnd,
-      });
+        cumPrinciple: cumPrin,
+        cumInterest: cumInt,
+        cumPayments,
+      };
+      m.payments.push(payment);
       date.add(1, 'month');
+      prevPayment = payment;
       if (m.rateAdjust && date.isSame(m.rateAdjust.adjustDate)) {
         intRate = m.rateAdjust.monthlyInterestRate;
         const t = m.term - m.rateAdjust.adjustDate.diff(m.startDate, 'months');
-        payment = calcMonthlyPayment(b, intRate, t);
-        m.rateAdjust.monthlyPayment = payment;
+        monthlyPayment = calcMonthlyPayment(b, intRate, t);
+        m.rateAdjust.monthlyPayment = monthlyPayment;
       }
     }
   }
@@ -232,6 +246,7 @@ function Report({ reportState }) {
   createAmortizationSchedules(state.mortgages);
   const { minDateMs, maxDateMs } = calcMinMaxDatesForAmortCharts(state);
   const comparison = compareMortgages(state);
+  console.log(state);
   const [m1, m2] = state.mortgages;
 
   return (
@@ -247,6 +262,10 @@ function Report({ reportState }) {
           minDateMs,
           maxDateMs
         )}
+      />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={createCumulativeChartOptions(m1, m2, minDateMs, maxDateMs)}
       />
       <HighchartsReact
         highcharts={Highcharts}

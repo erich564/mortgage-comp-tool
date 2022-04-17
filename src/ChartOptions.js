@@ -43,36 +43,6 @@ const commonOptions = {
   },
 };
 
-export const createAmortizationChartOptions = (m, minDate, maxDate) =>
-  merge(commonOptions, {
-    title: {
-      text: `${m.name} Amortization`,
-    },
-    series: [
-      {
-        name: 'Principal',
-        data: m.payments.map(payment => ({
-          x: payment.unixTimeMs,
-          y: payment.principal,
-        })),
-      },
-      {
-        name: 'Interest',
-        data: m.payments.map(payment => ({
-          x: payment.unixTimeMs,
-          y: payment.interest,
-        })),
-      },
-    ],
-    xAxis: {
-      min: minDate,
-      max: maxDate,
-    },
-    tooltip: {
-      valueDecimals: 2,
-    },
-  });
-
 export const createComparisonChartOptions = (
   comparison,
   m1,
@@ -145,5 +115,97 @@ export const createComparisonChartOptions = (
     },
     tooltip: {
       valueDecimals: 0,
+    },
+  });
+
+export const createCumulativeChartOptions = (m1, m2, minDate, maxDate) =>
+  merge(commonOptions, {
+    title: {
+      text: `Cumulative Payments`,
+    },
+    series: [
+      {
+        name: `${m1.name} Payments`,
+        data: m1.payments.map(p => ({
+          x: p.unixTimeMs,
+          y: p.cumPayments,
+        })),
+      },
+      {
+        name: `${m2.name} Payments`,
+        data: m2.payments.map(p => ({
+          x: p.unixTimeMs,
+          y: p.cumPayments,
+        })),
+      },
+      {
+        name: `${m1.name} Principal`,
+        data: m1.payments.map(p => ({
+          x: p.unixTimeMs,
+          y: p.cumPrinciple,
+        })),
+        visible: false,
+      },
+      {
+        name: `${m2.name} Principal`,
+        data: m2.payments.map(p => ({
+          x: p.unixTimeMs,
+          y: p.cumPrinciple,
+        })),
+        visible: false,
+      },
+      {
+        name: `${m1.name} Interest`,
+        data: m1.payments.map(p => ({
+          x: p.unixTimeMs,
+          y: p.cumInterest,
+        })),
+        visible: false,
+      },
+      {
+        name: `${m2.name} Interest`,
+        data: m2.payments.map(p => ({
+          x: p.unixTimeMs,
+          y: p.cumInterest,
+        })),
+        visible: false,
+      },
+    ],
+    xAxis: {
+      min: minDate,
+      max: maxDate,
+    },
+    tooltip: {
+      valueDecimals: 0,
+    },
+  });
+
+export const createAmortizationChartOptions = (m, minDate, maxDate) =>
+  merge(commonOptions, {
+    title: {
+      text: `${m.name} Amortization`,
+    },
+    series: [
+      {
+        name: 'Principal',
+        data: m.payments.map(payment => ({
+          x: payment.unixTimeMs,
+          y: payment.principal,
+        })),
+      },
+      {
+        name: 'Interest',
+        data: m.payments.map(payment => ({
+          x: payment.unixTimeMs,
+          y: payment.interest,
+        })),
+      },
+    ],
+    xAxis: {
+      min: minDate,
+      max: maxDate,
+    },
+    tooltip: {
+      valueDecimals: 2,
     },
   });
