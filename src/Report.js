@@ -416,7 +416,8 @@ buildAmortizationSchedule(mortgage1);
 buildAmortizationSchedule(mortgage2);
 const comparison = compareMortgages(mortgage1, mortgage2);
 
-export default function Report() {
+export default function Report({ state }) {
+  console.log(state);
   const minDate = moment
     .min(mortgage1.firstPaymentDate, mortgage2.firstPaymentDate)
     .clone();

@@ -12,9 +12,9 @@ import React, { useState } from 'react';
 
 export default function Header({ handleSampleData }) {
   const [open, setOpen] = useState(false);
-
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
   return (
     <>
       <Stack

@@ -1,4 +1,5 @@
 import { Stack, Typography } from '@mui/material';
+import clone from 'clone';
 import { Suspense, lazy, useState } from 'react';
 import { formDefaults, sampleData } from './FormData';
 import Header from './Header';
@@ -7,7 +8,8 @@ import InputForm from './InputForm';
 const Report = lazy(() => import('./Report'));
 
 export default function App() {
-  const [formState, setFormState] = useState(formDefaults);
+  const [formState, setFormState] = useState(clone(formDefaults));
+  const [reportState, setReportState] = useState(clone(formDefaults));
   const [doShowReport, setDoShowReport] = useState(false);
 
   const handleSampleData = ndx => setFormState(sampleData[ndx]);
@@ -16,7 +18,7 @@ export default function App() {
     const value =
       e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormState({
-      ...formState,
+      ...clone(formState),
       [e.target.name]: value,
     });
   };
@@ -38,7 +40,7 @@ export default function App() {
       value = data.target.value;
     }
 
-    const newState = { ...formState };
+    const newState = clone(formState);
     if (mortgageId !== undefined) {
       newState.mortgages.find(m => m.id === mortgageId)[name] = value;
     } else {
@@ -51,6 +53,7 @@ export default function App() {
   const handleSubmit = e => {
     e.preventDefault();
     setDoShowReport(true);
+    setReportState(clone(formState));
   };
 
   return (
@@ -67,7 +70,7 @@ export default function App() {
       />
       {doShowReport && (
         <Suspense fallback={<p>Loading...</p>}>
-          <Report />
+          <Report state={reportState} />
         </Suspense>
       )}
     </Stack>
