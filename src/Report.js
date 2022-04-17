@@ -12,18 +12,9 @@ import { termToMonths } from './MortgageTerm';
 import { MortgageType, yearsUntilFirstAdjust } from './MortgageType';
 
 /**
- * @typedef {import('moment').Moment} Moment
- */
-
-/**
  * Convert annual rate to monthly rate (with monthly compounding).
  */
 const calcMonthlyRoi = n => (1 + n) ** (1 / 12) - 1;
-
-const roi = 0.07; // % gain per year (return on investment)
-const monthlyRoi = calcMonthlyRoi(roi);
-
-const marginalTaxRate = 0.37;
 
 // round to 2 decimal places
 // eslint-disable-next-line prefer-template
@@ -41,20 +32,6 @@ const calcMonthlyPayment = (p, i, t) => {
   return roundToTwo((p * (i * x)) / (x - 1));
 };
 
-const createMortgage = obj => {
-  const m = obj;
-  m.monthlyInterestRate = obj.interestRate / 12;
-  m.monthlyPayment = calcMonthlyPayment(
-    obj.balance,
-    obj.monthlyInterestRate,
-    obj.term
-  );
-  m.payments = [];
-  m.netWorth = [];
-  m.closingCosts ??= 0;
-  return m;
-};
-
 const transformState = reportState => {
   const state = clone(reportState);
   state.roi /= 100;
@@ -65,10 +42,12 @@ const transformState = reportState => {
     m.interestRate /= 100;
     m.loanAmount = +m.loanAmount;
     m.term = termToMonths(m.term);
+    m.endDate = m.startDate.clone().add(m.term - 1, 'months');
     if (m.type !== MortgageType.FixedRate) {
       const years = yearsUntilFirstAdjust(m.type);
       m.rateAdjust = {
-        interestRate: +m.interestRateAdjusted,
+        interestRate: +m.interestRateAdjusted / 100,
+        monthlyInterestRate: +m.interestRateAdjusted / 100 / 12,
         adjustDate: m.startDate.clone().add(years, 'years'),
       };
     }
@@ -86,143 +65,100 @@ const transformState = reportState => {
   return state;
 };
 
-const mortgage1 = createMortgage({
-  name: 'Mortgage 1',
-  interestRate: 0.0275,
-  balance: 417000,
-  disbursementDate: moment('2016-10-19'), // use to calc per diem interest
-  term: 360,
-  firstPaymentDate: moment('2016-12-01'),
-  type: '7/1 ARM',
-  rateAdjust: {
-    interestRate: 0.06,
-    adjustDate: moment('2023-12-01'),
-  },
-  doItemize: false,
-  closingCosts: 2250,
-});
-const mortgage2 = createMortgage({
-  name: 'Mortgage 2',
-  interestRate: 0.05,
-  balance: 500000,
-  disbursementDate: moment('2022-04-02'),
-  term: 360,
-  firstPaymentDate: moment('2022-06-01'),
-  doItemize: false,
-  closingCosts: 2250,
-});
-
-// let mortgage1 = createMortgage({
-//   name: 'Mortgage 1',
-//   interestRate: .0425,
-//   balance: 500000,
-//   disbursementDate: moment('2022-04-02'), // use to calc per diem interest
-//   term: 360,
-//   firstPaymentDate: moment('2022-06-01'),
-//   rateAdjust: {
-//     interestRate: .075,
-//     adjustDate: moment('2029-06-01'),
-//   },
-//   doItemize: true,
-//   closingCosts: 2250,
-// });
-// let mortgage1 = createMortgage({
-//   name: 'Mortgage 1',
-//   interestRate: .04,
-//   balance: 500000,
-//   disbursementDate: moment('2022-04-02'), // use to calc per diem interest
-//   term: 180,
-//   firstPaymentDate: moment('2022-06-01'),
-//   doItemize: true,
-//   closingCosts: 2250,
-// });
-// let mortgage2 = createMortgage({
-//   name: 'Mortgage 2',
-//   interestRate: .0475,
-//   balance: 500000,
-//   disbursementDate: moment('2022-04-02'),
-//   term: 360,
-//   firstPaymentDate: moment('2022-06-01'),
-//   doItemize: true,
-//   closingCosts: 2250,
-// });
-
-/* ishaan's */
-// let mortgage1 = createMortgage({
-//   name: 'Mortgage 1',
-//   interestRate: .02625,
-//   balance: 519400,
-//   disbursementDate: moment('2020-07-10'),
-//   term: 360,
-//   firstPaymentDate: moment('2020-09-01'),
-//   doItemize: false,
-// });
-// let mortgage2 = createMortgage({
-//   name: 'Mortgage 2',
-//   interestRate: .025,
-//   balance: 1500000,
-//   //disbursementDate: moment('2022-01-01'),
-//   term: 360,
-//   firstPaymentDate: moment('2022-01-01'),
-//   doItemize: false,
-// });
+/**
+ * Determines min/max dates that will cover both mortgage amortization time periods.
+ * Then adds some padding to those dates so the data is not pushing up against the
+ * ends of the chart.
+ */
+function calcMinMaxDatesForAmortCharts(state) {
+  const m1 = state.mortgages[0];
+  const m2 = state.mortgages[1];
+  const minDate = moment.min(m1.startDate, m2.startDate).clone();
+  const maxDate = moment.max(
+    m1.startDate.clone().add(m1.term, 'months'),
+    m2.startDate.clone().add(m2.term, 'months')
+  );
+  const diff = maxDate.diff(minDate, 'days');
+  const margin = 0.015;
+  const padding = diff * margin;
+  minDate.subtract(padding, 'days');
+  maxDate.add(padding, 'days');
+  const minDateMs = minDate.valueOf();
+  const maxDateMs = maxDate.valueOf();
+  return { minDateMs, maxDateMs };
+}
 
 /**
- * Builds amortization schedule for a given mortgage, with each payments principal
+ * Builds amortization schedule for a mortgages, with each payment's principal
  * and interest portions.
- * @param obj Mortgage
  */
-const buildAmortizationSchedule = obj => {
-  const m = obj;
-  let b = m.balance;
-  let intRate = m.monthlyInterestRate;
-  const date = m.firstPaymentDate.clone();
-  let payment = m.monthlyPayment;
-  while (b > 0) {
-    const int = roundToTwo(b * intRate);
-    const prin = roundToTwo(payment - int);
-    const bStart = b;
-    const bEnd = bStart - prin;
-    b = bEnd;
-    m.payments.push({
-      principal: prin,
-      interest: int,
-      date: date.clone(),
-      unixTimeMs: date.valueOf(),
-      startingBalance: bStart,
-      remainingBalance: bEnd,
-    });
-    date.add(1, 'month');
-    if (m.rateAdjust && date.isSame(m.rateAdjust.adjustDate)) {
-      intRate = m.rateAdjust.interestRate / 12;
-      const t =
-        m.term - m.rateAdjust.adjustDate.diff(m.firstPaymentDate, 'months');
-      payment = calcMonthlyPayment(b, intRate, t);
-      m.rateAdjust.monthlyPayment = payment;
+const createAmortizationSchedules = mortgages => {
+  for (const m of mortgages) {
+    let b = m.loanAmount;
+    let intRate = m.monthlyInterestRate;
+    const date = m.startDate.clone();
+    let payment = m.monthlyPayment;
+    while (b > 0) {
+      const int = roundToTwo(b * intRate);
+      let prin;
+      // on the very last payment, pay off remaining balance due to rounding over time
+      if (date.isSame(m.endDate)) {
+        prin = b;
+      } else {
+        prin = roundToTwo(payment - int);
+      }
+      const bStart = roundToTwo(b);
+      const bEnd = roundToTwo(bStart - prin);
+      b = bEnd;
+      m.payments.push({
+        principal: prin,
+        interest: int,
+        date: date.clone(),
+        unixTimeMs: date.valueOf(),
+        startingBalance: bStart,
+        remainingBalance: bEnd,
+      });
+      date.add(1, 'month');
+      if (m.rateAdjust && date.isSame(m.rateAdjust.adjustDate)) {
+        intRate = m.rateAdjust.monthlyInterestRate;
+        const t = m.term - m.rateAdjust.adjustDate.diff(m.startDate, 'months');
+        payment = calcMonthlyPayment(b, intRate, t);
+        m.rateAdjust.monthlyPayment = payment;
+      }
     }
   }
 };
 
-const compareMortgages = (m1, m2) => {
+/**
+ * Creates data for comparing cash, equity, and net worth comparisons of the two
+ * mortgages over their life time.
+ */
+const compareMortgages = ({
+  mortgages,
+  isRefinance,
+  doItemize,
+  marginalTaxRate,
+  monthlyRoi,
+}) => {
+  const m1 = mortgages[0];
+  const m2 = mortgages[1];
   let m1n = 0;
   let m2n = 0;
   const m1PayLen = m1.payments.length;
   const m2PayLen = m2.payments.length;
 
   // fast-forward m1 payment schedule to first payment date of m2
-  while (m1.payments[m1n] && !m1.payments[m1n].date.isSame(m2.firstPaymentDate))
-    m1n++;
+  while (m1.payments[m1n] && !m1.payments[m1n].date.isSame(m2.startDate)) m1n++;
 
-  const isRefi = m1n !== 0;
   let m1Cash;
   let m2Cash;
   let m1Equity = 0;
   let m2Equity;
 
-  if (isRefi) {
+  if (isRefinance) {
     m1Cash = 0;
     m2Cash = roundToTwo(
-      m2.balance - m1.payments[m1n].startingBalance - m2.closingCosts
+      m2.loanAmount - m1.payments[m1n].startingBalance - m2.closingCosts
     );
     m2Equity = -m2Cash;
   } else {
@@ -249,7 +185,7 @@ const compareMortgages = (m1, m2) => {
         m1Payment = m1.rateAdjust.monthlyPayment;
       const accruedInt = m1PrevCash === undefined ? 0 : m1PrevCash * monthlyRoi;
       m1Cash = m1Cash - m1Payment + accruedInt;
-      if (m1.doItemize) m1Cash += m1.payments[m1n].interest * marginalTaxRate;
+      if (doItemize) m1Cash += m1.payments[m1n].interest * marginalTaxRate;
       m1Equity += m1.payments[m1n].principal;
       m1NetWorth = m1Cash + m1Equity;
       m1.netWorth.push({
@@ -267,7 +203,7 @@ const compareMortgages = (m1, m2) => {
         m2Payment = m2.rateAdjust.monthlyPayment;
       const accruedInt = m2PrevCash === undefined ? 0 : m2PrevCash * monthlyRoi;
       m2Cash = m2Cash - m2Payment + accruedInt;
-      if (m2.doItemize) m2Cash += m2.payments[m2n].interest * marginalTaxRate;
+      if (doItemize) m2Cash += m2.payments[m2n].interest * marginalTaxRate;
       m2Equity += m2.payments[m2n].principal;
       m2NetWorth = m2Cash + m2Equity;
       m2.netWorth.push({
@@ -291,34 +227,12 @@ const compareMortgages = (m1, m2) => {
   return netWorthDifferences;
 };
 
-Highcharts.setOptions({
-  lang: {
-    thousandsSep: ',',
-  },
-});
-
-buildAmortizationSchedule(mortgage1);
-buildAmortizationSchedule(mortgage2);
-const comparison = compareMortgages(mortgage1, mortgage2);
-
 function Report({ reportState }) {
   const state = transformState(reportState);
-  // eslint-disable-next-line no-console
-  console.log(state);
-  const minDate = moment
-    .min(mortgage1.firstPaymentDate, mortgage2.firstPaymentDate)
-    .clone();
-  const maxDate = moment.max(
-    mortgage1.firstPaymentDate.clone().add(mortgage1.term, 'months'),
-    mortgage2.firstPaymentDate.clone().add(mortgage2.term, 'months')
-  );
-  const diff = maxDate.diff(minDate, 'days');
-  const margin = 0.01;
-  const padding = diff * margin;
-  minDate.subtract(padding, 'days');
-  maxDate.add(padding, 'days');
-  const minDateMs = minDate.valueOf();
-  const maxDateMs = maxDate.valueOf();
+  createAmortizationSchedules(state.mortgages);
+  const { minDateMs, maxDateMs } = calcMinMaxDatesForAmortCharts(state);
+  const comparison = compareMortgages(state);
+  const [m1, m2] = state.mortgages;
 
   return (
     <>
@@ -326,23 +240,21 @@ function Report({ reportState }) {
       <br />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createAmortizationChartOptions(
-          mortgage1,
+        options={createComparisonChartOptions(
+          comparison,
+          m1,
+          m2,
           minDateMs,
           maxDateMs
         )}
       />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createAmortizationChartOptions(
-          mortgage2,
-          minDateMs,
-          maxDateMs
-        )}
+        options={createAmortizationChartOptions(m1, minDateMs, maxDateMs)}
       />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createComparisonChartOptions(comparison, mortgage1, mortgage2)}
+        options={createAmortizationChartOptions(m2, minDateMs, maxDateMs)}
       />
     </>
   );

@@ -23,6 +23,8 @@ export const formDefaults = {
   marginalTaxRate: '40',
 };
 
+const nextViableStartDate = moment().startOf('month').add(2, 'months');
+
 export const sampleData = [
   {
     isRefinance: true,
@@ -44,7 +46,7 @@ export const sampleData = [
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
         interestRate: '5',
-        startDate: moment('2016-12-01'),
+        startDate: nextViableStartDate.clone(),
         interestRateAdjusted: '',
         closingCosts: '2000',
       },
@@ -62,7 +64,7 @@ export const sampleData = [
         term: MortgageTerm._30_years,
         type: MortgageType._7_1_Arm,
         interestRate: '4.5',
-        startDate: moment(),
+        startDate: nextViableStartDate.clone(),
         interestRateAdjusted: '6.75',
         closingCosts: '2000',
       },
@@ -72,7 +74,7 @@ export const sampleData = [
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
         interestRate: '5',
-        startDate: moment(),
+        startDate: nextViableStartDate.clone(),
         interestRateAdjusted: '',
         closingCosts: '2000',
       },

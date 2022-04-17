@@ -1,6 +1,12 @@
-import { merge } from 'highcharts';
+import Highcharts, { merge } from 'highcharts';
 
 const yAxisLabelFormat = '${value:,.0f}';
+
+Highcharts.setOptions({
+  lang: {
+    thousandsSep: ',',
+  },
+});
 
 const commonOptions = {
   chart: {
@@ -40,7 +46,7 @@ const commonOptions = {
 export const createAmortizationChartOptions = (m, minDate, maxDate) =>
   merge(commonOptions, {
     title: {
-      text: `${m.name} Amortization schedule`,
+      text: `${m.name} Amortization`,
     },
     series: [
       {
@@ -67,35 +73,41 @@ export const createAmortizationChartOptions = (m, minDate, maxDate) =>
     },
   });
 
-export const createComparisonChartOptions = (comparison, m1, m2) =>
+export const createComparisonChartOptions = (
+  comparison,
+  m1,
+  m2,
+  minDate,
+  maxDate
+) =>
   merge(commonOptions, {
     title: {
       text: 'Mortgages Compared',
     },
     series: [
       {
-        name: 'NW Difference',
+        name: 'Net Worth Difference',
         data: comparison.map(c => ({
           x: c.unixTimeMs,
           y: Math.round(c.difference),
         })),
       },
       {
-        name: 'M1 Net Worth',
+        name: `${m1.name} Net Worth`,
         data: m1.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: Math.round(nw.netWorth),
         })),
       },
       {
-        name: 'M2 Net Worth',
+        name: `${m2.name} Net Worth`,
         data: m2.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: Math.round(nw.netWorth),
         })),
       },
       {
-        name: 'M1 Cash',
+        name: `${m1.name} Cash`,
         data: m1.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: Math.round(nw.cash),
@@ -103,7 +115,7 @@ export const createComparisonChartOptions = (comparison, m1, m2) =>
         visible: false,
       },
       {
-        name: 'M2 Cash',
+        name: `${m2.name} Cash`,
         data: m2.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: Math.round(nw.cash),
@@ -111,7 +123,7 @@ export const createComparisonChartOptions = (comparison, m1, m2) =>
         visible: false,
       },
       {
-        name: 'M1 Equity',
+        name: `${m1.name} Equity`,
         data: m1.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: Math.round(nw.equity),
@@ -119,7 +131,7 @@ export const createComparisonChartOptions = (comparison, m1, m2) =>
         visible: false,
       },
       {
-        name: 'M2 Equity',
+        name: `${m2.name} Equity`,
         data: m2.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: Math.round(nw.equity),
@@ -127,6 +139,10 @@ export const createComparisonChartOptions = (comparison, m1, m2) =>
         visible: false,
       },
     ],
+    xAxis: {
+      min: minDate,
+      max: maxDate,
+    },
     tooltip: {
       valueDecimals: 0,
     },
