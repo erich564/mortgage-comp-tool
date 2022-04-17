@@ -1,4 +1,5 @@
 import Highcharts, { merge } from 'highcharts';
+import moment from 'moment';
 
 const yAxisLabelFormat = '${value:,.0f}';
 
@@ -9,7 +10,29 @@ Highcharts.setOptions({
 });
 
 let commonOptions;
-export const setCommonOptions = ({ minDateMs, maxDateMs }) => {
+
+/**
+ * Determines min/max dates that will cover both mortgage amortization time periods.
+ * Then adds some padding to those dates so the data is not pushing up against the
+ * ends of the chart.
+ */
+const calcMinMaxDatesForCharts = mortgages => {
+  const m1 = mortgages[0];
+  const m2 = mortgages[1];
+  const minDate = moment.min(m1.startDate, m2.startDate).clone();
+  const maxDate = moment.max(m1.endDate, m2.endDate).clone();
+  const diff = maxDate.diff(minDate, 'days');
+  const margin = 0.02;
+  const padding = diff * margin;
+  minDate.subtract(padding, 'days');
+  maxDate.add(padding, 'days');
+  const minDateMs = minDate.valueOf();
+  const maxDateMs = maxDate.valueOf();
+  return { minDateMs, maxDateMs };
+};
+
+export const setCommonOptions = mortgages => {
+  const { minDateMs, maxDateMs } = calcMinMaxDatesForCharts(mortgages);
   commonOptions = {
     chart: {
       type: 'spline',

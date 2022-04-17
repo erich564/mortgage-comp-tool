@@ -2,7 +2,6 @@ import { Divider } from '@mui/material';
 import clone from 'clone';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import moment from 'moment';
 import { memo } from 'react';
 import {
   createAmortizationChartOptions,
@@ -66,29 +65,6 @@ const transformState = reportState => {
   }
   return state;
 };
-
-/**
- * Determines min/max dates that will cover both mortgage amortization time periods.
- * Then adds some padding to those dates so the data is not pushing up against the
- * ends of the chart.
- */
-function calcMinMaxDatesForCharts(state) {
-  const m1 = state.mortgages[0];
-  const m2 = state.mortgages[1];
-  const minDate = moment.min(m1.startDate, m2.startDate).clone();
-  const maxDate = moment.max(
-    m1.startDate.clone().add(m1.term, 'months'),
-    m2.startDate.clone().add(m2.term, 'months')
-  );
-  const diff = maxDate.diff(minDate, 'days');
-  const margin = 0.015;
-  const padding = diff * margin;
-  minDate.subtract(padding, 'days');
-  maxDate.add(padding, 'days');
-  const minDateMs = minDate.valueOf();
-  const maxDateMs = maxDate.valueOf();
-  return { minDateMs, maxDateMs };
-}
 
 /**
  * Builds amortization schedule for a mortgages, with each payment's principal
@@ -246,7 +222,7 @@ function Report({ reportState }) {
   const state = transformState(reportState);
   createAmortizationSchedules(state.mortgages);
   const comparison = compareMortgages(state);
-  setCommonOptions(calcMinMaxDatesForCharts(state));
+  setCommonOptions(state.mortgages);
 
   return (
     <>
