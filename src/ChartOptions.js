@@ -16,7 +16,7 @@ let commonOptions;
  * Then adds some padding to those dates so the data is not pushing up against the
  * ends of the chart.
  */
-const calcMinMaxDatesForCharts = mortgages => {
+const calcMinMaxDates = mortgages => {
   const m1 = mortgages[0];
   const m2 = mortgages[1];
   const minDate = moment.min(m1.startDate, m2.startDate).clone();
@@ -32,7 +32,7 @@ const calcMinMaxDatesForCharts = mortgages => {
 };
 
 export const setCommonOptions = mortgages => {
-  const { minDateMs, maxDateMs } = calcMinMaxDatesForCharts(mortgages);
+  const { minDateMs, maxDateMs } = calcMinMaxDates(mortgages);
   commonOptions = {
     chart: {
       type: 'spline',
