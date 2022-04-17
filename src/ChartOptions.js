@@ -8,48 +8,47 @@ Highcharts.setOptions({
   },
 });
 
-const commonOptions = {
-  chart: {
-    type: 'spline',
-    zoomType: 'x',
-  },
-  plotOptions: {
-    series: {
-      states: {
-        hover: {
-          lineWidthPlus: 0,
+let commonOptions;
+export const setCommonOptions = ({ minDateMs, maxDateMs }) => {
+  commonOptions = {
+    chart: {
+      type: 'spline',
+      zoomType: 'x',
+    },
+    plotOptions: {
+      series: {
+        states: {
+          hover: {
+            lineWidthPlus: 0,
+          },
         },
       },
     },
-  },
-  xAxis: {
-    type: 'datetime',
-  },
-  yAxis: {
-    title: {
-      text: null,
+    xAxis: {
+      type: 'datetime',
+      min: minDateMs,
+      max: maxDateMs,
     },
-    labels: {
-      format: yAxisLabelFormat,
+    yAxis: {
+      title: {
+        text: null,
+      },
+      labels: {
+        format: yAxisLabelFormat,
+      },
     },
-  },
-  tooltip: {
-    shared: true,
-    crosshairs: true,
-    // xDateFormat: '%b %Y',
-    xDateFormat: '%m-%Y',
-    headerFormat: '{point.key}<br/>',
-    valuePrefix: '$',
-  },
+    tooltip: {
+      shared: true,
+      crosshairs: true,
+      // xDateFormat: '%b %Y',
+      xDateFormat: '%m-%Y',
+      headerFormat: '{point.key}<br/>',
+      valuePrefix: '$',
+    },
+  };
 };
 
-export const createComparisonChartOptions = (
-  comparison,
-  m1,
-  m2,
-  minDate,
-  maxDate
-) =>
+export const createComparisonChartOptions = (comparison, mortgages) =>
   merge(commonOptions, {
     title: {
       text: 'Mortgages Compared',
@@ -59,128 +58,74 @@ export const createComparisonChartOptions = (
         name: 'Net Worth Difference',
         data: comparison.map(c => ({
           x: c.unixTimeMs,
-          y: Math.round(c.difference),
+          y: c.difference,
         })),
       },
-      {
-        name: `${m1.name} Net Worth`,
-        data: m1.netWorth.map(nw => ({
+      ...mortgages.map(m => ({
+        name: `${m.name} Net Worth`,
+        data: m.netWorth.map(nw => ({
           x: nw.unixTimeMs,
-          y: Math.round(nw.netWorth),
+          y: nw.netWorth,
         })),
-      },
-      {
-        name: `${m2.name} Net Worth`,
-        data: m2.netWorth.map(nw => ({
+      })),
+      ...mortgages.map(m => ({
+        name: `${m.name} Cash`,
+        data: m.netWorth.map(nw => ({
           x: nw.unixTimeMs,
-          y: Math.round(nw.netWorth),
-        })),
-      },
-      {
-        name: `${m1.name} Cash`,
-        data: m1.netWorth.map(nw => ({
-          x: nw.unixTimeMs,
-          y: Math.round(nw.cash),
+          y: nw.cash,
         })),
         visible: false,
-      },
-      {
-        name: `${m2.name} Cash`,
-        data: m2.netWorth.map(nw => ({
+      })),
+      ...mortgages.map(m => ({
+        name: `${m.name} Equity`,
+        data: m.netWorth.map(nw => ({
           x: nw.unixTimeMs,
-          y: Math.round(nw.cash),
+          y: nw.equity,
         })),
         visible: false,
-      },
-      {
-        name: `${m1.name} Equity`,
-        data: m1.netWorth.map(nw => ({
-          x: nw.unixTimeMs,
-          y: Math.round(nw.equity),
-        })),
-        visible: false,
-      },
-      {
-        name: `${m2.name} Equity`,
-        data: m2.netWorth.map(nw => ({
-          x: nw.unixTimeMs,
-          y: Math.round(nw.equity),
-        })),
-        visible: false,
-      },
+      })),
     ],
-    xAxis: {
-      min: minDate,
-      max: maxDate,
-    },
     tooltip: {
       valueDecimals: 0,
     },
   });
 
-export const createCumulativeChartOptions = (m1, m2, minDate, maxDate) =>
+export const createCumulativeChartOptions = mortgages =>
   merge(commonOptions, {
     title: {
       text: `Cumulative Payments`,
     },
     series: [
-      {
-        name: `${m1.name} Payments`,
-        data: m1.payments.map(p => ({
+      ...mortgages.map(m => ({
+        name: `${m.name} Payments`,
+        data: m.payments.map(p => ({
           x: p.unixTimeMs,
           y: p.cumPayments,
         })),
-      },
-      {
-        name: `${m2.name} Payments`,
-        data: m2.payments.map(p => ({
-          x: p.unixTimeMs,
-          y: p.cumPayments,
-        })),
-      },
-      {
-        name: `${m1.name} Principal`,
-        data: m1.payments.map(p => ({
+      })),
+      ...mortgages.map(m => ({
+        name: `${m.name} Principal`,
+        data: m.payments.map(p => ({
           x: p.unixTimeMs,
           y: p.cumPrinciple,
         })),
         visible: false,
-      },
-      {
-        name: `${m2.name} Principal`,
-        data: m2.payments.map(p => ({
-          x: p.unixTimeMs,
-          y: p.cumPrinciple,
-        })),
-        visible: false,
-      },
-      {
-        name: `${m1.name} Interest`,
-        data: m1.payments.map(p => ({
+      })),
+      ...mortgages.map(m => ({
+        name: `${m.name} Interest`,
+        data: m.payments.map(p => ({
           x: p.unixTimeMs,
           y: p.cumInterest,
         })),
         visible: false,
-      },
-      {
-        name: `${m2.name} Interest`,
-        data: m2.payments.map(p => ({
-          x: p.unixTimeMs,
-          y: p.cumInterest,
-        })),
-        visible: false,
-      },
+      })),
     ],
-    xAxis: {
-      min: minDate,
-      max: maxDate,
-    },
     tooltip: {
       valueDecimals: 0,
     },
   });
 
-export const createAmortizationChartOptions = (m, minDate, maxDate) =>
+export const createAmortizationChartOptions = m =>
   merge(commonOptions, {
     title: {
       text: `${m.name} Amortization`,
@@ -201,10 +146,6 @@ export const createAmortizationChartOptions = (m, minDate, maxDate) =>
         })),
       },
     ],
-    xAxis: {
-      min: minDate,
-      max: maxDate,
-    },
     tooltip: {
       valueDecimals: 2,
     },

@@ -8,6 +8,7 @@ import {
   createAmortizationChartOptions,
   createComparisonChartOptions,
   createCumulativeChartOptions,
+  setCommonOptions,
 } from './ChartOptions';
 import { termToMonths } from './MortgageTerm';
 import { MortgageType, yearsUntilFirstAdjust } from './MortgageType';
@@ -71,7 +72,7 @@ const transformState = reportState => {
  * Then adds some padding to those dates so the data is not pushing up against the
  * ends of the chart.
  */
-function calcMinMaxDatesForAmortCharts(state) {
+function calcMinMaxDatesForCharts(state) {
   const m1 = state.mortgages[0];
   const m2 = state.mortgages[1];
   const minDate = moment.min(m1.startDate, m2.startDate).clone();
@@ -244,10 +245,8 @@ const compareMortgages = ({
 function Report({ reportState }) {
   const state = transformState(reportState);
   createAmortizationSchedules(state.mortgages);
-  const { minDateMs, maxDateMs } = calcMinMaxDatesForAmortCharts(state);
   const comparison = compareMortgages(state);
-  console.log(state);
-  const [m1, m2] = state.mortgages;
+  setCommonOptions(calcMinMaxDatesForCharts(state));
 
   return (
     <>
@@ -255,26 +254,19 @@ function Report({ reportState }) {
       <br />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createComparisonChartOptions(
-          comparison,
-          m1,
-          m2,
-          minDateMs,
-          maxDateMs
-        )}
+        options={createComparisonChartOptions(comparison, state.mortgages)}
       />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createCumulativeChartOptions(m1, m2, minDateMs, maxDateMs)}
+        options={createCumulativeChartOptions(state.mortgages)}
       />
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={createAmortizationChartOptions(m1, minDateMs, maxDateMs)}
-      />
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={createAmortizationChartOptions(m2, minDateMs, maxDateMs)}
-      />
+      {state.mortgages.map(m => (
+        <HighchartsReact
+          key={m.id}
+          highcharts={Highcharts}
+          options={createAmortizationChartOptions(m)}
+        />
+      ))}
     </>
   );
 }
