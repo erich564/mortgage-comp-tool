@@ -13,7 +13,7 @@ const mortgageTemplate = {
 };
 
 export const formDefaults = {
-  purchaseOrRefinance: 'purchase',
+  isRefinance: null,
   roi: '9',
   mortgages: [1, 2].map(n => ({
     ...mortgageTemplate,
@@ -25,7 +25,7 @@ export const formDefaults = {
 
 export const sampleData = [
   {
-    purchaseOrRefinance: 'refinance',
+    isRefinance: true,
     roi: '9',
     mortgages: [
       {
@@ -53,7 +53,7 @@ export const sampleData = [
     marginalTaxRate: '40',
   },
   {
-    purchaseOrRefinance: 'purchase',
+    isRefinance: false,
     roi: '8.5',
     mortgages: [
       {

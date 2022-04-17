@@ -39,18 +39,18 @@ export default function InputForm({
         </FormLabel>
         <RadioGroup
           row
-          name="purchaseOrRefinance"
-          value={state.purchaseOrRefinance}
+          name="isRefinance"
+          value={String(state.isRefinance)}
           onChange={handleChange}
         >
           <FormControlLabel
-            value="purchase"
-            control={<Radio />}
+            value="false"
+            control={<Radio required />}
             label="Purchasing"
           />
           <FormControlLabel
-            value="refinance"
-            control={<Radio />}
+            value="true"
+            control={<Radio required />}
             label="Refinancing"
           />
         </RadioGroup>
