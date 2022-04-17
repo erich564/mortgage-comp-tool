@@ -30,7 +30,7 @@ export default function InputForm({
       <FormControl>
         <FormLabel
           sx={{
-            '&.Mui-focused': {
+            '&.MuiFormLabel-root': {
               color: 'rgba(0, 0, 0, 0.87)',
             },
           }}
