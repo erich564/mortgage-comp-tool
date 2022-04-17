@@ -1,6 +1,6 @@
 import moment from 'moment';
-import MortgageTerm from './MortgageTerm';
-import MortgageType from './MortgageType';
+import { MortgageTerm } from './MortgageTerm';
+import { MortgageType } from './MortgageType';
 
 const mortgageTemplate = {
   loanAmount: '',

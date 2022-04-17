@@ -70,7 +70,7 @@ export default function App() {
       />
       {doShowReport && (
         <Suspense fallback={<p>Loading...</p>}>
-          <Report state={reportState} />
+          <Report reportState={reportState} />
         </Suspense>
       )}
     </Stack>
