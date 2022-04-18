@@ -26,6 +26,7 @@ export default function Header({ handleSampleData }) {
         <Button onClick={handleOpen}>What is this?</Button>
         <Button onClick={() => handleSampleData(0)}>Sample Data 1</Button>
         <Button onClick={() => handleSampleData(1)}>Sample Data 2</Button>
+        <Button onClick={() => handleSampleData(2)}>Sample Data 3</Button>
       </Stack>
 
       <Dialog fullWidth maxWidth="md" open={open} onClose={handleClose}>

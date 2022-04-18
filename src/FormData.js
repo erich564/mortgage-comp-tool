@@ -82,4 +82,32 @@ export const sampleData = [
     doItemize: true,
     marginalTaxRate: '40',
   },
+  {
+    isRefinance: true,
+    roi: '4',
+    mortgages: [
+      {
+        id: 1,
+        loanAmount: '519400',
+        term: MortgageTerm._30_years,
+        type: MortgageType.FixedRate,
+        interestRate: '2.625',
+        startDate: moment('2020-09-1'),
+        interestRateAdjusted: '',
+        closingCosts: '2000',
+      },
+      {
+        id: 2,
+        loanAmount: '1500000',
+        term: MortgageTerm._30_years,
+        type: MortgageType.FixedRate,
+        interestRate: '2.5',
+        startDate: moment('2022-01-01'),
+        interestRateAdjusted: '',
+        closingCosts: '0',
+      },
+    ],
+    doItemize: false,
+    marginalTaxRate: '40',
+  },
 ];
