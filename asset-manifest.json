@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/mortgage-comp-tool/static/css/main.6e4e4140.css",
+    "main.js": "/mortgage-comp-tool/static/js/main.5d978cfb.js",
+    "static/js/969.886790db.chunk.js": "/mortgage-comp-tool/static/js/969.886790db.chunk.js",
+    "static/js/787.30ef975a.chunk.js": "/mortgage-comp-tool/static/js/787.30ef975a.chunk.js",
+    "static/js/903.78912916.chunk.js": "/mortgage-comp-tool/static/js/903.78912916.chunk.js",
+    "index.html": "/mortgage-comp-tool/index.html",
+    "main.6e4e4140.css.map": "/mortgage-comp-tool/static/css/main.6e4e4140.css.map",
+    "main.5d978cfb.js.map": "/mortgage-comp-tool/static/js/main.5d978cfb.js.map",
+    "969.886790db.chunk.js.map": "/mortgage-comp-tool/static/js/969.886790db.chunk.js.map",
+    "787.30ef975a.chunk.js.map": "/mortgage-comp-tool/static/js/787.30ef975a.chunk.js.map",
+    "903.78912916.chunk.js.map": "/mortgage-comp-tool/static/js/903.78912916.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6e4e4140.css",
+    "static/js/main.5d978cfb.js"
+  ]
+}
