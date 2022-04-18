@@ -92,7 +92,7 @@ const createAmortizationSchedules = mortgages => {
       const bEnd = roundToTwo(bStart - prin);
       b = bEnd;
       const cumPrin = roundToTwo(
-        prin + (prevPayment ? prevPayment.cumPrinciple : 0)
+        prin + (prevPayment ? prevPayment.cumPrincipal : 0)
       );
       const cumInt = roundToTwo(
         int + (prevPayment ? prevPayment.cumInterest : 0)
@@ -105,7 +105,7 @@ const createAmortizationSchedules = mortgages => {
         unixTimeMs: date.valueOf(),
         startingBalance: bStart,
         remainingBalance: bEnd,
-        cumPrinciple: cumPrin,
+        cumPrincipal: cumPrin,
         cumInterest: cumInt,
         cumPayments,
       };

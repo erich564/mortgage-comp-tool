@@ -130,7 +130,7 @@ export const createCumulativeChartOptions = mortgages =>
         name: `${m.name} Principal`,
         data: m.payments.map(p => ({
           x: p.unixTimeMs,
-          y: p.cumPrinciple,
+          y: p.cumPrincipal,
         })),
         visible: false,
       })),
