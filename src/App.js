@@ -4,11 +4,16 @@ import { Suspense, lazy, useState } from 'react';
 import { formDefaults, sampleData } from './FormData';
 import Header from './Header';
 import InputForm from './InputForm';
+import { queryStringToState } from './QueryStringUtil';
 
 const Report = lazy(() => import('./Report'));
 
 export default function App() {
-  const [formState, setFormState] = useState(clone(formDefaults));
+  const isQueryString = window.location.search !== '';
+  const initialFormState = isQueryString
+    ? queryStringToState(clone(formDefaults))
+    : clone(formDefaults);
+  const [formState, setFormState] = useState(initialFormState);
   const [reportState, setReportState] = useState(clone(formDefaults));
   const [doShowReport, setDoShowReport] = useState(false);
 

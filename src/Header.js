@@ -11,9 +11,9 @@ import {
 import React, { useState } from 'react';
 
 export default function Header({ handleSampleData }) {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
 
   return (
     <>
@@ -29,7 +29,7 @@ export default function Header({ handleSampleData }) {
         <Button onClick={() => handleSampleData(2)}>Sample Data 3</Button>
       </Stack>
 
-      <Dialog fullWidth maxWidth="md" open={open} onClose={handleClose}>
+      <Dialog maxWidth="md" open={isOpen} onClose={handleClose}>
         <DialogTitle>What is this?</DialogTitle>
         <DialogContent>
           <DialogContentText>

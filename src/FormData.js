@@ -25,7 +25,7 @@ export const formDefaults = {
 };
 
 const nextViableStartDate = moment().startOf('month').add(2, 'months');
-const strFormat = 'YYYY-MM-DD';
+export const MOMENT_FORMAT = 'YYYY-MM-DD';
 
 export const sampleData = [
   {
@@ -38,7 +38,7 @@ export const sampleData = [
         term: MortgageTerm._30_years,
         type: MortgageType._7_1_Arm,
         interestRate: '2.75',
-        startDate: moment('2016-12-01', strFormat),
+        startDate: moment('2016-12-01', MOMENT_FORMAT),
         isStartDateChanged: true,
         interestRateAdjusted: '6',
         closingCosts: '2000',
@@ -98,7 +98,7 @@ export const sampleData = [
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
         interestRate: '2.625',
-        startDate: moment('2020-09-1', strFormat),
+        startDate: moment('2020-09-1', MOMENT_FORMAT),
         isStartDateChanged: true,
         interestRateAdjusted: '',
         closingCosts: '2000',
@@ -109,7 +109,7 @@ export const sampleData = [
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
         interestRate: '2.5',
-        startDate: moment('2022-01-01', strFormat),
+        startDate: moment('2022-01-01', MOMENT_FORMAT),
         isStartDateChanged: true,
         interestRateAdjusted: '',
         closingCosts: '0',
