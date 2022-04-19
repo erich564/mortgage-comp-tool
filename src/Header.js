@@ -2,6 +2,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ShareIcon from '@mui/icons-material/Share';
 import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
+import { sampleData } from './FormData';
 import InfoDialog from './InfoDialog';
 import ShareDialog from './ShareDialog';
 
@@ -10,6 +11,7 @@ export default function Header({ state, handleSampleData }) {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const handleMenuClose = () => setMenuAnchorEl(null);
+  const sampleDataLen = sampleData.length;
 
   const selectMenuItem = n => {
     handleSampleData(n);
@@ -45,9 +47,11 @@ export default function Header({ state, handleSampleData }) {
         open={Boolean(menuAnchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={() => selectMenuItem(0)}>Sample Data 1</MenuItem>
-        <MenuItem onClick={() => selectMenuItem(1)}>Sample Data 2</MenuItem>
-        <MenuItem onClick={() => selectMenuItem(2)}>Sample Data 3</MenuItem>
+        {[...Array(sampleDataLen).keys()].map(n => (
+          <MenuItem key={n} onClick={() => selectMenuItem(n)}>
+            Sample Data {n + 1}
+          </MenuItem>
+        ))}
       </Menu>
 
       <InfoDialog
