@@ -94,7 +94,7 @@ export const sampleData = [
     mortgages: [
       {
         id: 1,
-        loanAmount: '519400',
+        loanAmount: '520000',
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
         interestRate: '2.625',

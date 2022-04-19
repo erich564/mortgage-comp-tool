@@ -13,8 +13,12 @@ import copy from 'copy-to-clipboard';
 import { useState } from 'react';
 import { stateToQueryStringUrl } from './QueryStringUtil';
 
-export default function ShareDialog({ state, isDialogOpen, setIsDialogOpen }) {
-  const handleClose = () => setIsDialogOpen(false);
+export default function ShareDialog({
+  state,
+  isShareDialogOpen,
+  setIsShareDialogOpen,
+}) {
+  const handleClose = () => setIsShareDialogOpen(false);
   const initialText = 'Click to copy';
   const clickedText = 'Copied!';
   const [tooltip, setTooltip] = useState(initialText);
@@ -27,7 +31,12 @@ export default function ShareDialog({ state, isDialogOpen, setIsDialogOpen }) {
   };
 
   return (
-    <Dialog fullWidth maxWidth="sm" open={isDialogOpen} onClose={handleClose}>
+    <Dialog
+      fullWidth
+      maxWidth="sm"
+      open={isShareDialogOpen}
+      onClose={handleClose}
+    >
       <DialogTitle>Share</DialogTitle>
       <DialogContent>
         <Tooltip

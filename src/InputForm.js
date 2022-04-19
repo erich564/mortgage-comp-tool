@@ -1,4 +1,3 @@
-import ShareIcon from '@mui/icons-material/Share';
 import {
   Box,
   Button,
@@ -6,15 +5,12 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Grid,
   InputAdornment,
   Radio,
   RadioGroup,
   TextField,
 } from '@mui/material';
-import { useState } from 'react';
 import MortgageForm from './MortgageForm';
-import ShareDialog from './ShareDialog';
 
 const inputWidth = '120px';
 
@@ -24,8 +20,6 @@ export default function InputForm({
   handleMortgageChange,
   handleSubmit,
 }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   return (
     <Box
       component="form"
@@ -118,27 +112,9 @@ export default function InputForm({
       </FormControl>
       <br />
       <br />
-      <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
-        <Grid item>
-          <Button variant="contained" type="submit">
-            Compare
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="outlined"
-            startIcon={<ShareIcon />}
-            onClick={() => setIsDialogOpen(true)}
-          >
-            Share
-          </Button>
-          <ShareDialog
-            state={state}
-            isDialogOpen={isDialogOpen}
-            setIsDialogOpen={setIsDialogOpen}
-          />
-        </Grid>
-      </Grid>
+      <Button variant="contained" type="submit">
+        Compare
+      </Button>
       <br />
       <br />
     </Box>

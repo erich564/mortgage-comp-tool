@@ -58,8 +58,6 @@ export const queryStringToState = formDefaults => {
   const qsState = unflatten(
     queryString.parse(window.location.search, { parseBooleans: true })
   );
-  console.log('newState', newState);
-  console.log('qsState', qsState);
   merge(true, newState, qsState);
   for (const m of newState.mortgages) {
     m.isStartDateChanged = m.startDate !== null;
@@ -78,7 +76,6 @@ export const stateToQueryStringUrl = pState => {
     }
     delete m.isStartDateChanged;
   }
-  // state = translatePropertyNames(state);
   const flatState = flat(state);
   const qs = queryString.stringify(flatState, {
     skipEmptyString: true,

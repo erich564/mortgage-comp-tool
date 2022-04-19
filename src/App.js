@@ -77,7 +77,7 @@ export default function App() {
       <Typography variant="h4" component="div">
         Mortgage Comparison Tool
       </Typography>
-      <Header handleSampleData={handleSampleData} />
+      <Header handleSampleData={handleSampleData} state={formState} />
       <InputForm
         state={formState}
         handleChange={handleChange}
