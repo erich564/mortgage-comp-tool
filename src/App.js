@@ -2,9 +2,9 @@ import { Stack, Typography } from '@mui/material';
 import clone from 'clone';
 import { Suspense, lazy, useState } from 'react';
 import { formDefaults, sampleData } from './FormData';
-import Header from './Header';
 import InputForm from './InputForm';
 import { queryStringToState } from './QueryStringUtil';
+import Header from './header/Header';
 
 const Report = lazy(() => import('./Report'));
 

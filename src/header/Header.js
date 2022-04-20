@@ -2,9 +2,9 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ShareIcon from '@mui/icons-material/Share';
 import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
-import { sampleData } from './FormData';
+import { sampleData } from '../FormData';
+import { stateToQueryStringUrl } from '../QueryStringUtil';
 import InfoDialog from './InfoDialog';
-import { stateToQueryStringUrl } from './QueryStringUtil';
 import ShareDialog from './ShareDialog';
 
 export default function Header({ state, handleSampleData }) {
