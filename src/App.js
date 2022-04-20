@@ -37,6 +37,7 @@ export default function App() {
   const handleMortgageChange = (mortgageId, data, key) => {
     const name = key ?? data.target.name;
     let value;
+    // if true, then is start date field and data is a moment
     if (key) {
       value = data;
     } else if (data.target.type === 'checkbox') {
@@ -46,19 +47,24 @@ export default function App() {
     }
 
     const newState = clone(formState);
-    // if true, then is start date field
+
     if (mortgageId !== undefined) {
       const mortgage = newState.mortgages.find(m => m.id === mortgageId);
       mortgage[name] = value;
-      mortgage.isStartDateChanged = true;
-      if (newState.isRefinance !== true)
-        for (const m of newState.mortgages) {
-          // set start date of other mortgage to same value if not refinance and
-          // user has not changed it already
-          if (!m.isStartDateChanged) {
-            m[name] = value;
+
+      // if key, data is a moment
+      if (key) {
+        mortgage.isStartDateChanged = true;
+        if (newState.isRefinance !== true) {
+          for (const m of newState.mortgages) {
+            // set start date of other mortgage to same value if not refinance and
+            // user has not changed it already
+            if (!m.isStartDateChanged) {
+              m[name] = value;
+            }
           }
         }
+      }
     } else {
       newState[name] = value;
     }
