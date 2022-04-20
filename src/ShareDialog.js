@@ -10,18 +10,22 @@ import {
   Tooltip,
 } from '@mui/material';
 import copy from 'copy-to-clipboard';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 
 export default function ShareDialog({
   link,
   isShareDialogOpen,
   setIsShareDialogOpen,
 }) {
-  const handleClose = () => setIsShareDialogOpen(false);
   const initialText = 'Click to copy';
   const clickedText = 'Copied!';
   const [tooltip, setTooltip] = useState(initialText);
+  const handleClose = () => setIsShareDialogOpen(false);
+  const textField = createRef();
+
   const handleClick = () => {
+    textField.current.select();
+
     copy(link, {
       format: 'text/plain',
       onCopy: () => setTooltip(clickedText),
@@ -66,6 +70,7 @@ export default function ShareDialog({
                       cursor: 'pointer',
                     },
                   },
+                  ref: textField,
                 },
               }}
             />
