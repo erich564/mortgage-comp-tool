@@ -11,10 +11,9 @@ import {
 } from '@mui/material';
 import copy from 'copy-to-clipboard';
 import { useState } from 'react';
-import { stateToQueryStringUrl } from './QueryStringUtil';
 
 export default function ShareDialog({
-  state,
+  link,
   isShareDialogOpen,
   setIsShareDialogOpen,
 }) {
@@ -22,7 +21,6 @@ export default function ShareDialog({
   const initialText = 'Click to copy';
   const clickedText = 'Copied!';
   const [tooltip, setTooltip] = useState(initialText);
-  const link = stateToQueryStringUrl(state);
   const handleClick = () => {
     copy(link, {
       format: 'text/plain',

@@ -4,6 +4,7 @@ import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import { sampleData } from './FormData';
 import InfoDialog from './InfoDialog';
+import { stateToQueryStringUrl } from './QueryStringUtil';
 import ShareDialog from './ShareDialog';
 
 export default function Header({ state, handleSampleData }) {
@@ -18,6 +19,7 @@ export default function Header({ state, handleSampleData }) {
     handleMenuClose();
   };
   const buttonStyle = { px: 2 };
+  const link = stateToQueryStringUrl(state);
 
   return (
     <>
@@ -60,7 +62,7 @@ export default function Header({ state, handleSampleData }) {
       />
 
       <ShareDialog
-        state={state}
+        link={link}
         isShareDialogOpen={isShareDialogOpen}
         setIsShareDialogOpen={setIsShareDialogOpen}
       />
