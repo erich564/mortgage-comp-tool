@@ -1,9 +1,9 @@
 import clone from 'clone';
 import flat, { unflatten } from 'flat';
-import { merge } from 'highcharts';
 import moment from 'moment';
 import queryString from 'query-string';
 import { MOMENT_FORMAT } from './FormData';
+import merge from './Merge';
 
 // eslint-disable-next-line no-unused-vars
 const { url: baseUrl, query: initialQuery } = queryString.parseUrl(
@@ -54,11 +54,11 @@ const translatePropertyNames = state => {
 */
 
 export const queryStringToState = formDefaults => {
-  const newState = formDefaults;
+  let newState = formDefaults;
   const qsState = unflatten(
     queryString.parse(window.location.search, { parseBooleans: true })
   );
-  merge(true, newState, qsState);
+  newState = merge(newState, qsState);
   for (const m of newState.mortgages) {
     m.isStartDateChanged = m.startDate !== null;
     m.startDate = moment(m.startDate, MOMENT_FORMAT);
