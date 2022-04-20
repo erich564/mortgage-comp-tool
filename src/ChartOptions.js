@@ -27,13 +27,33 @@ const calcMinMaxDates = mortgages => {
   const padding = diff * margin;
   minDate.subtract(padding, 'days');
   maxDate.add(padding, 'days');
-  const minDateMs = minDate.valueOf();
-  const maxDateMs = maxDate.valueOf();
-  return { minDateMs, maxDateMs };
+  return { minDate, maxDate };
+};
+
+/**
+ * Vertical lines on the graphs.
+ */
+const makePlotLines = (minDate, maxDate) => {
+  const yearsBetweenLines = 5;
+  const arr = [];
+  const date = minDate.clone().add(1, 'year').startOf('year');
+  while (date.year() % yearsBetweenLines !== 0) date.add(1, 'year');
+  while (date.isBefore(maxDate)) {
+    arr.push({
+      color: '#EEE',
+      width: 1,
+      value: date.valueOf(),
+      zIndex: 2,
+    });
+    date.add(yearsBetweenLines, 'year');
+  }
+  return arr;
 };
 
 export const setCommonOptions = mortgages => {
-  const { minDateMs, maxDateMs } = calcMinMaxDates(mortgages);
+  const { minDate, maxDate } = calcMinMaxDates(mortgages);
+  const plotLines = makePlotLines(minDate, maxDate);
+
   commonOptions = {
     chart: {
       type: 'spline',
@@ -50,8 +70,9 @@ export const setCommonOptions = mortgages => {
     },
     xAxis: {
       type: 'datetime',
-      min: minDateMs,
-      max: maxDateMs,
+      min: minDate.valueOf(),
+      max: maxDate.valueOf(),
+      plotLines,
     },
     yAxis: {
       title: {

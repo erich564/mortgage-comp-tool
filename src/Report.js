@@ -182,7 +182,9 @@ const compareMortgages = ({
         m1Payment = m1.rateAdjust.monthlyPayment;
       const accruedInt = m1PrevCash === undefined ? 0 : m1PrevCash * monthlyRoi;
       m1Cash = m1Cash - m1Payment + accruedInt;
-      if (doItemize) m1Cash += m1.payments[m1n].interest * marginalTaxRate;
+      if (doItemize) {
+        m1Cash += m1.payments[m1n].interest * marginalTaxRate;
+      }
       m1Equity += m1.payments[m1n].principal;
       m1NetWorth = m1Cash + m1Equity;
       m1.netWorth.push({
@@ -200,7 +202,9 @@ const compareMortgages = ({
         m2Payment = m2.rateAdjust.monthlyPayment;
       const accruedInt = m2PrevCash === undefined ? 0 : m2PrevCash * monthlyRoi;
       m2Cash = m2Cash - m2Payment + accruedInt;
-      if (doItemize) m2Cash += m2.payments[m2n].interest * marginalTaxRate;
+      if (doItemize) {
+        m2Cash += m2.payments[m2n].interest * marginalTaxRate;
+      }
       m2Equity += m2.payments[m2n].principal;
       m2NetWorth = m2Cash + m2Equity;
       m2.netWorth.push({
