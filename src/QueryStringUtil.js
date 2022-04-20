@@ -63,7 +63,6 @@ export const queryStringToState = formDefaults => {
     m.isStartDateChanged = m.startDate !== null;
     m.startDate = moment(m.startDate, MOMENT_FORMAT);
     m.id = +m.id;
-    m.interestRateAdjusted ??= '';
   }
   return newState;
 };
