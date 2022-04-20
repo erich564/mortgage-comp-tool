@@ -5,10 +5,7 @@ import queryString from 'query-string';
 import { MOMENT_FORMAT } from './FormData';
 import merge from './Merge';
 
-// eslint-disable-next-line no-unused-vars
-const { url: baseUrl, query: initialQuery } = queryString.parseUrl(
-  window.location.href
-);
+const { url: baseUrl } = queryString.parseUrl(window.location.href);
 
 /*
 const map = new Map();
@@ -64,6 +61,7 @@ export const queryStringToState = formDefaults => {
     m.startDate = moment(m.startDate, MOMENT_FORMAT);
     m.id = +m.id;
   }
+  newState.mortgages = newState.mortgages.sort((a, b) => a.id - b.id);
   return newState;
 };
 
