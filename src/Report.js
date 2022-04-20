@@ -164,8 +164,8 @@ const compareMortgages = ({
     m2Equity = 0;
   }
 
-  let m1PrevCash;
-  let m2PrevCash;
+  let m1PrevCash = m1Cash;
+  let m2PrevCash = m2Cash;
   const netWorthDifferences = [];
   let m1Payment = m1.monthlyPayment;
   let m2Payment = m2.monthlyPayment;
