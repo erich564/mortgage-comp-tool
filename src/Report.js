@@ -133,8 +133,12 @@ const compareMortgages = ({
   marginalTaxRate,
   monthlyRoi,
 }) => {
-  const m1 = mortgages[0];
-  const m2 = mortgages[1];
+  let m1 = mortgages[0];
+  let m2 = mortgages[1];
+  const isM2StartDateBeforeM1 = m2.startDate.isBefore(m1.startDate);
+  if (isM2StartDateBeforeM1) {
+    [m1, m2] = [m2, m1];
+  }
   let m1n = 0;
   let m2n = 0;
   const m1PayLen = m1.payments.length;
@@ -225,7 +229,6 @@ function Report({ reportState }) {
   createAmortizationSchedules(state.mortgages);
   const comparison = compareMortgages(state);
   setCommonOptions(state.mortgages);
-
   return (
     <>
       <Divider variant="middle" />
