@@ -9,8 +9,8 @@ import {
   createCumulativeChartOptions,
   setCommonOptions,
 } from './ChartOptions';
-import { termToMonths } from './MortgageTerm';
-import { MortgageType, yearsUntilFirstAdjust } from './MortgageType';
+import MortgageTerm from './MortgageTerm';
+import MortgageType from './MortgageType';
 
 const monthsPerYear = 12;
 
@@ -43,10 +43,10 @@ const transformState = reportState => {
     m.name = `Mortgage ${m.id}`;
     m.interestRate /= 100;
     m.loanAmount = +m.loanAmount;
-    m.term = termToMonths(m.term);
+    m.term = MortgageTerm.props[m.term].months;
     m.endDate = m.startDate.clone().add(m.term - 1, 'months');
     if (m.type !== MortgageType.FixedRate) {
-      const years = yearsUntilFirstAdjust(m.type);
+      const years = MortgageType.props[m.type].yearsFixed;
       const intRate = m.interestRateAdjusted / 100;
       m.rateAdjust = {
         interestRate: intRate,
@@ -186,7 +186,7 @@ const compareMortgages = ({
         m1Cash += m1.payments[m1n].interest * marginalTaxRate;
       }
       m1Equity += m1.payments[m1n].principal;
-      m1NetWorth = m1Cash + m1Equity;
+      m1NetWorth = roundToTwo(m1Cash + m1Equity);
       m1.netWorth.push({
         unixTimeMs,
         cash: m1Cash,
@@ -233,6 +233,7 @@ function Report({ reportState }) {
   createAmortizationSchedules(state.mortgages);
   const comparison = compareMortgages(state);
   setCommonOptions(state.mortgages);
+
   return (
     <>
       <Divider variant="middle" />

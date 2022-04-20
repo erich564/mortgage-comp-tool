@@ -12,8 +12,8 @@ import {
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { MortgageTerm } from './MortgageTerm';
-import { MortgageType } from './MortgageType';
+import MortgageTerm from './MortgageTerm';
+import MortgageType from './MortgageType';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -116,11 +116,11 @@ export default function MortgageForm({ handleMortgageChange, state }) {
             sx={{ width: skinnyWidth }}
             onChange={handleChange}
           >
-            <MenuItem value={MortgageTerm._10_years}>10 years</MenuItem>
-            <MenuItem value={MortgageTerm._15_years}>15 years</MenuItem>
-            <MenuItem value={MortgageTerm._20_years}>20 years</MenuItem>
-            <MenuItem value={MortgageTerm._30_years}>30 years</MenuItem>
-            <MenuItem value={MortgageTerm._40_years}>40 years</MenuItem>
+            {Object.keys(MortgageTerm.props).map(n => (
+              <MenuItem key={n} value={n}>
+                {MortgageTerm.props[n].name}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <br />
@@ -134,11 +134,11 @@ export default function MortgageForm({ handleMortgageChange, state }) {
             sx={{ width: skinnyWidth, mr: gutterWidth }}
             onChange={handleChange}
           >
-            <MenuItem value={MortgageType.FixedRate}>Fixed-rate</MenuItem>
-            <MenuItem value={MortgageType._10_1_Arm}>10/1 ARM</MenuItem>
-            <MenuItem value={MortgageType._7_1_Arm}>7/1 ARM</MenuItem>
-            <MenuItem value={MortgageType._5_1_Arm}>5/1 ARM</MenuItem>
-            <MenuItem value={MortgageType._3_1_Arm}>3/1 ARM</MenuItem>
+            {Object.keys(MortgageType.props).map(n => (
+              <MenuItem key={n} value={n}>
+                {MortgageType.props[n].name}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <TextField

@@ -1,22 +1,18 @@
-export const MortgageTerm = {
-  _40_years: '40 years',
-  _30_years: '30 years',
-  _20_years: '20 years',
-  _15_years: '15 years',
-  _10_years: '10 years',
+const monthsPerYear = 12;
+
+const MortgageTerm = {
+  _40_years: '1',
+  _30_years: '2',
+  _20_years: '3',
+  _15_years: '4',
+  _10_years: '5',
+  props: {
+    1: { name: '40 years', months: 40 * monthsPerYear },
+    2: { name: '30 years', months: 30 * monthsPerYear },
+    3: { name: '20 years', months: 20 * monthsPerYear },
+    4: { name: '15 years', months: 15 * monthsPerYear },
+    5: { name: '10 years', months: 10 * monthsPerYear },
+  },
 };
 
-export const termToMonths = t => {
-  switch (t) {
-    case MortgageTerm._40_years:
-      return 480;
-    case MortgageTerm._30_years:
-      return 360;
-    case MortgageTerm._20_years:
-      return 240;
-    case MortgageTerm._10_years:
-      return 120;
-    default:
-      throw new Error('invalid MortgageTerm!');
-  }
-};
+export default MortgageTerm;
