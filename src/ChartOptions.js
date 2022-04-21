@@ -91,6 +91,9 @@ export const setCommonOptions = mortgages => {
             enabled: false,
           },
         },
+        marker: {
+          radius: 2,
+        },
       },
     },
     xAxis: {
