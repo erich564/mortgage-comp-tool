@@ -6,7 +6,8 @@ import InputForm from './InputForm';
 import { queryStringToState } from './QueryStringUtil';
 import Header from './header/Header';
 
-const Report = lazy(() => import('./Report'));
+const reportPromise = import('./Report');
+const Report = lazy(() => reportPromise);
 
 export default function App() {
   const isQueryString = window.location.search !== '';
