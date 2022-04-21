@@ -238,13 +238,13 @@ function Report({ reportState }) {
   createAmortizationSchedules(state.mortgages);
   const comparison = compareMortgages(state);
   setCommonOptions(state.mortgages);
-  console.log(state);
 
   const tableCellStyle = {
     border: 0,
     fontSize: 'initial',
     padding: 1,
   };
+
   return (
     <>
       <Divider variant="middle" />
@@ -294,44 +294,56 @@ function Report({ reportState }) {
       <br />
       The difference in net worths is the bottom-line takeaway for this tool.
       Note that you can zoom in on graphs by clicking and dragging.
+      <br />
+      <br />
       <HighchartsReact
         highcharts={Highcharts}
         options={createNetWorthChartOptions(comparison, state.mortgages)}
       />
-      The Net Worth graph shows how Mortgage 1 and Mortgage 2 compare in value
-      over time. Net Worth is defined here as Cash plus Equity. See below. The
-      Difference graph line values are simply &quot;Mortgage 2 Net Worth&quot;
-      minus &quot;Mortgage 1 Net Worth.&quot;
+      <p>
+        The Net Worth graph shows how Mortgage 1 and Mortgage 2 compare in value
+        over time. Net Worth is defined here as Cash plus Equity. See below. The
+        Difference graph line values are simply &quot;Mortgage 2 Net Worth&quot;
+        minus &quot;Mortgage 1 Net Worth.&quot;
+      </p>
+      <br />
       <HighchartsReact
         highcharts={Highcharts}
         options={createCashEquityChartOptions(state.mortgages)}
       />
-      For each monthly mortgage payment made, Cash goes down by that amount.
-      Equity goes up by the principal portion of the payment. Cash has
-      additional value over time, as it can be invested. To account for the time
-      value of money, each month Cash is multiplied by a monthly ROI value
-      (which is derived from the yearly ROI value supplied above). If Cash is
-      positive, then this value is added to Cash. If Cash is negative, then this
-      value is an opportunity cost that gets subtracted from Cash.
+      <p>
+        For each monthly mortgage payment made, Cash goes down by that amount.
+        Equity goes up by the principal portion of the payment. Cash has
+        additional value over time, as it can be invested. To account for the
+        time value of money, each month Cash is multiplied by a monthly ROI
+        value (which is derived from the yearly ROI value supplied above). If
+        Cash is positive, then this value is added to Cash. If Cash is negative,
+        then this value is an opportunity cost that gets subtracted from Cash.
+        <br />
+        <br />
+        If this scenario is a refinance, then the starting cash starts off
+        increased by the cash-out amount and equity starts off decreased by the
+        cash-out amount.
+        <br />
+      </p>
       <br />
-      <br />
-      If this scenario is a refinance, then the starting cash starts off
-      increased by the cash-out amount and equity starts off decreased by the
-      cash-out amount.
       <HighchartsReact
         highcharts={Highcharts}
         options={createPaymentsChartOptions(state.mortgages)}
       />
-      This graph shows a running total of mortgage payments made. It is further
-      divided into cumulative principal and cumulative interest, via other graph
-      lines. You can show/hide them by clicking on legend entries.
+      <p>
+        This graph shows a running total of mortgage payments made. It is
+        further divided into cumulative principal and cumulative interest, via
+        other graph lines. You can show/hide them by clicking on legend entries.
+      </p>
       {state.mortgages.map(m => (
         <Fragment key={m.id}>
+          <br />
           <HighchartsReact
             highcharts={Highcharts}
             options={createAmortizationChartOptions(m)}
           />
-          Amortization schedule for Mortgage {m.id}.
+          <p>Amortization schedule for Mortgage {m.id}.</p>
         </Fragment>
       ))}
     </>

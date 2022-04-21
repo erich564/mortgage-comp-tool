@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Alert, Snackbar, Stack, Typography } from '@mui/material';
 import clone from 'clone';
 import { Suspense, lazy, useState } from 'react';
 import { formDefaults, sampleData } from './FormData';
@@ -15,9 +15,11 @@ export default function App() {
     : clone(formDefaults);
   const [formState, setFormState] = useState(initialFormState);
   const [reportState, setReportState] = useState(clone(formDefaults));
-  const [doShowReport, setDoShowReport] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [showSnackbar, setShowSnackbar] = useState(false);
 
   const handleSampleData = ndx => setFormState(sampleData[ndx]);
+  const handleCloseSnackbar = () => setShowSnackbar(false);
 
   const handleChange = e => {
     const value =
@@ -74,7 +76,8 @@ export default function App() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    setDoShowReport(true);
+    setShowSnackbar(true);
+    setShowReport(true);
     setReportState(clone(formState));
   };
 
@@ -90,11 +93,20 @@ export default function App() {
         handleMortgageChange={handleMortgageChange}
         handleSubmit={handleSubmit}
       />
-      {doShowReport && (
+      {showReport && (
         <Suspense fallback={<p>Loading...</p>}>
           <Report reportState={reportState} />
         </Suspense>
       )}
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={2500}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert elevation={6} onClose={handleCloseSnackbar} severity="success">
+          Created report!
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }
