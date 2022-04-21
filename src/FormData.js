@@ -98,7 +98,7 @@ export const sampleData = [
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
         interestRate: '2.625',
-        startDate: moment('2020-09-1', MOMENT_FORMAT),
+        startDate: moment('2020-09-1', MOMENT_FORMAT), // closing date 07/10/20
         isStartDateChanged: true,
         interestRateAdjusted: '',
         closingCosts: '2000',
