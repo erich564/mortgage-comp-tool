@@ -1,6 +1,6 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ShareIcon from '@mui/icons-material/Share';
-import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
+import { Button, ButtonGroup, Menu } from '@mui/material';
 import { useState } from 'react';
 import { sampleData } from '../FormData';
 import { stateToQueryStringUrl } from '../QueryStringUtil';
@@ -50,9 +50,13 @@ export default function Header({ state, handleSampleData }) {
         onClose={handleMenuClose}
       >
         {[...Array(sampleDataLen).keys()].map(n => (
-          <MenuItem key={n} onClick={() => selectMenuItem(n)}>
+          <Button
+            key={n}
+            onClick={() => selectMenuItem(n)}
+            sx={{ display: 'flex', flexDirection: 'column' }}
+          >
             Sample Data {n + 1}
-          </MenuItem>
+          </Button>
         ))}
       </Menu>
 
