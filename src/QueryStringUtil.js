@@ -33,7 +33,6 @@ for (const arr of mappings) {
 
 const translatePropertyNames = state => {
   const newState = {};
-  // eslint-disable-next-line guard-for-in
   for (const prop in state) {
     if (map.has(prop)) {
       let value;

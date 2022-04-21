@@ -26,6 +26,7 @@
     "react/react-in-jsx-scope": "off",
     "arrow-parens": "off",
     "no-underscore-dangle": "off",
-    "no-restricted-syntax": "off"
+    "no-restricted-syntax": "off",
+    "guard-for-in": "off"
   }
 }

@@ -1,8 +1,30 @@
+import Color from 'color';
 import Highcharts from 'highcharts';
 import moment from 'moment';
 import merge from './Merge';
 
 const yAxisLabelFormat = '${value:,.0f}';
+
+const colors = {
+  red: '#b84c3e',
+  green: '#86a542',
+  blue: '#6881d8',
+  gold: '#c18739',
+  purple: '#8650a6',
+  teal: '#50b47b',
+  pink: '#b84c7d',
+  grey: '#888',
+};
+
+for (const c in colors) {
+  const lightenPct = 0.4;
+  const darkenPct = 0.25;
+  const color = Color(colors[c]);
+  colors[`${c}s`] = [
+    color.lighten(lightenPct).hex(),
+    color.darken(darkenPct).hex(),
+  ];
+}
 
 Highcharts.setOptions({
   lang: {
@@ -96,7 +118,7 @@ export const setCommonOptions = mortgages => {
 export const createComparisonChartOptions = (comparison, mortgages) =>
   merge(commonOptions, {
     title: {
-      text: 'Mortgages Compared',
+      text: 'Mortgage Comparison',
     },
     series: [
       {
@@ -105,28 +127,32 @@ export const createComparisonChartOptions = (comparison, mortgages) =>
           x: c.unixTimeMs,
           y: c.difference,
         })),
+        color: colors.grey,
       },
-      ...mortgages.map(m => ({
+      ...mortgages.map((m, n) => ({
         name: `${m.name} Net Worth`,
         data: m.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: nw.netWorth,
         })),
+        color: colors.blues[n],
       })),
-      ...mortgages.map(m => ({
+      ...mortgages.map((m, n) => ({
         name: `${m.name} Cash`,
         data: m.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: nw.cash,
         })),
+        color: colors.teals[n],
         visible: false,
       })),
-      ...mortgages.map(m => ({
+      ...mortgages.map((m, n) => ({
         name: `${m.name} Equity`,
         data: m.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: nw.equity,
         })),
+        color: colors.golds[n],
         visible: false,
       })),
     ],
@@ -141,28 +167,31 @@ export const createCumulativeChartOptions = mortgages =>
       text: `Cumulative Payments`,
     },
     series: [
-      ...mortgages.map(m => ({
+      ...mortgages.map((m, n) => ({
         name: `${m.name} Payments`,
         data: m.payments.map(p => ({
           x: p.unixTimeMs,
           y: p.cumPayments,
         })),
+        color: colors.purples[n],
       })),
-      ...mortgages.map(m => ({
+      ...mortgages.map((m, n) => ({
         name: `${m.name} Principal`,
         data: m.payments.map(p => ({
           x: p.unixTimeMs,
           y: p.cumPrincipal,
         })),
         visible: false,
+        color: colors.greens[n],
       })),
-      ...mortgages.map(m => ({
+      ...mortgages.map((m, n) => ({
         name: `${m.name} Interest`,
         data: m.payments.map(p => ({
           x: p.unixTimeMs,
           y: p.cumInterest,
         })),
         visible: false,
+        color: colors.reds[n],
       })),
     ],
     tooltip: {
@@ -182,6 +211,7 @@ export const createAmortizationChartOptions = m =>
           x: payment.unixTimeMs,
           y: payment.principal,
         })),
+        color: colors.green,
       },
       {
         name: 'Interest',
@@ -189,6 +219,7 @@ export const createAmortizationChartOptions = m =>
           x: payment.unixTimeMs,
           y: payment.interest,
         })),
+        color: colors.red,
       },
     ],
     tooltip: {

@@ -17,6 +17,7 @@
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
     "clone": "^2.1.2",
+    "color": "^4.2.3",
     "copy-to-clipboard": "^3.3.1",
     "deepmerge": "^4.2.2",
     "flat": "^5.0.2",
