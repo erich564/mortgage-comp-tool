@@ -87,6 +87,9 @@ export const setCommonOptions = mortgages => {
           hover: {
             lineWidthPlus: 0,
           },
+          inactive: {
+            enabled: false,
+          },
         },
       },
     },
