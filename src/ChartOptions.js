@@ -115,19 +115,20 @@ export const setCommonOptions = mortgages => {
   };
 };
 
-export const createComparisonChartOptions = (comparison, mortgages) =>
+export const createNetWorthChartOptions = (comparison, mortgages) =>
   merge(commonOptions, {
     title: {
-      text: 'Mortgage Comparison',
+      text: 'Net Worth',
     },
     series: [
       {
-        name: 'Net Worth Difference',
+        name: 'Difference',
         data: comparison.map(c => ({
           x: c.unixTimeMs,
           y: c.difference,
         })),
         color: colors.grey,
+        visible: false,
       },
       ...mortgages.map((m, n) => ({
         name: `${m.name} Net Worth`,
@@ -137,6 +138,18 @@ export const createComparisonChartOptions = (comparison, mortgages) =>
         })),
         color: colors.blues[n],
       })),
+    ],
+    tooltip: {
+      valueDecimals: 0,
+    },
+  });
+
+export const createCashEquityChartOptions = mortgages =>
+  merge(commonOptions, {
+    title: {
+      text: 'Cash & Equity',
+    },
+    series: [
       ...mortgages.map((m, n) => ({
         name: `${m.name} Cash`,
         data: m.netWorth.map(nw => ({
@@ -144,7 +157,6 @@ export const createComparisonChartOptions = (comparison, mortgages) =>
           y: nw.cash,
         })),
         color: colors.teals[n],
-        visible: false,
       })),
       ...mortgages.map((m, n) => ({
         name: `${m.name} Equity`,
@@ -153,7 +165,6 @@ export const createComparisonChartOptions = (comparison, mortgages) =>
           y: nw.equity,
         })),
         color: colors.golds[n],
-        visible: false,
       })),
     ],
     tooltip: {
@@ -161,10 +172,10 @@ export const createComparisonChartOptions = (comparison, mortgages) =>
     },
   });
 
-export const createCumulativeChartOptions = mortgages =>
+export const createPaymentsChartOptions = mortgages =>
   merge(commonOptions, {
     title: {
-      text: `Cumulative Payments`,
+      text: `Total Payments`,
     },
     series: [
       ...mortgages.map((m, n) => ({

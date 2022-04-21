@@ -5,8 +5,9 @@ import HighchartsReact from 'highcharts-react-official';
 import { memo } from 'react';
 import {
   createAmortizationChartOptions,
-  createComparisonChartOptions,
-  createCumulativeChartOptions,
+  createCashEquityChartOptions,
+  createNetWorthChartOptions,
+  createPaymentsChartOptions,
   setCommonOptions,
 } from './ChartOptions';
 import MortgageTerm from './MortgageTerm';
@@ -240,11 +241,15 @@ function Report({ reportState }) {
       <br />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createComparisonChartOptions(comparison, state.mortgages)}
+        options={createNetWorthChartOptions(comparison, state.mortgages)}
       />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createCumulativeChartOptions(state.mortgages)}
+        options={createCashEquityChartOptions(state.mortgages)}
+      />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={createPaymentsChartOptions(state.mortgages)}
       />
       {state.mortgages.map(m => (
         <HighchartsReact
