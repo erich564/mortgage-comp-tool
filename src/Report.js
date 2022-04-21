@@ -157,9 +157,32 @@ const compareMortgages = ({
     m2Equity = 0;
   }
 
+  const netWorthDifferences = [];
+  // insert an additional data point before first payment date
+  (() => {
+    const m1NetWorth = m1Cash + m1Equity;
+    const m2NetWorth = m2Cash + m2Equity;
+    const unixTimeMs = m1.payments[m1n].date.subtract(1, 'month').valueOf();
+    m1.netWorth.push({
+      unixTimeMs,
+      cash: m1Cash,
+      equity: m1Equity,
+      netWorth: m1NetWorth,
+    });
+    m2.netWorth.push({
+      unixTimeMs,
+      cash: m2Cash,
+      equity: m2Equity,
+      netWorth: m2NetWorth,
+    });
+    netWorthDifferences.push({
+      unixTimeMs,
+      difference: m2NetWorth - m1NetWorth,
+    });
+  })();
+
   let m1PrevCash = m1Cash;
   let m2PrevCash = m2Cash;
-  const netWorthDifferences = [];
   let m1Payment = m1.monthlyPayment;
   let m2Payment = m2.monthlyPayment;
 
@@ -210,7 +233,7 @@ const compareMortgages = ({
       m2n++;
     }
 
-    if (m1NetWorth && m2NetWorth) {
+    if (m1NetWorth !== null && m2NetWorth !== null) {
       netWorthDifferences.push({
         unixTimeMs,
         difference: m2NetWorth - m1NetWorth,
