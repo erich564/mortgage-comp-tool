@@ -23,7 +23,7 @@ export default function App() {
 
   const handleCloseSnackbar = () => setShowSnackbar(false);
 
-  /** Crude at best. */
+  /** Crude constraint validation. */
   const stripIllegalCharacters = str => str.replace(/[^0-9.]/g, '');
 
   const handleChange = e => {
