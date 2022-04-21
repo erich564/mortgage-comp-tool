@@ -19,11 +19,17 @@ export default function App() {
   const [showSnackbar, setShowSnackbar] = useState(false);
 
   const handleSampleData = ndx => setFormState(sampleData[ndx]);
+
   const handleCloseSnackbar = () => setShowSnackbar(false);
+
+  /** Crude at best. */
+  const stripIllegalCharacters = str => str.replace(/[^0-9.]/g, '');
 
   const handleChange = e => {
     const value =
-      e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+      e.target.type === 'checkbox'
+        ? e.target.checked
+        : stripIllegalCharacters(e.target.value);
     setFormState({
       ...clone(formState),
       [e.target.name]: value,
@@ -45,7 +51,7 @@ export default function App() {
     } else if (data.target.type === 'checkbox') {
       value = data.target.checked;
     } else {
-      value = data.target.value;
+      value = stripIllegalCharacters(data.target.value);
     }
 
     const newState = clone(formState);
@@ -68,7 +74,7 @@ export default function App() {
         }
       }
     } else {
-      newState[name] = value;
+      newState[name] = stripIllegalCharacters(value);
     }
 
     setFormState(newState);
