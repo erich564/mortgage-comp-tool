@@ -65,7 +65,7 @@ export default function InputForm({
       ))}
       <br />
       <FormControl>
-        How much do you expect investments to make on average?
+        How much do you expect investments to make per year (on average)?
         <TextField
           required
           margin="normal"

@@ -128,7 +128,6 @@ export const createNetWorthChartOptions = (comparison, mortgages) =>
           y: c.difference,
         })),
         color: colors.grey,
-        visible: false,
       },
       ...mortgages.map((m, n) => ({
         name: `${m.name} Net Worth`,

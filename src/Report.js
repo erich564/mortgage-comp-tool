@@ -1,8 +1,9 @@
-import { Divider } from '@mui/material';
+/* eslint-disable react/style-prop-object */
+import { Divider, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import clone from 'clone';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import { memo } from 'react';
+import { Fragment, memo } from 'react';
 import {
   createAmortizationChartOptions,
   createCashEquityChartOptions,
@@ -14,6 +15,8 @@ import MortgageTerm from './MortgageTerm';
 import MortgageType from './MortgageType';
 
 const monthsPerYear = 12;
+
+const locale = 'en-US';
 
 /**
  * Convert annual rate to monthly rate (with monthly compounding).
@@ -44,8 +47,8 @@ const transformState = reportState => {
     m.name = `Mortgage ${m.id}`;
     m.interestRate /= 100;
     m.loanAmount = +m.loanAmount;
-    m.term = MortgageTerm.props[m.term].months;
-    m.endDate = m.startDate.clone().add(m.term - 1, 'months');
+    m.termMonths = MortgageTerm.props[m.term].months;
+    m.endDate = m.startDate.clone().add(m.termMonths - 1, 'months');
     if (m.type !== MortgageType.FixedRate) {
       const years = MortgageType.props[m.type].yearsFixed;
       const intRate = m.interestRateAdjusted / 100;
@@ -59,7 +62,7 @@ const transformState = reportState => {
     m.monthlyPayment = calcMonthlyPayment(
       m.loanAmount,
       m.monthlyInterestRate,
-      m.term
+      m.termMonths
     );
     m.payments = [];
     m.netWorth = [];
@@ -115,7 +118,8 @@ const createAmortizationSchedules = mortgages => {
       prevPayment = payment;
       if (m.rateAdjust && date.isSame(m.rateAdjust.adjustDate)) {
         intRate = m.rateAdjust.monthlyInterestRate;
-        const t = m.term - m.rateAdjust.adjustDate.diff(m.startDate, 'months');
+        const t =
+          m.termMonths - m.rateAdjust.adjustDate.diff(m.startDate, 'months');
         monthlyPayment = calcMonthlyPayment(b, intRate, t);
         m.rateAdjust.monthlyPayment = monthlyPayment;
       }
@@ -234,29 +238,101 @@ function Report({ reportState }) {
   createAmortizationSchedules(state.mortgages);
   const comparison = compareMortgages(state);
   setCommonOptions(state.mortgages);
+  console.log(state);
 
+  const tableCellStyle = {
+    border: 0,
+    fontSize: 'initial',
+    padding: 1,
+  };
   return (
     <>
       <Divider variant="middle" />
       <br />
+      <br />
+      <Table sx={{ width: 'fit-content', margin: 'auto !important' }}>
+        {state.mortgages.map(m => (
+          <Fragment key={m.id}>
+            <TableBody>
+              <TableRow>
+                <TableCell
+                  sx={{
+                    ...tableCellStyle,
+                    verticalAlign: 'top',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Mortgage {m.id}:
+                </TableCell>
+                <TableCell sx={tableCellStyle}>
+                  ${m.loanAmount.toLocaleString(locale)} at{' '}
+                  {m.interestRate * 100}% for
+                  {m.type === MortgageType.FixedRate
+                    ? ` ${MortgageTerm.props[m.term].name}.`
+                    : ` the first ${m.rateAdjust.adjustDate.diff(
+                        m.startDate,
+                        'years'
+                      )} years, then ${
+                        m.rateAdjust.interestRate * 100
+                      }% for the remaining duration of the loan.`}
+                  <br />
+                  Monthly payment
+                  {m.type === MortgageType.FixedRate
+                    ? ` is $${m.monthlyPayment.toLocaleString(locale)}.`
+                    : ` starts at $${m.monthlyPayment.toLocaleString(
+                        locale
+                      )}, and then changes to $${m.rateAdjust.monthlyPayment.toLocaleString(
+                        locale
+                      )} on ${m.rateAdjust.adjustDate.format('MM-DD-YYYY')}.`}
+                  <br />
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Fragment>
+        ))}
+      </Table>
+      <br />
+      The difference in net worths is the bottom-line takeaway for this tool.
+      Note that you can zoom in on graphs by clicking and dragging.
       <HighchartsReact
         highcharts={Highcharts}
         options={createNetWorthChartOptions(comparison, state.mortgages)}
       />
+      The Net Worth graph shows how Mortgage 1 and Mortgage 2 compare in value
+      over time. Net Worth is defined here as Cash plus Equity. See below. The
+      Difference graph line values are simply &quot;Mortgage 2 Net Worth&quot;
+      minus &quot;Mortgage 1 Net Worth.&quot;
       <HighchartsReact
         highcharts={Highcharts}
         options={createCashEquityChartOptions(state.mortgages)}
       />
+      For each monthly mortgage payment made, Cash goes down by that amount.
+      Equity goes up by the principal portion of the payment. Cash has
+      additional value over time, as it can be invested. To account for the time
+      value of money, each month Cash is multiplied by a monthly ROI value
+      (which is derived from the yearly ROI value supplied above). If Cash is
+      positive, then this value is added to Cash. If Cash is negative, then this
+      value is an opportunity cost that gets subtracted from Cash.
+      <br />
+      <br />
+      If this scenario is a refinance, then the starting cash starts off
+      increased by the cash-out amount and equity starts off decreased by the
+      cash-out amount.
       <HighchartsReact
         highcharts={Highcharts}
         options={createPaymentsChartOptions(state.mortgages)}
       />
+      This graph shows a running total of mortgage payments made. It is further
+      divided into cumulative principal and cumulative interest, via other graph
+      lines. You can show/hide them by clicking on legend entries.
       {state.mortgages.map(m => (
-        <HighchartsReact
-          key={m.id}
-          highcharts={Highcharts}
-          options={createAmortizationChartOptions(m)}
-        />
+        <Fragment key={m.id}>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={createAmortizationChartOptions(m)}
+          />
+          Amortization schedule for Mortgage {m.id}.
+        </Fragment>
       ))}
     </>
   );
