@@ -7,8 +7,8 @@ import { Fragment, memo } from 'react';
 import {
   createAmortizationChartOptions,
   createCashEquityChartOptions,
+  createInterestChartOptions,
   createNetWorthChartOptions,
-  createPaymentsChartOptions,
   setCommonOptions,
 } from './ChartOptions';
 import MortgageTerm from './MortgageTerm';
@@ -82,7 +82,6 @@ const createAmortizationSchedules = mortgages => {
     let intRate = m.monthlyInterestRate;
     const date = m.startDate.clone();
     let { monthlyPayment } = m;
-    let prevPayment;
     while (b > 0) {
       const int = roundToTwo(b * intRate);
       let prin;
@@ -95,13 +94,6 @@ const createAmortizationSchedules = mortgages => {
       const bStart = roundToTwo(b);
       const bEnd = roundToTwo(bStart - prin);
       b = bEnd;
-      const cumPrin = roundToTwo(
-        prin + (prevPayment ? prevPayment.cumPrincipal : 0)
-      );
-      const cumInt = roundToTwo(
-        int + (prevPayment ? prevPayment.cumInterest : 0)
-      );
-      const cumPayments = roundToTwo(cumPrin + cumInt);
       const payment = {
         principal: prin,
         interest: int,
@@ -109,13 +101,9 @@ const createAmortizationSchedules = mortgages => {
         unixTimeMs: date.valueOf(),
         startingBalance: bStart,
         remainingBalance: bEnd,
-        cumPrincipal: cumPrin,
-        cumInterest: cumInt,
-        cumPayments,
       };
       m.payments.push(payment);
       date.add(1, 'month');
-      prevPayment = payment;
       if (m.rateAdjust && date.isSame(m.rateAdjust.adjustDate)) {
         intRate = m.rateAdjust.monthlyInterestRate;
         const t =
@@ -233,10 +221,31 @@ const compareMortgages = ({
   return netWorthDifferences;
 };
 
+const calcMortgageInterestByYear = mortgages => {
+  for (const m of mortgages) {
+    m.interestByYear = [];
+    let interest = 0;
+    let prevYear;
+    for (const p of m.payments) {
+      const newYear = p.date.year();
+      if (prevYear && prevYear !== newYear) {
+        m.interestByYear.push({
+          year: prevYear,
+          interest: roundToTwo(interest),
+        });
+        interest = 0;
+      }
+      interest += p.interest;
+      prevYear = newYear;
+    }
+  }
+};
+
 function Report({ reportState }) {
   const state = transformState(reportState);
   createAmortizationSchedules(state.mortgages);
   const comparison = compareMortgages(state);
+  calcMortgageInterestByYear(state.mortgages);
   setCommonOptions(state.mortgages);
 
   const tableCellStyle = {
@@ -293,7 +302,8 @@ function Report({ reportState }) {
       </Table>
       <br />
       The difference in net worths is the bottom-line takeaway for this tool.
-      Note that you can zoom in on graphs by clicking and dragging.
+      Note that you can zoom in on graphs by clicking and dragging. You also can
+      show/hide lines by clicking on their legend entries.
       <br />
       <br />
       <HighchartsReact
@@ -329,12 +339,10 @@ function Report({ reportState }) {
       <br />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createPaymentsChartOptions(state.mortgages)}
+        options={createInterestChartOptions(state.mortgages)}
       />
       <p>
-        This graph shows a running total of mortgage payments made. It is
-        further divided into cumulative principal and cumulative interest, via
-        other graph lines. You can show/hide them by clicking on legend entries.
+        This graph shows the total mortgage interest paid in each calendar year.
       </p>
       {state.mortgages.map(m => (
         <Fragment key={m.id}>

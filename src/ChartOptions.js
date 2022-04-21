@@ -177,43 +177,58 @@ export const createCashEquityChartOptions = mortgages =>
     },
   });
 
-export const createPaymentsChartOptions = mortgages =>
-  merge(commonOptions, {
-    title: {
-      text: `Total Payments`,
+export const createInterestChartOptions = mortgages => ({
+  chart: {
+    type: 'column',
+  },
+  title: {
+    text: `Mortgage Interest By Year`,
+  },
+  plotOptions: {
+    column: {
+      groupPadding: 0,
+      pointPadding: 0,
     },
-    series: [
-      ...mortgages.map((m, n) => ({
-        name: `${m.name} Payments`,
-        data: m.payments.map(p => ({
-          x: p.unixTimeMs,
-          y: p.cumPayments,
-        })),
-        color: colors.purples[n],
+    series: {
+      states: {
+        inactive: {
+          enabled: false,
+        },
+        hover: false,
+      },
+    },
+  },
+  series: [
+    ...mortgages.map((m, n) => ({
+      name: `${m.name} Interest`,
+      data: m.interestByYear.map(i => ({
+        name: i.year,
+        y: i.interest,
       })),
-      ...mortgages.map((m, n) => ({
-        name: `${m.name} Principal`,
-        data: m.payments.map(p => ({
-          x: p.unixTimeMs,
-          y: p.cumPrincipal,
-        })),
-        visible: false,
-        color: colors.greens[n],
-      })),
-      ...mortgages.map((m, n) => ({
-        name: `${m.name} Interest`,
-        data: m.payments.map(p => ({
-          x: p.unixTimeMs,
-          y: p.cumInterest,
-        })),
-        visible: false,
-        color: colors.reds[n],
-      })),
+      color: colors.reds[n],
+    })),
+  ],
+  xAxis: {
+    type: 'category',
+    categories: [
+      ...new Set(mortgages.map(m => m.interestByYear.map(i => i.year)).flat()),
     ],
-    tooltip: {
-      valueDecimals: 0,
+  },
+  yAxis: {
+    title: {
+      text: null,
     },
-  });
+    labels: {
+      format: yAxisLabelFormat,
+    },
+  },
+  tooltip: {
+    valueDecimals: 0,
+    headerFormat: '{point.key}<br/>',
+    shared: true,
+    valuePrefix: '$',
+  },
+});
 
 export const createAmortizationChartOptions = m =>
   merge(commonOptions, {
