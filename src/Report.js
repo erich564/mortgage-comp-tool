@@ -150,7 +150,7 @@ const compareMortgages = ({
     m2Cash = roundToTwo(
       m2.loanAmount - m1.payments[m1n].startingBalance - m2.closingCosts
     );
-    m2Equity = -m2Cash;
+    m2Equity = -roundToTwo(m2.loanAmount - m1.payments[m1n].startingBalance);
   } else {
     m1Cash = -m1.closingCosts;
     m2Cash = -m2.closingCosts;
