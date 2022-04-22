@@ -24,7 +24,8 @@ export default function App() {
   const handleCloseSnackbar = () => setShowSnackbar(false);
 
   /** Crude constraint validation. */
-  const stripIllegalCharacters = str => str.replace(/[^0-9.]/g, '');
+  const stripIllegalCharacters = str =>
+    str === 'false' || str === 'true' ? str : str.replace(/[^0-9.]/g, '');
 
   const handleChange = e => {
     const value =
