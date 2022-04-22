@@ -48,7 +48,7 @@ export const sampleData = [
         loanAmount: '500000',
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
-        interestRate: '5',
+        interestRate: '5.625',
         startDate: nextViableStartDate.clone(),
         isStartDateChanged: true,
         interestRateAdjusted: '',
