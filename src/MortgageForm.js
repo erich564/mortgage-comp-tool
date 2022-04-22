@@ -154,6 +154,7 @@ export default function MortgageForm({ handleMortgageChange, state }) {
           InputProps={{
             endAdornment: <InputAdornment position="end">%</InputAdornment>,
           }}
+          InputLabelProps={{ required: false }}
         />
         <br />
         <TextField
@@ -168,6 +169,7 @@ export default function MortgageForm({ handleMortgageChange, state }) {
           InputProps={{
             startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
+          InputLabelProps={{ required: false }}
         />
       </Box>
     </Item>
