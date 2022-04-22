@@ -230,15 +230,41 @@ export const createInterestChartOptions = mortgages => ({
   },
 });
 
-export const createAmortizationChartOptions = m =>
+export const createBalanceChartOptions = mortgages =>
   merge(commonOptions, {
     title: {
-      text: `${m.name} Amortization`,
+      text: `Mortgage Balances`,
+    },
+    series: [
+      ...mortgages.map((m, n) => ({
+        name: `${m.name} Balance`,
+        data: [
+          {
+            x: m.startDate.subtract(1, 'month').valueOf(),
+            y: m.loanAmount,
+          },
+          ...m.payments.map(payment => ({
+            x: payment.unixTimeMs,
+            y: payment.remainingBalance,
+          })),
+        ],
+        color: colors.purples[n],
+      })),
+    ],
+    tooltip: {
+      valueDecimals: 0,
+    },
+  });
+
+export const createAmortizationChartOptions = mortgage =>
+  merge(commonOptions, {
+    title: {
+      text: `${mortgage.name} Amortization`,
     },
     series: [
       {
         name: 'Principal',
-        data: m.payments.map(payment => ({
+        data: mortgage.payments.map(payment => ({
           x: payment.unixTimeMs,
           y: payment.principal,
         })),
@@ -246,7 +272,7 @@ export const createAmortizationChartOptions = m =>
       },
       {
         name: 'Interest',
-        data: m.payments.map(payment => ({
+        data: mortgage.payments.map(payment => ({
           x: payment.unixTimeMs,
           y: payment.interest,
         })),

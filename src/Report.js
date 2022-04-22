@@ -6,6 +6,7 @@ import HighchartsReact from 'highcharts-react-official';
 import { Fragment, memo } from 'react';
 import {
   createAmortizationChartOptions,
+  createBalanceChartOptions,
   createCashEquityChartOptions,
   createInterestChartOptions,
   createNetWorthChartOptions,
@@ -366,6 +367,14 @@ function Report({ reportState }) {
       />
       <p>
         This graph shows the total mortgage interest paid in each calendar year.
+      </p>
+      <br />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={createBalanceChartOptions(state.mortgages)}
+      />
+      <p>
+        This graph shows the outstanding mortgage balances decreasing over time.
       </p>
       {state.mortgages.map(m => (
         <Fragment key={m.id}>
