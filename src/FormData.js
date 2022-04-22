@@ -40,8 +40,8 @@ export const sampleData = [
         interestRate: '2.75',
         startDate: moment('2016-12-01', MOMENT_FORMAT),
         isStartDateChanged: true,
-        interestRateAdjusted: '6',
-        closingCosts: '2000',
+        interestRateAdjusted: '4.62',
+        closingCosts: '3231.41',
       },
       {
         id: 2,
@@ -52,7 +52,7 @@ export const sampleData = [
         startDate: nextViableStartDate.clone(),
         isStartDateChanged: true,
         interestRateAdjusted: '',
-        closingCosts: '2000',
+        closingCosts: '3500',
       },
     ],
     doItemize: true,
@@ -71,7 +71,7 @@ export const sampleData = [
         startDate: nextViableStartDate.clone(),
         isStartDateChanged: true,
         interestRateAdjusted: '6.75',
-        closingCosts: '2000',
+        closingCosts: '3500',
       },
       {
         id: 2,
@@ -82,7 +82,7 @@ export const sampleData = [
         startDate: nextViableStartDate.clone(),
         isStartDateChanged: true,
         interestRateAdjusted: '',
-        closingCosts: '2000',
+        closingCosts: '3500',
       },
     ],
     doItemize: true,
@@ -101,7 +101,7 @@ export const sampleData = [
         startDate: moment('2020-09-1', MOMENT_FORMAT), // closing date 07/10/20
         isStartDateChanged: true,
         interestRateAdjusted: '',
-        closingCosts: '2000',
+        closingCosts: '0',
       },
       {
         id: 2,
