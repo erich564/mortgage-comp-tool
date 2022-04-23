@@ -5,6 +5,8 @@ import merge from './Merge';
 
 const yAxisLabelFormat = '${value:,.0f}';
 
+const fiveYearsInMs = 157784630000;
+
 const colors = {
   red: '#b84c3e',
   green: '#86a542',
@@ -100,6 +102,7 @@ export const setCommonOptions = mortgages => {
       type: 'datetime',
       min: minDate.valueOf(),
       max: maxDate.valueOf(),
+      minRange: fiveYearsInMs,
       plotLines,
     },
     yAxis: {
