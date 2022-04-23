@@ -112,6 +112,14 @@ export const setCommonOptions = mortgages => {
       labels: {
         format: yAxisLabelFormat,
       },
+      plotLines: [
+        {
+          color: '#AAA',
+          width: 1,
+          value: 0,
+          zIndex: 2,
+        },
+      ],
     },
     tooltip: {
       shared: true,
@@ -224,6 +232,14 @@ export const createInterestChartOptions = mortgages => ({
     labels: {
       format: yAxisLabelFormat,
     },
+    plotLines: [
+      {
+        color: '#AAA',
+        width: 1,
+        value: 0,
+        zIndex: 2,
+      },
+    ],
   },
   tooltip: {
     valueDecimals: 0,
