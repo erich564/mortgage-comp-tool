@@ -163,7 +163,10 @@ const compareMortgages = ({
   (() => {
     const m1NetWorth = m1Cash + m1Equity;
     const m2NetWorth = m2Cash + m2Equity;
-    const unixTimeMs = m1.payments[m1n].date.subtract(1, 'month').valueOf();
+    const unixTimeMs = m1.payments[m1n].date
+      .clone()
+      .subtract(1, 'month')
+      .valueOf();
     m1.netWorth.push({
       unixTimeMs,
       cash: m1Cash,
@@ -271,7 +274,7 @@ function Report({ reportState }) {
   const comparison = compareMortgages(state);
   calcMortgageInterestByYear(state.mortgages);
   setCommonOptions(state.mortgages);
-
+  console.log(state.mortgages);
   const tableCellStyle = {
     border: 0,
     fontSize: 'initial',
