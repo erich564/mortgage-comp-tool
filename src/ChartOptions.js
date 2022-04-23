@@ -123,6 +123,7 @@ export const setCommonOptions = mortgages => {
     },
     tooltip: {
       shared: true,
+      split: true,
       crosshairs: true,
       // xDateFormat: '%b %Y',
       xDateFormat: '%m-%Y',
@@ -242,6 +243,7 @@ export const createInterestChartOptions = mortgages => ({
     ],
   },
   tooltip: {
+    split: true,
     valueDecimals: 0,
     headerFormat: '{point.key}<br/>',
     shared: true,
@@ -277,8 +279,19 @@ export const createBalanceChartOptions = mortgages =>
 
 export const createAmortizationChartOptions = mortgage =>
   merge(commonOptions, {
+    chart: {
+      type: 'area',
+    },
     title: {
       text: `${mortgage.name} Amortization`,
+    },
+    plotOptions: {
+      area: {
+        stacking: 'normal',
+      },
+      series: {
+        fillOpacity: 0.15,
+      },
     },
     series: [
       {

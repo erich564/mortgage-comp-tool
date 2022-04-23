@@ -274,7 +274,7 @@ function Report({ reportState }) {
   const comparison = compareMortgages(state);
   calcMortgageInterestByYear(state.mortgages);
   setCommonOptions(state.mortgages);
-  console.log(state.mortgages);
+
   const tableCellStyle = {
     border: 0,
     fontSize: 'initial',
