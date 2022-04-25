@@ -24,9 +24,10 @@ const locale = 'en-US';
  */
 const calcMonthlyRoi = n => (1 + n) ** (1 / monthsPerYear) - 1;
 
-/** Round to 2 decimal places */
-// eslint-disable-next-line prefer-template
-const roundToTwo = num => +(Math.round(+`${num}e+2`) + 'e-2');
+/** Round to n decimal places */
+const roundTo = (n, num) => +`${Math.round(+`${num}e+${n}`)}e-${n}`;
+const roundToTwo = num => roundTo(2, num);
+const displayInterestRate = pct => roundTo(3, pct * 100);
 
 /**
  * Calculate monthly loan payment amount
@@ -162,7 +163,7 @@ const setInitialCashEquity = (isRefinance, m1, m2, m1n) => {
   return { m1Cash, m1Equity, m2Cash, m2Equity };
 };
 
-const insertInitialPointBeforeRefiStartDate = (
+const insertInitialPointBeforeLaterStartDate = (
   m1Cash,
   m1Equity,
   m2Cash,
@@ -222,7 +223,7 @@ const compareMortgages = ({
 
   const netWorthDifferences = [];
   // insert an additional data point before first payment date
-  insertInitialPointBeforeRefiStartDate(
+  insertInitialPointBeforeLaterStartDate(
     m1Cash,
     m1Equity,
     m2Cash,
@@ -355,15 +356,15 @@ function Report({ reportState }) {
                 </TableCell>
                 <TableCell sx={tableCellStyle}>
                   ${m.loanAmount.toLocaleString(locale)} at{' '}
-                  {m.interestRate * 100}% for
+                  {displayInterestRate(m.interestRate)}% for
                   {m.type === MortgageType.FixedRate
                     ? ` ${MortgageTerm.props[m.term].name}.`
                     : ` the first ${m.rateAdjust.adjustDate.diff(
                         m.startDate,
                         'years'
-                      )} years, then ${
-                        m.rateAdjust.interestRate * 100
-                      }% for the remaining duration of the loan.`}
+                      )} years, then ${displayInterestRate(
+                        m.rateAdjust.interestRate
+                      )}% for the remaining duration of the loan.`}
                   <br />
                   Monthly payment
                   {m.type === MortgageType.FixedRate
