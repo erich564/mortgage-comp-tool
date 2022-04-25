@@ -116,6 +116,86 @@ const createAmortizationSchedules = mortgages => {
   }
 };
 
+const setM1AsOldMortgage = mortgages => {
+  const m1 = mortgages[0];
+  const m2 = mortgages[1];
+  const isM2StartDateBeforeM1 = m2.startDate.isBefore(m1.startDate);
+  if (isM2StartDateBeforeM1) {
+    return [m2, m1, isM2StartDateBeforeM1];
+  }
+  return [m1, m2, isM2StartDateBeforeM1];
+};
+
+const setInitialCashEquity = (isRefinance, m1, m2, m1n) => {
+  let m1Cash;
+  let m2Cash;
+  const m1Equity = 0;
+  let m2Equity;
+
+  if (isRefinance) {
+    const priorMonthNdx = m1n - 1;
+    const priorMonthPayment = m1.payments[priorMonthNdx];
+    const priorMonthStartingBalance = priorMonthPayment.startingBalance;
+    const refiClosingDate = priorMonthPayment.date.clone().date(15); // arbirarily chosen
+    const refiClosingDay = refiClosingDate.date();
+    const daysInMonth = refiClosingDate.daysInMonth();
+    const proRatedInterestForOldLender =
+      priorMonthPayment.interest * ((refiClosingDay - 1) / daysInMonth);
+    const prepaidInterestForNewLender =
+      m2.payments[0].interest *
+      ((daysInMonth - refiClosingDay + 1) / daysInMonth);
+
+    m1Cash = 0;
+    m2Cash = roundToTwo(
+      m2.loanAmount -
+        priorMonthStartingBalance -
+        m2.closingCosts -
+        proRatedInterestForOldLender -
+        prepaidInterestForNewLender
+    );
+    m2Equity = -roundToTwo(m2.loanAmount - priorMonthStartingBalance);
+  } else {
+    m1Cash = -m1.closingCosts;
+    m2Cash = -m2.closingCosts;
+    m2Equity = 0;
+  }
+  return { m1Cash, m1Equity, m2Cash, m2Equity };
+};
+
+const insertInitialPointBeforeRefiStartDate = (
+  m1Cash,
+  m1Equity,
+  m2Cash,
+  m2Equity,
+  m1,
+  m1n,
+  m2,
+  netWorthDifferences
+) => {
+  const m1NetWorth = m1Cash + m1Equity;
+  const m2NetWorth = m2Cash + m2Equity;
+  const unixTimeMs = m1.payments[m1n].date
+    .clone()
+    .subtract(1, 'month')
+    .valueOf();
+  m1.netWorth.push({
+    unixTimeMs,
+    cash: m1Cash,
+    equity: m1Equity,
+    netWorth: m1NetWorth,
+  });
+  m2.netWorth.push({
+    unixTimeMs,
+    cash: m2Cash,
+    equity: m2Equity,
+    netWorth: m2NetWorth,
+  });
+  netWorthDifferences.push({
+    unixTimeMs,
+    difference: m2NetWorth - m1NetWorth,
+  });
+};
+
 /**
  * Creates data for comparing cash, equity, and net worth comparisons of the two
  * mortgages over their life time.
@@ -127,68 +207,39 @@ const compareMortgages = ({
   marginalTaxRate,
   monthlyRoi,
 }) => {
-  let m1 = mortgages[0];
-  let m2 = mortgages[1];
-  const isM2StartDateBeforeM1 = m2.startDate.isBefore(m1.startDate);
-  if (isM2StartDateBeforeM1) {
-    [m1, m2] = [m2, m1];
-  }
-  let m1n = 0;
-  let m2n = 0;
-  const m1PayLen = m1.payments.length;
-  const m2PayLen = m2.payments.length;
+  const [m1, m2, isSwapped] = setM1AsOldMortgage(mortgages);
 
+  let m1n = 0;
   // fast-forward m1 payment schedule to first payment date of m2
   while (m1.payments[m1n] && !m1.payments[m1n].date.isSame(m2.startDate)) m1n++;
 
-  let m1Cash;
-  let m2Cash;
-  let m1Equity = 0;
-  let m2Equity;
-
-  if (isRefinance) {
-    m1Cash = 0;
-    m2Cash = roundToTwo(
-      m2.loanAmount - m1.payments[m1n].startingBalance - m2.closingCosts
-    );
-    m2Equity = -roundToTwo(m2.loanAmount - m1.payments[m1n].startingBalance);
-  } else {
-    m1Cash = -m1.closingCosts;
-    m2Cash = -m2.closingCosts;
-    m2Equity = 0;
-  }
+  let { m1Cash, m1Equity, m2Cash, m2Equity } = setInitialCashEquity(
+    isRefinance,
+    m1,
+    m2,
+    m1n
+  );
 
   const netWorthDifferences = [];
   // insert an additional data point before first payment date
-  (() => {
-    const m1NetWorth = m1Cash + m1Equity;
-    const m2NetWorth = m2Cash + m2Equity;
-    const unixTimeMs = m1.payments[m1n].date
-      .clone()
-      .subtract(1, 'month')
-      .valueOf();
-    m1.netWorth.push({
-      unixTimeMs,
-      cash: m1Cash,
-      equity: m1Equity,
-      netWorth: m1NetWorth,
-    });
-    m2.netWorth.push({
-      unixTimeMs,
-      cash: m2Cash,
-      equity: m2Equity,
-      netWorth: m2NetWorth,
-    });
-    netWorthDifferences.push({
-      unixTimeMs,
-      difference: m2NetWorth - m1NetWorth,
-    });
-  })();
+  insertInitialPointBeforeRefiStartDate(
+    m1Cash,
+    m1Equity,
+    m2Cash,
+    m2Equity,
+    m1,
+    m1n,
+    m2,
+    netWorthDifferences
+  );
 
   let m1PrevCash = m1Cash;
   let m2PrevCash = m2Cash;
   let m1Payment = m1.monthlyPayment;
   let m2Payment = m2.monthlyPayment;
+  const m1PayLen = m1.payments.length;
+  const m2PayLen = m2.payments.length;
+  let m2n = 0;
 
   while (m1n < m1PayLen || m2n < m2PayLen) {
     const eitherPayment = m1n < m1PayLen ? m1.payments[m1n] : m2.payments[m2n];
@@ -240,7 +291,9 @@ const compareMortgages = ({
     if (m1NetWorth !== null && m2NetWorth !== null) {
       netWorthDifferences.push({
         unixTimeMs,
-        difference: m2NetWorth - m1NetWorth,
+        difference: isSwapped
+          ? m1NetWorth - m2NetWorth
+          : m2NetWorth - m1NetWorth,
       });
     }
   }

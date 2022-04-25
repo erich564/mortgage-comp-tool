@@ -41,7 +41,7 @@ export const sampleData = [
         startDate: moment('2016-12-01', MOMENT_FORMAT),
         isStartDateChanged: true,
         interestRateAdjusted: '4.62',
-        closingCosts: '3231.41',
+        closingCosts: '2773',
       },
       {
         id: 2,
@@ -94,7 +94,7 @@ export const sampleData = [
     mortgages: [
       {
         id: 1,
-        loanAmount: '520000',
+        loanAmount: '512060',
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
         interestRate: '2.625',

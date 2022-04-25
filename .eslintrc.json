@@ -27,6 +27,7 @@
     "arrow-parens": "off",
     "no-underscore-dangle": "off",
     "no-restricted-syntax": "off",
-    "guard-for-in": "off"
+    "guard-for-in": "off",
+    "no-unused-vars": "warn"
   }
 }
