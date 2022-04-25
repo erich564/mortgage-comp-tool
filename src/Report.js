@@ -1,4 +1,3 @@
-/* eslint-disable react/style-prop-object */
 import { Divider, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import clone from 'clone';
 import Highcharts from 'highcharts';
