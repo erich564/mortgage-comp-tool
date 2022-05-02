@@ -12,8 +12,8 @@ import {
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import MortgageTerm from './MortgageTerm';
-import MortgageType from './MortgageType';
+import MortgageTerm from './enum/MortgageTerm';
+import MortgageType from './enum/MortgageType';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,

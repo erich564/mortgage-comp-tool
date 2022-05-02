@@ -21,9 +21,9 @@ import {
   TextField,
   styled,
 } from '@mui/material';
-import DeductionFrequency from './DeductionFrequency';
-import IRSFilingStatus from './IRSFilingStatus';
 import MortgageForm from './MortgageForm';
+import DeductionFrequency from './enum/DeductionFrequency';
+import IRSFilingStatus from './enum/IRSFilingStatus';
 
 const inputWidth = '120px';
 

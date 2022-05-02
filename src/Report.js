@@ -11,8 +11,8 @@ import {
   createNetWorthChartOptions,
   setCommonOptions,
 } from './ChartOptions';
-import MortgageTerm from './MortgageTerm';
-import MortgageType from './MortgageType';
+import MortgageTerm from './enum/MortgageTerm';
+import MortgageType from './enum/MortgageType';
 
 const monthsPerYear = 12;
 
