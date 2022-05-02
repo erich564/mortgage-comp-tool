@@ -38,6 +38,13 @@ export default function App() {
     });
   };
 
+  const handleExplicitChange = (name, value) => {
+    setFormState({
+      ...clone(formState),
+      [name]: value,
+    });
+  };
+
   /**
    *
    * @param mortgageId
@@ -99,6 +106,7 @@ export default function App() {
         state={formState}
         handleChange={handleChange}
         handleMortgageChange={handleMortgageChange}
+        handleExplicitChange={handleExplicitChange}
         handleSubmit={handleSubmit}
       />
       {showReport && (

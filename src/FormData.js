@@ -20,8 +20,11 @@ export const formDefaults = {
     ...mortgageTemplate,
     id: n,
   })),
-  doItemize: true,
-  marginalTaxRate: '40',
+  doItemize: false,
+  marginalTaxRate: '',
+  newAcquisitionDebt: '0',
+  deductionFrequency: 1,
+  irsFilingStatus: 1,
 };
 
 const nextViableStartDate = moment().startOf('month').add(2, 'months');
@@ -29,6 +32,7 @@ export const MOMENT_FORMAT = 'YYYY-MM-DD';
 
 export const sampleData = [
   {
+    ...formDefaults,
     isRefinance: true,
     roi: '9',
     mortgages: [
@@ -59,6 +63,7 @@ export const sampleData = [
     marginalTaxRate: '40',
   },
   {
+    ...formDefaults,
     isRefinance: false,
     roi: '8.5',
     mortgages: [
@@ -89,6 +94,7 @@ export const sampleData = [
     marginalTaxRate: '40',
   },
   {
+    ...formDefaults,
     isRefinance: true,
     roi: '4',
     mortgages: [
