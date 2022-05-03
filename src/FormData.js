@@ -1,4 +1,6 @@
 import moment from 'moment';
+import DeductionFrequency from './enum/DeductionFrequency';
+import IRSFilingStatus from './enum/IRSFilingStatus';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
 
@@ -20,11 +22,11 @@ export const formDefaults = {
     ...mortgageTemplate,
     id: n,
   })),
-  doItemize: false,
+  doItemize: 'false',
   marginalTaxRate: '',
   newAcquisitionDebt: '0',
-  deductionFrequency: 1,
-  irsFilingStatus: 1,
+  deductionFrequency: DeductionFrequency.Monthly,
+  irsFilingStatus: IRSFilingStatus.Single,
 };
 
 const nextViableStartDate = moment().startOf('month').add(2, 'months');
@@ -59,8 +61,8 @@ export const sampleData = [
         closingCosts: '3500',
       },
     ],
-    doItemize: true,
-    marginalTaxRate: '40',
+    doItemize: 'true',
+    marginalTaxRate: '33.3',
   },
   {
     ...formDefaults,
@@ -90,7 +92,7 @@ export const sampleData = [
         closingCosts: '3500',
       },
     ],
-    doItemize: true,
+    doItemize: 'true',
     marginalTaxRate: '40',
   },
   {
@@ -121,7 +123,8 @@ export const sampleData = [
         closingCosts: '0',
       },
     ],
-    doItemize: false,
-    marginalTaxRate: '40',
+    doItemize: 'true',
+    marginalTaxRate: '49.3',
+    irsFilingStatus: IRSFilingStatus.MarriedFilingJointly,
   },
 ];
