@@ -34,9 +34,9 @@ const TableCellField = styled(TableCell)({
   paddingBottom: 9,
   paddingRight: 40,
   fontSize: 'inherit',
-  minWidth: inputWidth,
   lineHeight: 'inherit',
   letterSpacing: 'inherit',
+  width: '100%',
 });
 
 const TableCellValue = styled(TableCell)({
@@ -103,23 +103,32 @@ export default function InputForm({
         />
       ))}
       <br />
-      <FormControl>
-        How much do you expect investments to make per year (on average)?
-        <TextField
-          required
-          margin="none"
-          label="ROI"
-          name="roi"
-          value={state.roi}
-          placeholder="9"
-          sx={{ input: { textAlign: 'right' }, width: inputWidth }}
-          onChange={handleChange}
-          InputProps={{
-            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-          }}
-          InputLabelProps={{ required: false }}
-        />
-      </FormControl>
+      <Table sx={{ margin: 'auto', width: 'auto' }}>
+        <TableBody>
+          <TableRow>
+            <TableCellField sx={{ width: 'auto' }}>
+              How much do you expect investments to make per year?
+            </TableCellField>
+            <TableCellValue sx={{ padding: 0 }}>
+              <TextField
+                required
+                margin="none"
+                name="roi"
+                value={state.roi}
+                placeholder="9"
+                sx={{ input: { textAlign: 'right' }, width: inputWidth }}
+                onChange={handleChange}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ required: false }}
+              />
+            </TableCellValue>
+          </TableRow>
+        </TableBody>
+      </Table>
       <br />
       <br />
       <Accordion
@@ -134,7 +143,7 @@ export default function InputForm({
         }}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Table sx={{ margin: 'auto' }}>
+          <Table sx={{ margin: 'auto', width: 1 }}>
             <TableBody>
               <TableRow>
                 <TableCellField>
@@ -157,7 +166,7 @@ export default function InputForm({
           </Table>
         </AccordionSummary>
         <AccordionDetails sx={{ paddingTop: 0 }}>
-          <Table sx={{ margin: 'auto' }}>
+          <Table sx={{ margin: 'auto', width: 1 }}>
             <TableBody>
               <TableRow>
                 <TableCellField>Marginal Tax Rate:</TableCellField>
