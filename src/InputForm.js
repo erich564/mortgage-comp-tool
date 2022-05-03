@@ -229,7 +229,9 @@ export default function InputForm({
                 <TableCellValue>
                   <TextField
                     required
-                    disabled={!state.doItemize}
+                    disabled={
+                      !(state.doItemize && String(state.isRefinance) === 'true')
+                    }
                     margin="none"
                     name="newAcquisitionDebt"
                     value={state.newAcquisitionDebt}
