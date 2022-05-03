@@ -25,7 +25,7 @@ import MortgageForm from './MortgageForm';
 import DeductionFrequency from './enum/DeductionFrequency';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 
-const inputWidth = '120px';
+const inputWidth = '124px';
 
 const TableCellField = styled(TableCell)({
   border: 0,
