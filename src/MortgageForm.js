@@ -147,8 +147,8 @@ export default function MortgageForm({ handleMortgageChange, state }) {
           name="interestRateAdjusted"
           value={state.interestRateAdjusted}
           onChange={handleChange}
-          disabled={state.type === MortgageType.FixedRate}
-          required={state.type !== MortgageType.FixedRate}
+          disabled={state.type === MortgageType.FixedRate || state.type === ''}
+          required
           sx={{ input: { textAlign: 'right' }, width: skinnyWidth }}
           placeholder="6.75"
           InputProps={{
