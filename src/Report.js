@@ -199,11 +199,12 @@ const calcProRatedInterestForRefi = (m1, m2, firstSharedM1Index) => {
   const refiClosingDate = priorMonthPayment.date.clone().date(15); // arbirarily chosen
   const refiClosingDay = refiClosingDate.date();
   const daysInMonth = refiClosingDate.daysInMonth();
-  m1.proRatedInterest =
-    priorMonthPayment.interest * ((refiClosingDay - 1) / daysInMonth);
-  m2.proRatedInterest =
-    m2.payments[0].interest *
-    ((daysInMonth - refiClosingDay + 1) / daysInMonth);
+  m1.proRatedInterest = roundToTwo(
+    priorMonthPayment.interest * ((refiClosingDay - 1) / daysInMonth)
+  );
+  m2.proRatedInterest = roundToTwo(
+    m2.payments[0].interest * ((daysInMonth - refiClosingDay + 1) / daysInMonth)
+  );
 };
 
 /**
@@ -392,7 +393,8 @@ const calcMortgageInterestByYear = (
   }
 
   // for refi's, determine partial year interest from m1 so that it can
-  // be used for itemizing interest
+  // be used for itemizing interest. also, add pro-rated interest for
+  // old and new lender to total yearly interest paid
   if (isRefinance) {
     let m1n = firstSharedM1Index;
     const refiYear = m1.payments[m1n].date.year();
@@ -400,8 +402,9 @@ const calcMortgageInterestByYear = (
     for (m1n -= 2; m1.payments[m1n].date.year() === refiYear; m1n--) {
       preRefiInterest += m1.payments[m1n].interest;
     }
-    m2.interestByYear[0].preRefiInterest =
-      m1.proRatedInterest + preRefiInterest;
+    m2.interestByYear[0].preRefiInterest = roundToTwo(
+      m1.proRatedInterest + preRefiInterest
+    );
     m2.interestByYear[0].interest += m2.proRatedInterest;
   }
 };
@@ -442,10 +445,10 @@ function Report({ reportState }) {
   extendStandardDeductions(m1, m2, state.irsFilingStatus);
   createAmortizationSchedules(state.mortgages);
   const firstSharedM1Index = findFirstSharedPaymentDateIndex(m1, m2);
-  calcMortgageInterestByYear(m1, m2, state.isRefinance, firstSharedM1Index);
-  console.log(state);
   if (state.isRefinance)
     calcProRatedInterestForRefi(m1, m2, firstSharedM1Index);
+  calcMortgageInterestByYear(m1, m2, state.isRefinance, firstSharedM1Index);
+  console.log(state);
   calcInitialCashEquityAndDebt(state, m1, m2, firstSharedM1Index);
   if (state.doItemize) calcItemizedMortgageInterest(state);
   const comparison = compareMortgages(state, m1, m2, firstSharedM1Index);
