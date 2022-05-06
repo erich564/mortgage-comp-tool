@@ -2,6 +2,7 @@ import { Divider, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import clone from 'clone';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import moment from 'moment';
 import { Fragment, memo } from 'react';
 import {
   createAmortizationChartOptions,
@@ -11,6 +12,7 @@ import {
   createNetWorthChartOptions,
   setCommonOptions,
 } from './ChartOptions';
+import IRSFilingStatus from './enum/IRSFilingStatus';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
 
@@ -44,6 +46,7 @@ const transformState = reportState => {
   state.roi /= 100;
   state.monthlyRoi = calcMonthlyRoi(state.roi);
   state.marginalTaxRate /= 100;
+  state.newAcquisitionDebt = +state.newAcquisitionDebt;
   for (const m of state.mortgages) {
     m.name = `Mortgage ${m.id}`;
     m.interestRate /= 100;
@@ -116,78 +119,154 @@ const createAmortizationSchedules = mortgages => {
   }
 };
 
-const setM1AsOldMortgage = mortgages => {
-  const m1 = mortgages[0];
-  const m2 = mortgages[1];
-  const isM2StartDateBeforeM1 = m2.startDate.isBefore(m1.startDate);
-  if (isM2StartDateBeforeM1) {
-    return [m2, m1, isM2StartDateBeforeM1];
+/**
+ * Extrapolate past and future standard deductions as needed.
+ */
+const extendStandardDeductions = (m1, m2, irsFilingStatus) => {
+  const percentChange = 3.25 / 100;
+  let startYear;
+  let endYear;
+
+  if (m1.startDate.isBefore(m2.startDate)) {
+    startYear = m1.startDate.year();
+  } else {
+    startYear = m2.startDate.year();
   }
-  return [m1, m2, isM2StartDateBeforeM1];
+  if (m1.endDate.isAfter(m2.endDate)) {
+    endYear = m1.endDate.year();
+  } else {
+    endYear = m2.endDate.year();
+  }
+  const stdDev = IRSFilingStatus.props[irsFilingStatus].standardDeduction;
+  const keys = Object.keys(stdDev);
+  const first = +keys[0];
+  const last = +keys.pop();
+  for (let i = first - 1; i >= startYear; i--) {
+    stdDev[i] = roundToTwo(stdDev[i + 1] / (1 + percentChange));
+  }
+  for (let i = last + 1; i <= endYear; i++) {
+    stdDev[i] = stdDev[i - 1];
+  }
 };
 
-const setInitialCashEquity = (isRefinance, m1, m2, m1n) => {
-  let m1Cash;
-  let m2Cash;
-  const m1Equity = 0;
-  let m2Equity;
+/**
+ * Caps home acquisition debt to a maximum amount which depends the mortgage's
+ * start date and the IRS filing status.
+ */
+const capHomeAcquisitionDebt = (amount, startDate, irsFilingStatus) => {
+  const tcjaBreakpoint = moment('2018-02-15', 'YYYY-MM-DD');
+  let homeAcquisitionDebt;
+  if (startDate.isAfter(tcjaBreakpoint)) {
+    if (irsFilingStatus === IRSFilingStatus.MarriedFilingSeparately) {
+      homeAcquisitionDebt = Math.min(375000, amount);
+    } else {
+      homeAcquisitionDebt = Math.min(750000, amount);
+    }
+  } else {
+    if (irsFilingStatus === IRSFilingStatus.MarriedFilingSeparately) {
+      homeAcquisitionDebt = Math.min(500000, amount);
+    } else {
+      homeAcquisitionDebt = Math.min(1000000, amount);
+    }
+  }
+  return homeAcquisitionDebt;
+};
+
+/**
+ * Assuming m1 and m2 will overlap payment dates, find the first m1 index where
+ * they share the same date. Also, assume m1.startDate <= m2.startDate.
+ */
+const findFirstSharedPaymentDateIndex = (m1, m2) => {
+  let m1n = 0;
+  while (m1.payments[m1n] && !m1.payments[m1n].date.isSame(m2.startDate)) {
+    m1n++;
+    if (m1n === 1000)
+      throw new Error(
+        `Couldn't find intersecting payment dates between the two mortgages.`
+      );
+  }
+  return m1n;
+};
+
+/**
+ * Calculate pro-rated interest for old lender, as well as prepaid per-diem
+ * interest for the new lender.
+ */
+const setProRatedInterestForRefi = (m1, m2, firstSharedM1Index) => {
+  const priorMonthNdx = firstSharedM1Index - 1;
+  const priorMonthPayment = m1.payments[priorMonthNdx];
+  const priorMonthStartingBalance = priorMonthPayment.startingBalance;
+  const refiClosingDate = priorMonthPayment.date.clone().date(15); // arbirarily chosen
+  const refiClosingDay = refiClosingDate.date();
+  const daysInMonth = refiClosingDate.daysInMonth();
+  m1.proRatedInterest =
+    priorMonthPayment.interest * ((refiClosingDay - 1) / daysInMonth);
+  m2.proRatedInterest =
+    m2.payments[0].interest *
+    ((daysInMonth - refiClosingDay + 1) / daysInMonth);
+};
+
+/**
+ * Determine starting values for cash, equity, and home acquisition debt.
+ */
+const setInitialCashEquityAndDebt = (
+  { isRefinance, newAcquisitionDebt, irsFilingStatus },
+  m1,
+  m2,
+  firstSharedM1Index
+) => {
+  m1.initEquity = 0;
 
   if (isRefinance) {
-    const priorMonthNdx = m1n - 1;
-    const priorMonthPayment = m1.payments[priorMonthNdx];
-    const priorMonthStartingBalance = priorMonthPayment.startingBalance;
-    const refiClosingDate = priorMonthPayment.date.clone().date(15); // arbirarily chosen
-    const refiClosingDay = refiClosingDate.date();
-    const daysInMonth = refiClosingDate.daysInMonth();
-    const proRatedInterestForOldLender =
-      priorMonthPayment.interest * ((refiClosingDay - 1) / daysInMonth);
-    const prepaidInterestForNewLender =
-      m2.payments[0].interest *
-      ((daysInMonth - refiClosingDay + 1) / daysInMonth);
-
-    m1Cash = 0;
-    m2Cash = roundToTwo(
+    const priorMonthStartingBalance =
+      m1.payments[firstSharedM1Index - 1].startingBalance;
+    m1.initCash = 0;
+    m2.initCash = roundToTwo(
       m2.loanAmount -
         priorMonthStartingBalance -
         m2.closingCosts -
-        proRatedInterestForOldLender -
-        prepaidInterestForNewLender
+        m1.proRatedInterest -
+        m2.proRatedInterest
     );
-    m2Equity = -roundToTwo(m2.loanAmount - priorMonthStartingBalance);
+    m2.initEquity = -roundToTwo(m2.loanAmount - priorMonthStartingBalance);
+    m2.homeAcquisitionDebt =
+      Math.min(priorMonthStartingBalance, m2.loanAmount) + newAcquisitionDebt;
   } else {
-    m1Cash = -m1.closingCosts;
-    m2Cash = -m2.closingCosts;
-    m2Equity = 0;
+    m1.initCash = -m1.closingCosts;
+    m2.initCash = -m2.closingCosts;
+    m2.initEquity = 0;
+    m2.homeAcquisitionDebt = m2.loanAmount;
   }
-  return { m1Cash, m1Equity, m2Cash, m2Equity };
+
+  m1.homeAcquisitionDebt = capHomeAcquisitionDebt(
+    m1.loanAmount,
+    m1.startDate,
+    irsFilingStatus
+  );
+  m2.homeAcquisitionDebt = capHomeAcquisitionDebt(
+    m2.homeAcquisitionDebt,
+    m1.startDate, // using m1's startDate instead of m2 on purpose!
+    irsFilingStatus
+  );
 };
 
-const insertInitialPointBeforeLaterStartDate = (
-  m1Cash,
-  m1Equity,
-  m2Cash,
-  m2Equity,
-  m1,
-  m1n,
-  m2,
-  netWorthDifferences
-) => {
-  const m1NetWorth = m1Cash + m1Equity;
-  const m2NetWorth = m2Cash + m2Equity;
-  const unixTimeMs = m1.payments[m1n].date
-    .clone()
-    .subtract(1, 'month')
-    .valueOf();
+/**
+ * Inserts an additional data point before first payment date.
+ */
+const insertInitialPointBeforeStartDates = (m1, m2, netWorthDifferences) => {
+  const m1NetWorth = m1.initCash + m1.initEquity;
+  const m2NetWorth = m2.initCash + m2.initEquity;
+  const unixTimeMs = m2.payments[0].date.clone().subtract(1, 'month').valueOf();
   m1.netWorth.push({
     unixTimeMs,
-    cash: m1Cash,
-    equity: m1Equity,
+    cash: m1.initCash,
+    equity: m1.initEquity,
     netWorth: m1NetWorth,
   });
   m2.netWorth.push({
     unixTimeMs,
-    cash: m2Cash,
-    equity: m2Equity,
+    cash: m2.initCash,
+    equity: m2.initEquity,
     netWorth: m2NetWorth,
   });
   netWorthDifferences.push({
@@ -200,39 +279,27 @@ const insertInitialPointBeforeLaterStartDate = (
  * Creates data for comparing cash, equity, and net worth comparisons of the two
  * mortgages over their life time.
  */
-const compareMortgages = ({
-  mortgages,
-  isRefinance,
-  doItemize,
-  marginalTaxRate,
-  monthlyRoi,
-}) => {
-  const [m1, m2, isSwapped] = setM1AsOldMortgage(mortgages);
-
-  let m1n = 0;
-  // fast-forward m1 payment schedule to first payment date of m2
-  while (m1.payments[m1n] && !m1.payments[m1n].date.isSame(m2.startDate)) m1n++;
-
-  let { m1Cash, m1Equity, m2Cash, m2Equity } = setInitialCashEquity(
-    isRefinance,
-    m1,
-    m2,
-    m1n
-  );
+const compareMortgages = (
+  { doItemize, monthlyRoi },
+  m1,
+  m2,
+  firstSharedM1Index
+) => {
+  let m1n = firstSharedM1Index;
 
   const netWorthDifferences = [];
-  // insert an additional data point before first payment date
-  insertInitialPointBeforeLaterStartDate(
-    m1Cash,
-    m1Equity,
-    m2Cash,
-    m2Equity,
+
+  insertInitialPointBeforeStartDates(
     m1,
-    m1n,
     m2,
+
     netWorthDifferences
   );
 
+  let m1Cash = m1.initCash;
+  let m2Cash = m2.initCash;
+  let m1Equity = m1.initEquity;
+  let m2Equity = m2.initEquity;
   let m1PrevCash = m1Cash;
   let m2PrevCash = m2Cash;
   let m1Payment = m1.monthlyPayment;
@@ -254,7 +321,7 @@ const compareMortgages = ({
       const accruedInt = m1PrevCash === undefined ? 0 : m1PrevCash * monthlyRoi;
       m1Cash = m1Cash - m1Payment + accruedInt;
       if (doItemize) {
-        m1Cash += m1.payments[m1n].interest * marginalTaxRate;
+        m1Cash += m1.payments[m1n].itemizedInterest;
       }
       m1Equity += m1.payments[m1n].principal;
       m1NetWorth = roundToTwo(m1Cash + m1Equity);
@@ -274,7 +341,7 @@ const compareMortgages = ({
       const accruedInt = m2PrevCash === undefined ? 0 : m2PrevCash * monthlyRoi;
       m2Cash = m2Cash - m2Payment + accruedInt;
       if (doItemize) {
-        m2Cash += m2.payments[m2n].interest * marginalTaxRate;
+        m2Cash += m2.payments[m2n].itemizedInterest;
       }
       m2Equity += m2.payments[m2n].principal;
       m2NetWorth = m2Cash + m2Equity;
@@ -291,9 +358,7 @@ const compareMortgages = ({
     if (m1NetWorth !== null && m2NetWorth !== null) {
       netWorthDifferences.push({
         unixTimeMs,
-        difference: isSwapped
-          ? m1NetWorth - m2NetWorth
-          : m2NetWorth - m1NetWorth,
+        difference: m2NetWorth - m1NetWorth,
       });
     }
   }
@@ -301,8 +366,13 @@ const compareMortgages = ({
   return netWorthDifferences;
 };
 
-const calcMortgageInterestByYear = mortgages => {
-  for (const m of mortgages) {
+const calcMortgageInterestByYear = (
+  m1,
+  m2,
+  isRefinance,
+  firstSharedM1Index
+) => {
+  for (const m of [m1, m2]) {
     m.interestByYear = [];
     let interest = 0;
     let prevYear;
@@ -312,6 +382,7 @@ const calcMortgageInterestByYear = mortgages => {
         m.interestByYear.push({
           year: prevYear,
           interest: roundToTwo(interest),
+          preRefiInterest: 0,
         });
         interest = 0;
       }
@@ -319,13 +390,60 @@ const calcMortgageInterestByYear = mortgages => {
       prevYear = newYear;
     }
   }
+
+  // for refi's, determine partial year interest from m1 so that it can
+  // be used for itemizing interest
+  if (isRefinance) {
+    let m1n = firstSharedM1Index;
+    const refiYear = m1.payments[m1n].date.year();
+    let preRefiInterest = 0;
+    for (m1n -= 2; m1.payments[m1n].date.year() === refiYear; m1n--) {
+      preRefiInterest += m1.payments[m1n].interest;
+    }
+    m2.interestByYear[0].preRefiInterest =
+      m1.proRatedInterest + preRefiInterest;
+    m2.interestByYear[0].interest += m2.proRatedInterest;
+  }
+};
+
+const calcItemizedMortgageInterest = ({
+  mortgages,
+  deductionFrequency,
+  irsFilingStatus,
+  otherItemizedDeductions,
+  marginalTaxRate,
+}) => {
+  const standarddDeductionData =
+    IRSFilingStatus.props[irsFilingStatus].standardDeduction;
+
+  for (const m of mortgages) {
+    for (const p of m.payments) {
+      const standardDeduction = standarddDeductionData[p.date.year()];
+      const ratio =
+        m.homeAcquisitionDebt < p.startingBalance
+          ? m.homeAcquisitionDebt / p.startingBalance
+          : 1;
+      p.itemizedInterest = roundToTwo(p.interest * marginalTaxRate * ratio);
+      p.itemizedInterestRatio = ratio;
+      p.itemizedInterestCashDiff =
+        p.itemizedInterest -
+        Math.max(standardDeduction / 12 - otherItemizedDeductions, 0);
+    }
+  }
 };
 
 function Report({ reportState }) {
   const state = transformState(reportState);
+  const [m1, m2] = [state.mortgages[0], state.mortgages[1]];
+  extendStandardDeductions(m1, m2, state.irsFilingStatus);
   createAmortizationSchedules(state.mortgages);
-  const comparison = compareMortgages(state);
-  calcMortgageInterestByYear(state.mortgages);
+  const firstSharedM1Index = findFirstSharedPaymentDateIndex(m1, m2);
+  calcMortgageInterestByYear(m1, m2, state.isRefinance, firstSharedM1Index);
+  // console.log(state);
+  setProRatedInterestForRefi(m1, m2, firstSharedM1Index);
+  setInitialCashEquityAndDebt(state, m1, m2, firstSharedM1Index);
+  if (state.doItemize) calcItemizedMortgageInterest(state);
+  const comparison = compareMortgages(state, m1, m2, firstSharedM1Index);
   setCommonOptions(state.mortgages);
 
   const tableCellStyle = {

@@ -22,11 +22,12 @@ export const formDefaults = {
     ...mortgageTemplate,
     id: n,
   })),
-  doItemize: 'false',
+  doItemize: false,
   marginalTaxRate: '',
   newAcquisitionDebt: '0',
   deductionFrequency: DeductionFrequency.Monthly,
   irsFilingStatus: IRSFilingStatus.Single,
+  otherItemizedDeductions: '10000',
 };
 
 const nextViableStartDate = moment().startOf('month').add(2, 'months');
@@ -61,7 +62,7 @@ export const sampleData = [
         closingCosts: '3500',
       },
     ],
-    doItemize: 'true',
+    doItemize: true,
     marginalTaxRate: '33.3',
   },
   {
@@ -92,7 +93,7 @@ export const sampleData = [
         closingCosts: '3500',
       },
     ],
-    doItemize: 'true',
+    doItemize: true,
     marginalTaxRate: '40',
   },
   {
@@ -123,7 +124,7 @@ export const sampleData = [
         closingCosts: '0',
       },
     ],
-    doItemize: 'true',
+    doItemize: true,
     marginalTaxRate: '49.3',
     irsFilingStatus: IRSFilingStatus.MarriedFilingJointly,
   },

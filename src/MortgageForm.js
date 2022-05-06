@@ -24,7 +24,11 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function MortgageForm({ handleMortgageChange, state }) {
+export default function MortgageForm({
+  state,
+  handleMortgageChange,
+  isRefinance,
+}) {
   const handleChange = e => {
     handleMortgageChange(state.id, e);
   };
@@ -44,7 +48,8 @@ export default function MortgageForm({ handleMortgageChange, state }) {
           gutterBottom
           sx={{ textAlign: 'center' }}
         >
-          Mortgage {state.id}
+          Mortgage {state.id}{' '}
+          {isRefinance ? `(${state.id === 1 ? 'Old' : 'New'})` : ''}
         </Typography>
         <LocalizationProvider dateAdapter={AdapterMoment}>
           <DatePicker

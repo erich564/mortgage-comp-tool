@@ -100,6 +100,7 @@ export default function InputForm({
           key={m.id}
           handleMortgageChange={handleMortgageChange}
           state={m}
+          isRefinance={state.isRefinance}
         />
       ))}
       <br />
@@ -212,7 +213,29 @@ export default function InputForm({
               </TableRow>
               <TableRow>
                 <TableCellField>
-                  How often will you benefit from the deduction?
+                  Other itemized deductions (e.g. salt, donations):
+                </TableCellField>
+                <TableCellValue>
+                  <TextField
+                    required
+                    disabled={!state.doItemize}
+                    margin="none"
+                    name="otherItemizedDeductions"
+                    value={state.otherItemizedDeductions}
+                    sx={{ input: { textAlign: 'right' }, width: inputWidth }}
+                    onChange={handleChange}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">$</InputAdornment>
+                      ),
+                    }}
+                    InputLabelProps={{ required: false }}
+                  />
+                </TableCellValue>
+              </TableRow>
+              <TableRow>
+                <TableCellField>
+                  How often are income taxes withheld or paid?
                 </TableCellField>
                 <TableCellValue>
                   <Select
@@ -238,9 +261,7 @@ export default function InputForm({
                 <TableCellValue>
                   <TextField
                     required
-                    disabled={
-                      !(state.doItemize && String(state.isRefinance) === 'true')
-                    }
+                    disabled={!(state.doItemize && state.isRefinance)}
                     margin="none"
                     name="newAcquisitionDebt"
                     value={state.newAcquisitionDebt}

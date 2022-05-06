@@ -28,6 +28,8 @@
     "no-underscore-dangle": "off",
     "no-restricted-syntax": "off",
     "guard-for-in": "off",
-    "no-unused-vars": "warn"
+    "no-unused-vars": "warn",
+    "no-lonely-if": "off",
+    "no-param-reassign": ["error", { "props": false }]
   }
 }

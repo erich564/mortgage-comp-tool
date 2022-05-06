@@ -23,9 +23,14 @@ export default function App() {
 
   const handleCloseSnackbar = () => setShowSnackbar(false);
 
-  /** Crude constraint validation. */
+  /**
+   * Crude constraint validation. Converts true/false strings to booleans,
+   * and strips non-numeric characters otherwise.
+   */
   const stripIllegalCharacters = str =>
-    str === 'false' || str === 'true' ? str : str.replace(/[^0-9.]/g, '');
+    str === 'false' || str === 'true'
+      ? str === 'true'
+      : str.replace(/[^0-9.]/g, '');
 
   const handleChange = e => {
     const value =
