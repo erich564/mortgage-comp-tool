@@ -196,7 +196,6 @@ const findFirstSharedPaymentDateIndex = (m1, m2) => {
 const setProRatedInterestForRefi = (m1, m2, firstSharedM1Index) => {
   const priorMonthNdx = firstSharedM1Index - 1;
   const priorMonthPayment = m1.payments[priorMonthNdx];
-  const priorMonthStartingBalance = priorMonthPayment.startingBalance;
   const refiClosingDate = priorMonthPayment.date.clone().date(15); // arbirarily chosen
   const refiClosingDay = refiClosingDate.date();
   const daysInMonth = refiClosingDate.daysInMonth();
@@ -440,8 +439,8 @@ function Report({ reportState }) {
   createAmortizationSchedules(state.mortgages);
   const firstSharedM1Index = findFirstSharedPaymentDateIndex(m1, m2);
   calcMortgageInterestByYear(m1, m2, state.isRefinance, firstSharedM1Index);
-  console.log(state);
-  setProRatedInterestForRefi(m1, m2, firstSharedM1Index);
+  // console.log(state);
+  if (state.isRefinance) setProRatedInterestForRefi(m1, m2, firstSharedM1Index);
   setInitialCashEquityAndDebt(state, m1, m2, firstSharedM1Index);
   if (state.doItemize) calcItemizedMortgageInterest(state);
   const comparison = compareMortgages(state, m1, m2, firstSharedM1Index);
