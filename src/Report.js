@@ -46,6 +46,7 @@ const transformState = reportState => {
   state.roi /= 100;
   state.monthlyRoi = calcMonthlyRoi(state.roi);
   state.marginalTaxRate /= 100;
+  state.otherItemizedDeductions = +state.otherItemizedDeductions;
   state.newAcquisitionDebt = +state.newAcquisitionDebt;
   for (const m of state.mortgages) {
     m.name = `Mortgage ${m.id}`;
@@ -439,7 +440,7 @@ function Report({ reportState }) {
   createAmortizationSchedules(state.mortgages);
   const firstSharedM1Index = findFirstSharedPaymentDateIndex(m1, m2);
   calcMortgageInterestByYear(m1, m2, state.isRefinance, firstSharedM1Index);
-  // console.log(state);
+  console.log(state);
   setProRatedInterestForRefi(m1, m2, firstSharedM1Index);
   setInitialCashEquityAndDebt(state, m1, m2, firstSharedM1Index);
   if (state.doItemize) calcItemizedMortgageInterest(state);

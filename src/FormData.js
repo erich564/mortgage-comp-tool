@@ -47,7 +47,7 @@ export const sampleData = [
         interestRate: '2.75',
         startDate: moment('2016-12-01', MOMENT_FORMAT),
         isStartDateChanged: true,
-        interestRateAdjusted: '4.62',
+        interestRateAdjusted: '5',
         closingCosts: '2773',
       },
       {
@@ -55,7 +55,7 @@ export const sampleData = [
         loanAmount: '500000',
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
-        interestRate: '5.625',
+        interestRate: '5.5',
         startDate: nextViableStartDate.clone(),
         isStartDateChanged: true,
         interestRateAdjusted: '',
@@ -68,7 +68,7 @@ export const sampleData = [
   {
     ...formDefaults,
     isRefinance: false,
-    roi: '8.5',
+    roi: '7.5',
     mortgages: [
       {
         id: 1,
