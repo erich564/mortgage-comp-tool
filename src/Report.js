@@ -193,7 +193,7 @@ const findFirstSharedPaymentDateIndex = (m1, m2) => {
  * Calculate pro-rated interest for old lender, as well as prepaid per-diem
  * interest for the new lender.
  */
-const setProRatedInterestForRefi = (m1, m2, firstSharedM1Index) => {
+const calcProRatedInterestForRefi = (m1, m2, firstSharedM1Index) => {
   const priorMonthNdx = firstSharedM1Index - 1;
   const priorMonthPayment = m1.payments[priorMonthNdx];
   const refiClosingDate = priorMonthPayment.date.clone().date(15); // arbirarily chosen
@@ -209,7 +209,7 @@ const setProRatedInterestForRefi = (m1, m2, firstSharedM1Index) => {
 /**
  * Determine starting values for cash, equity, and home acquisition debt.
  */
-const setInitialCashEquityAndDebt = (
+const calcInitialCashEquityAndDebt = (
   { isRefinance, newAcquisitionDebt, irsFilingStatus },
   m1,
   m2,
@@ -321,7 +321,7 @@ const compareMortgages = (
       const accruedInt = m1PrevCash === undefined ? 0 : m1PrevCash * monthlyRoi;
       m1Cash = m1Cash - m1Payment + accruedInt;
       if (doItemize) {
-        m1Cash += m1.payments[m1n].itemizedInterest;
+        m1Cash += m1.payments[m1n].itemizedInterestCashDiff;
       }
       m1Equity += m1.payments[m1n].principal;
       m1NetWorth = roundToTwo(m1Cash + m1Equity);
@@ -341,7 +341,7 @@ const compareMortgages = (
       const accruedInt = m2PrevCash === undefined ? 0 : m2PrevCash * monthlyRoi;
       m2Cash = m2Cash - m2Payment + accruedInt;
       if (doItemize) {
-        m2Cash += m2.payments[m2n].itemizedInterest;
+        m2Cash += m2.payments[m2n].itemizedInterestCashDiff;
       }
       m2Equity += m2.payments[m2n].principal;
       m2NetWorth = m2Cash + m2Equity;
@@ -425,9 +425,13 @@ const calcItemizedMortgageInterest = ({
           : 1;
       p.itemizedInterest = roundToTwo(p.interest * marginalTaxRate * ratio);
       p.itemizedInterestRatio = ratio;
-      p.itemizedInterestCashDiff =
-        p.itemizedInterest -
-        Math.max(standardDeduction / 12 - otherItemizedDeductions, 0);
+      p.itemizedInterestCashDiff = roundToTwo(
+        Math.max(
+          p.itemizedInterest -
+            Math.max(standardDeduction - otherItemizedDeductions, 0) / 12,
+          0
+        )
+      );
     }
   }
 };
@@ -439,9 +443,10 @@ function Report({ reportState }) {
   createAmortizationSchedules(state.mortgages);
   const firstSharedM1Index = findFirstSharedPaymentDateIndex(m1, m2);
   calcMortgageInterestByYear(m1, m2, state.isRefinance, firstSharedM1Index);
-  // console.log(state);
-  if (state.isRefinance) setProRatedInterestForRefi(m1, m2, firstSharedM1Index);
-  setInitialCashEquityAndDebt(state, m1, m2, firstSharedM1Index);
+  console.log(state);
+  if (state.isRefinance)
+    calcProRatedInterestForRefi(m1, m2, firstSharedM1Index);
+  calcInitialCashEquityAndDebt(state, m1, m2, firstSharedM1Index);
   if (state.doItemize) calcItemizedMortgageInterest(state);
   const comparison = compareMortgages(state, m1, m2, firstSharedM1Index);
   setCommonOptions(state.mortgages);
