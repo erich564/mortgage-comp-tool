@@ -41,9 +41,7 @@ let commonOptions;
  * Then adds some padding to those dates so the data is not pushing up against the
  * ends of the chart.
  */
-const calcMinMaxDates = mortgages => {
-  const m1 = mortgages[0];
-  const m2 = mortgages[1];
+const calcMinMaxDates = (m1, m2) => {
   const minDate = moment.min(m1.startDate, m2.startDate).clone();
   const maxDate = moment.max(m1.endDate, m2.endDate).clone();
   const diff = maxDate.diff(minDate, 'days');
@@ -74,8 +72,8 @@ const makePlotLines = (minDate, maxDate) => {
   return arr;
 };
 
-export const setCommonOptions = mortgages => {
-  const { minDate, maxDate } = calcMinMaxDates(mortgages);
+export const setCommonOptions = ({ m1, m2 }) => {
+  const { minDate, maxDate } = calcMinMaxDates(m1, m2);
   const plotLines = makePlotLines(minDate, maxDate);
 
   commonOptions = {
@@ -133,7 +131,7 @@ export const setCommonOptions = mortgages => {
   };
 };
 
-export const createNetWorthChartOptions = (comparison, mortgages) =>
+export const createNetWorthChartOptions = (netWorthDifferences, mortgages) =>
   merge(commonOptions, {
     title: {
       text: 'Net Worth',
@@ -141,7 +139,7 @@ export const createNetWorthChartOptions = (comparison, mortgages) =>
     series: [
       {
         name: 'Difference',
-        data: comparison.map(c => ({
+        data: netWorthDifferences.map(c => ({
           x: c.unixTimeMs,
           y: c.difference,
         })),
