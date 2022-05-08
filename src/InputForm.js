@@ -234,16 +234,36 @@ export default function InputForm({
               </TableRow>
               <TableRow>
                 <TableCellField>
+                  For cash-out refinances, Mortgage 1&apos;s home acquisition
+                  debt if less than its loan amount:
+                </TableCellField>
+                <TableCellValue>
+                  <TextField
+                    disabled={!(state.doItemize && state.isRefinance)}
+                    margin="none"
+                    name="m1HomeAcquisitionDebt"
+                    value={state.m1HomeAcquisitionDebt}
+                    sx={{ input: { textAlign: 'right' }, width: inputWidth }}
+                    onChange={handleChange}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">$</InputAdornment>
+                      ),
+                    }}
+                    InputLabelProps={{ required: false }}
+                  />
+                </TableCellValue>
+              </TableRow>
+              <TableRow>
+                <TableCellField>
                   For cash-out refinances, new home acquisition debt:
                 </TableCellField>
                 <TableCellValue>
                   <TextField
-                    required
                     disabled={!(state.doItemize && state.isRefinance)}
                     margin="none"
-                    name="newAcquisitionDebt"
-                    value={state.newAcquisitionDebt}
-                    placeholder="9"
+                    name="refiNewAcquisitionDebt"
+                    value={state.refiNewAcquisitionDebt}
                     sx={{ input: { textAlign: 'right' }, width: inputWidth }}
                     onChange={handleChange}
                     InputProps={{

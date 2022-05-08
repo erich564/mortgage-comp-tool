@@ -23,7 +23,8 @@ export const formDefaults = {
   })),
   doItemize: false,
   marginalTaxRate: '',
-  newAcquisitionDebt: '0',
+  m1HomeAcquisitionDebt: '',
+  refiNewAcquisitionDebt: '',
   irsFilingStatus: IRSFilingStatus.Single,
   otherItemizedDeductions: '10000',
 };

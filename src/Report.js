@@ -42,13 +42,14 @@ const calcMonthlyPayment = (p, i, t) => {
 };
 
 const transformState = reportState => {
-  const state = clone(reportState);
-  state.roi /= 100;
-  state.monthlyRoi = calcMonthlyRoi(state.roi);
-  state.marginalTaxRate /= 100;
-  state.otherItemizedDeductions = +state.otherItemizedDeductions;
-  state.newAcquisitionDebt = +state.newAcquisitionDebt;
-  for (const m of state.mortgages) {
+  const data = clone(reportState);
+  data.roi /= 100;
+  data.monthlyRoi = calcMonthlyRoi(data.roi);
+  data.marginalTaxRate /= 100;
+  data.otherItemizedDeductions = +data.otherItemizedDeductions;
+  data.m1HomeAcquisitionDebt = +data.m1HomeAcquisitionDebt;
+  data.refiNewAcquisitionDebt = +data.refiNewAcquisitionDebt;
+  for (const m of data.mortgages) {
     m.name = `Mortgage ${m.id}`;
     m.interestRate /= 100;
     m.loanAmount = +m.loanAmount;
@@ -72,7 +73,8 @@ const transformState = reportState => {
     m.closingCosts = +m.closingCosts;
     delete m.interestRateAdjusted;
   }
-  return state;
+
+  return data;
 };
 
 /**
@@ -211,11 +213,12 @@ const calcProRatedInterestForRefi = ({ m1, m2, firstSharedM1Index }) => {
  */
 const calcInitialCashEquityAndDebt = ({
   isRefinance,
-  newAcquisitionDebt,
+  refiNewAcquisitionDebt,
   irsFilingStatus,
   m1,
   m2,
   firstSharedM1Index,
+  m1HomeAcquisitionDebt,
 }) => {
   m1.initEquity = 0;
 
@@ -231,8 +234,20 @@ const calcInitialCashEquityAndDebt = ({
         m2.proRatedInterest
     );
     m2.initEquity = -roundToTwo(m2.loanAmount - priorMonthStartingBalance);
-    m2.homeAcquisitionDebt =
-      Math.min(priorMonthStartingBalance, m2.loanAmount) + newAcquisitionDebt;
+    if (m1HomeAcquisitionDebt === 0) {
+      m1.homeAcquisitionDebt = m1.loanAmount;
+    } else {
+      m1.homeAcquisitionDebt = Math.min(m1HomeAcquisitionDebt, m1.loanAmount);
+    }
+    m2.homeAcquisitionDebt = Math.min(
+      roundToTwo(
+        Math.min(
+          m1.homeAcquisitionDebt,
+          Math.min(priorMonthStartingBalance, m2.loanAmount)
+        ) + refiNewAcquisitionDebt
+      ),
+      m2.loanAmount
+    );
   } else {
     m1.initCash = -m1.closingCosts;
     m2.initCash = -m2.closingCosts;
@@ -241,7 +256,7 @@ const calcInitialCashEquityAndDebt = ({
   }
 
   m1.homeAcquisitionDebt = capHomeAcquisitionDebt(
-    m1.loanAmount,
+    m1.homeAcquisitionDebt,
     m1.startDate,
     irsFilingStatus
   );
@@ -410,7 +425,7 @@ const calcMortgageInterestByYear = ({
       m1Interest += m1.payments[m1n].interest;
       m1ItemizableInterest += m1.payments[m1n].itemizableInterest;
     }
-    const refiM1Ratio = 1; // TODO: implement m1 home acquisition debt!
+    const refiM1Ratio = calcRatio(m1.homeAcquisitionDebt, m2.loanAmount);
     m2.interestByYear[0].m1Interest = roundToTwo(
       m1Interest + m1.proRatedInterest
     );
