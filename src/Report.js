@@ -280,17 +280,16 @@ const insertInitialPointBeforeStartDates = (m1, m2, netWorthDifferences) => {
 };
 
 /**
- * Determine how much to offset cash due to the benefits of
+ * Determine how much to offset monthly cash due to the benefits of
  * itemizing mortgage interest.
  */
-const calcCashFromItemizedInterest = (m, payment) => {
+const calcMonthlyNetGainFromItemizedInterest = (payment, interestByYear) => {
   const year = payment.date.year();
-  const interestByYear = m.interestByYear.find(x => x.year === year);
-  const { itemizedInterestNetGain } = interestByYear;
-  const monthlyItemizedInterestNetGain = roundToTwo(
-    itemizedInterestNetGain / monthsPerYear
+  const { itemizationNetGain } = interestByYear.find(x => x.year === year);
+  const monthlyItemizationNetGain = roundToTwo(
+    itemizationNetGain / monthsPerYear
   );
-  return monthlyItemizedInterestNetGain;
+  return monthlyItemizationNetGain;
 };
 
 /**
@@ -320,7 +319,10 @@ const compareMortgages = ({
       const accruedInt = prevCash * monthlyRoi;
       cash = cash - monthlyPayment + accruedInt;
       if (doItemize) {
-        cash += calcCashFromItemizedInterest(m, payment);
+        cash += calcMonthlyNetGainFromItemizedInterest(
+          payment,
+          m.interestByYear
+        );
       }
       equity += payment.principal;
       const netWorth = roundToTwo(cash + equity);
@@ -363,11 +365,11 @@ const calcMortgageInterestByYear = ({
   otherItemizedDeductions,
   marginalTaxRate,
 }) => {
-  const pushResult = (m, year, interest, itemizedInterest) => {
+  const pushResult = (m, year, interest, itemizableInterest) => {
     m.interestByYear.push({
       year,
       interest: roundToTwo(interest),
-      itemizedInterest,
+      itemizableInterest: roundToTwo(itemizableInterest),
     });
   };
   const calcRatio = (homeAcquisitionDebt, startingBalance) =>
@@ -378,63 +380,69 @@ const calcMortgageInterestByYear = ({
   for (const m of [m1, m2]) {
     m.interestByYear = [];
     let interest = 0;
-    let itemizedInterest = 0;
+    let itemizableInterest = 0;
     let prevYear;
     for (const p of m.payments) {
       const year = p.date.year();
       if (prevYear && prevYear !== year) {
-        pushResult(m, prevYear, interest, itemizedInterest);
+        pushResult(m, prevYear, interest, itemizableInterest);
         interest = 0;
-        itemizedInterest = 0;
+        itemizableInterest = 0;
       }
       interest += p.interest;
       const ratio = calcRatio(m.homeAcquisitionDebt, p.startingBalance);
-      p.itemizedInterest = roundToTwo(p.interest * ratio);
-      itemizedInterest += p.itemizedInterest;
+      p.itemizableInterest = roundToTwo(p.interest * ratio);
+      itemizableInterest += p.itemizableInterest;
       prevYear = year;
     }
-    pushResult(m, prevYear, interest, itemizedInterest);
+    pushResult(m, prevYear, interest, itemizableInterest);
   }
 
-  // for refi's, determine partial year interest from m1 so that it can
-  // be used for itemizing interest. also, add pro-rated interest for
-  // old and new lender to total yearly interest paid
+  // for refi's, determine partial year interest from m1. also,
+  // add pro-rated interest for old and new lender to total yearly interest
+  // totals
   if (isRefinance) {
     let m1n = firstSharedM1Index;
     const refiYear = m1.payments[m1n].date.year();
     let m1Interest = 0;
-    let m1ItemizedInterest = 0;
+    let m1ItemizableInterest = 0;
     for (m1n -= 2; m1.payments[m1n].date.year() === refiYear; m1n--) {
       m1Interest += m1.payments[m1n].interest;
-      m1ItemizedInterest += m1.payments[m1n].itemizedInterest;
+      m1ItemizableInterest += m1.payments[m1n].itemizableInterest;
     }
+    const refiM1Ratio = 1; // TODO: implement m1 home acquisition debt!
     m2.interestByYear[0].m1Interest = roundToTwo(
-      m1.proRatedInterest + m1Interest
+      m1Interest + m1.proRatedInterest
     );
-    const refiRatio = calcRatio(m2.homeAcquisitionDebt, m2.loanAmount);
-    const itemizedM2ProRatedInterest = roundToTwo(
-      m2.proRatedInterest * refiRatio
+    m2.interestByYear[0].m1ItemizableInterest =
+      m1ItemizableInterest + m1.proRatedInterest * refiM1Ratio;
+    const refiM2Ratio = calcRatio(m2.homeAcquisitionDebt, m2.loanAmount);
+    m2.interestByYear[0].interest = roundToTwo(
+      m2.interestByYear[0].interest + m2.proRatedInterest
     );
-    m2.interestByYear[0].interest += itemizedM2ProRatedInterest;
-    m2.interestByYear[0].m1ItemizedInterest =
-      m1ItemizedInterest + m1.proRatedInterest;
+    m2.interestByYear[0].itemizableInterest = roundToTwo(
+      m2.interestByYear[0].itemizableInterest +
+        m1.proRatedInterest * refiM1Ratio +
+        m2.proRatedInterest * refiM2Ratio
+    );
   }
 
-  // determine the net worth benefit of mortgage interest itemization for
-  // each year.
+  // determine the net benefit of mortgage interest itemization for
+  // each year, taking into account other deductions
   if (doItemize) {
     const standarddDeductionData =
       IRSFilingStatus.props[irsFilingStatus].standardDeduction;
     for (const m of [m1, m2]) {
       for (const i of m.interestByYear) {
         const standardDeduction = standarddDeductionData[i.year];
-        i.itemizedInterestNetGain =
+        i.itemizationNetGain = roundToTwo(
           marginalTaxRate *
-          Math.max(
-            i.itemizedInterest -
-              Math.max(standardDeduction - otherItemizedDeductions, 0),
-            0
-          );
+            Math.max(
+              i.itemizableInterest -
+                Math.max(standardDeduction - otherItemizedDeductions, 0),
+              0
+            )
+        );
       }
     }
   }
