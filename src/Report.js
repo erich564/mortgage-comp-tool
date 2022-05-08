@@ -12,7 +12,6 @@ import {
   createNetWorthChartOptions,
   setCommonOptions,
 } from './ChartOptions';
-import DeductionFrequency from './enum/DeductionFrequency';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
@@ -284,52 +283,14 @@ const insertInitialPointBeforeStartDates = (m1, m2, netWorthDifferences) => {
  * Determine how much to offset cash due to the benefits of
  * itemizing mortgage interest.
  */
-const calcCashFromItemizedInterest = (payment, m, deductionFrequency) => {
-  const month = payment.date.month();
+const calcCashFromItemizedInterest = (m, payment) => {
   const year = payment.date.year();
-  const monthsWhenQuarterlyTaxesAreDue = [1, 4, 6, 9];
   const interestByYear = m.interestByYear.find(x => x.year === year);
-  const prevInterestByYear = m.interestByYear.find(x => x.year === year - 1);
   const { itemizedInterestNetGain } = interestByYear;
   const monthlyItemizedInterestNetGain = roundToTwo(
     itemizedInterestNetGain / monthsPerYear
   );
-  let cash = 0;
-  switch (deductionFrequency) {
-    case DeductionFrequency.Monthly:
-      cash += monthlyItemizedInterestNetGain;
-      break;
-    case DeductionFrequency.Quarterly:
-      interestByYear.deferredItemizedInterest =
-        (interestByYear.deferredItemizedInterest ?? 0) +
-        monthlyItemizedInterestNetGain;
-      if (monthsWhenQuarterlyTaxesAreDue.includes(month)) {
-        cash += interestByYear.deferredItemizedInterest;
-        interestByYear.deferredItemizedInterest = 0;
-        if (prevInterestByYear && prevInterestByYear.deferredItemizedInterest) {
-          cash += prevInterestByYear.deferredItemizedInterest;
-          prevInterestByYear.deferredItemizedInterest = 0;
-        }
-      }
-      break;
-    case DeductionFrequency.Yearly:
-      interestByYear.deferredItemizedInterest =
-        (interestByYear.deferredItemizedInterest ?? 0) +
-        monthlyItemizedInterestNetGain;
-      // assume yearly taxes paid in april
-      if (
-        month === 4 &&
-        prevInterestByYear &&
-        prevInterestByYear.deferredItemizedInterest
-      ) {
-        cash += prevInterestByYear.deferredItemizedInterest;
-        prevInterestByYear.deferredItemizedInterest = 0;
-      }
-      break;
-    default:
-      throw new Error(`Unknown deduction frequency ${deductionFrequency}`);
-  }
-  return cash;
+  return monthlyItemizedInterestNetGain;
 };
 
 /**
@@ -342,7 +303,6 @@ const compareMortgages = ({
   doItemize,
   monthlyRoi,
   firstSharedM1Index,
-  deductionFrequency,
 }) => {
   const netWorthDifferences = [];
 
@@ -360,7 +320,7 @@ const compareMortgages = ({
       const accruedInt = prevCash * monthlyRoi;
       cash = cash - monthlyPayment + accruedInt;
       if (doItemize) {
-        cash += calcCashFromItemizedInterest(payment, m, deductionFrequency);
+        cash += calcCashFromItemizedInterest(m, payment);
       }
       equity += payment.principal;
       const netWorth = roundToTwo(cash + equity);
@@ -468,12 +428,10 @@ const calcMortgageInterestByYear = ({
     for (const m of [m1, m2]) {
       for (const i of m.interestByYear) {
         const standardDeduction = standarddDeductionData[i.year];
-        const itemizedInterest =
-          i.itemizedInterest + (i.m1ItemizedInterest ?? 0);
         i.itemizedInterestNetGain =
           marginalTaxRate *
           Math.max(
-            itemizedInterest -
+            i.itemizedInterest -
               Math.max(standardDeduction - otherItemizedDeductions, 0),
             0
           );

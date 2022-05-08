@@ -1,5 +1,4 @@
 import moment from 'moment';
-import DeductionFrequency from './enum/DeductionFrequency';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
@@ -25,7 +24,6 @@ export const formDefaults = {
   doItemize: false,
   marginalTaxRate: '',
   newAcquisitionDebt: '0',
-  deductionFrequency: DeductionFrequency.Monthly,
   irsFilingStatus: IRSFilingStatus.Single,
   otherItemizedDeductions: '10000',
 };

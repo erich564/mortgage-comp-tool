@@ -22,7 +22,6 @@ import {
   styled,
 } from '@mui/material';
 import MortgageForm from './MortgageForm';
-import DeductionFrequency from './enum/DeductionFrequency';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 
 const inputWidth = '124px';
@@ -231,27 +230,6 @@ export default function InputForm({
                     }}
                     InputLabelProps={{ required: false }}
                   />
-                </TableCellValue>
-              </TableRow>
-              <TableRow>
-                <TableCellField>
-                  How often are income taxes withheld or paid?
-                </TableCellField>
-                <TableCellValue>
-                  <Select
-                    required
-                    disabled={!state.doItemize}
-                    sx={{ minWidth: inputWidth }}
-                    value={state.deductionFrequency}
-                    name="deductionFrequency"
-                    onChange={handleChange}
-                  >
-                    {Object.keys(DeductionFrequency.props).map(n => (
-                      <MenuItem key={n} value={n}>
-                        {DeductionFrequency.props[n].name}
-                      </MenuItem>
-                    ))}
-                  </Select>
                 </TableCellValue>
               </TableRow>
               <TableRow>
