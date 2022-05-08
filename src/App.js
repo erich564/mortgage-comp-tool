@@ -104,7 +104,7 @@ export default function App() {
   return (
     <Stack spacing={2} style={{ margin: 25, textAlign: 'center' }}>
       <Typography variant="h4" component="div">
-        Mortgage Comparison Tool
+        <a href=".">Mortgage Comparison Tool</a>
       </Typography>
       <Header handleSampleData={handleSampleData} state={formState} />
       <InputForm
