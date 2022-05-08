@@ -17,7 +17,8 @@ import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
 
 const monthsPerYear = 12;
-
+// TCJA = Tax Cuts & Jobs Act of 2017
+const tcjaBreakpoint = moment('2018-02-15', 'YYYY-MM-DD');
 const locale = 'en-US';
 
 /**
@@ -156,7 +157,6 @@ const extendStandardDeductions = ({ m1, m2, irsFilingStatus }) => {
  * start date and the IRS filing status.
  */
 const capHomeAcquisitionDebt = (amount, startDate, irsFilingStatus) => {
-  const tcjaBreakpoint = moment('2018-02-15', 'YYYY-MM-DD');
   let homeAcquisitionDebt;
   if (startDate.isAfter(tcjaBreakpoint)) {
     if (irsFilingStatus === IRSFilingStatus.MarriedFilingSeparately) {
@@ -234,20 +234,17 @@ const calcInitialCashEquityAndDebt = ({
         m2.proRatedInterest
     );
     m2.initEquity = -roundToTwo(m2.loanAmount - priorMonthStartingBalance);
-    if (m1HomeAcquisitionDebt === 0) {
-      m1.homeAcquisitionDebt = m1.loanAmount;
-    } else {
+    if (m1.startDate.isAfter(tcjaBreakpoint) && m1HomeAcquisitionDebt !== 0) {
       m1.homeAcquisitionDebt = Math.min(m1HomeAcquisitionDebt, m1.loanAmount);
+    } else {
+      m1.homeAcquisitionDebt = m1.loanAmount;
     }
-    m2.homeAcquisitionDebt = Math.min(
-      roundToTwo(
-        Math.min(
-          m1.homeAcquisitionDebt,
-          Math.min(priorMonthStartingBalance, m2.loanAmount)
-        ) + refiNewAcquisitionDebt
-      ),
-      m2.loanAmount
-    );
+    let debt = m2.loanAmount;
+    if (m2.startDate.isAfter(tcjaBreakpoint))
+      debt =
+        Math.min(m1.homeAcquisitionDebt, priorMonthStartingBalance, debt) +
+        refiNewAcquisitionDebt;
+    m2.homeAcquisitionDebt = Math.min(roundToTwo(debt), m2.loanAmount);
   } else {
     m1.initCash = -m1.closingCosts;
     m2.initCash = -m2.closingCosts;

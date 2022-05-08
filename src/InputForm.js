@@ -234,15 +234,15 @@ export default function InputForm({
               </TableRow>
               <TableRow>
                 <TableCellField>
-                  For cash-out refinances, Mortgage 1&apos;s home acquisition
-                  debt if less than its loan amount:
+                  For post-TCJA cash-out refinances, enter new home acquisition
+                  debt, if any:
                 </TableCellField>
                 <TableCellValue>
                   <TextField
                     disabled={!(state.doItemize && state.isRefinance)}
                     margin="none"
-                    name="m1HomeAcquisitionDebt"
-                    value={state.m1HomeAcquisitionDebt}
+                    name="refiNewAcquisitionDebt"
+                    value={state.refiNewAcquisitionDebt}
                     sx={{ input: { textAlign: 'right' }, width: inputWidth }}
                     onChange={handleChange}
                     InputProps={{
@@ -256,14 +256,15 @@ export default function InputForm({
               </TableRow>
               <TableRow>
                 <TableCellField>
-                  For cash-out refinances, new home acquisition debt:
+                  For refinances with a post-TCJA Mortgage 1, enter its home
+                  acquisition debt if less than its loan amount:
                 </TableCellField>
                 <TableCellValue>
                   <TextField
                     disabled={!(state.doItemize && state.isRefinance)}
                     margin="none"
-                    name="refiNewAcquisitionDebt"
-                    value={state.refiNewAcquisitionDebt}
+                    name="m1HomeAcquisitionDebt"
+                    value={state.m1HomeAcquisitionDebt}
                     sx={{ input: { textAlign: 'right' }, width: inputWidth }}
                     onChange={handleChange}
                     InputProps={{
