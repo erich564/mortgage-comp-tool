@@ -131,28 +131,28 @@ export const setCommonOptions = ({ m1, m2 }) => {
   };
 };
 
-export const createNetWorthChartOptions = (netWorthDifferences, mortgages) =>
+export const createComparisonChartOptions = netWorthDifferences =>
   merge(commonOptions, {
     title: {
-      text: 'Net Worth',
+      text: 'Comparison',
     },
     series: [
       {
-        name: 'Difference',
+        name: 'Net Worth difference',
         data: netWorthDifferences.map(c => ({
           x: c.unixTimeMs,
           y: c.difference,
         })),
         color: colors.grey,
       },
-      ...mortgages.map((m, n) => ({
-        name: `${m.name} Net Worth`,
-        data: m.netWorth.map(nw => ({
-          x: nw.unixTimeMs,
-          y: nw.netWorth,
-        })),
-        color: colors.blues[n],
-      })),
+      // ...mortgages.map((m, n) => ({
+      //   name: `${m.name} Net Worth`,
+      //   data: m.netWorth.map(nw => ({
+      //     x: nw.unixTimeMs,
+      //     y: nw.netWorth,
+      //   })),
+      //   color: colors.blues[n],
+      // })),
     ],
     tooltip: {
       valueDecimals: 0,
@@ -166,7 +166,7 @@ export const createCashEquityChartOptions = mortgages =>
     },
     series: [
       ...mortgages.map((m, n) => ({
-        name: `${m.name} Cash`,
+        name: `Scenario ${m.id} Cash`,
         data: m.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: nw.cash,
@@ -174,7 +174,7 @@ export const createCashEquityChartOptions = mortgages =>
         color: colors.teals[n],
       })),
       ...mortgages.map((m, n) => ({
-        name: `${m.name} Equity`,
+        name: `Scenario ${m.id} Equity`,
         data: m.netWorth.map(nw => ({
           x: nw.unixTimeMs,
           y: nw.equity,

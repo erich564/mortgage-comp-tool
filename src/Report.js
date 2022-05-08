@@ -8,8 +8,8 @@ import {
   createAmortizationChartOptions,
   createBalanceChartOptions,
   createCashEquityChartOptions,
+  createComparisonChartOptions,
   createInterestChartOptions,
-  createNetWorthChartOptions,
   setCommonOptions,
 } from './ChartOptions';
 import IRSFilingStatus from './enum/IRSFilingStatus';
@@ -40,6 +40,33 @@ const displayInterestRate = pct => roundTo(3, pct * 100);
 const calcMonthlyPayment = (p, i, t) => {
   const x = (1 + i) ** t;
   return roundToTwo((p * (i * x)) / (x - 1));
+};
+
+const calcPerformanceRanges = netWorthDifferences => {
+  const ranges = [];
+  let isPositiveNow;
+  let prevIsPositive;
+  const firstDate = netWorthDifferences[0].date;
+  const lastDate = netWorthDifferences[netWorthDifferences.length - 1].date;
+  let prevDate = firstDate;
+  const pushResult = (startDate, endDate, isPositive) => {
+    ranges.push({
+      startDate,
+      endDate,
+      isPositive,
+    });
+    prevDate = endDate;
+  };
+  for (const nwd of netWorthDifferences) {
+    isPositiveNow = nwd.difference > 0;
+    const isZeroNow = nwd.difference === 0;
+    if (isPositiveNow !== prevIsPositive && prevIsPositive !== undefined) {
+      pushResult(prevDate, nwd.date, prevIsPositive);
+    }
+    prevIsPositive = isZeroNow ? undefined : isPositiveNow;
+  }
+  pushResult(prevDate, lastDate, prevIsPositive);
+  return ranges;
 };
 
 const transformState = reportState => {
@@ -267,27 +294,26 @@ const calcInitialCashEquityAndDebt = ({
 /**
  * Inserts an additional data point before first payment date.
  */
-const insertInitialPointBeforeStartDates = (m1, m2, netWorthDifferences) => {
+const insertInitialPointBeforeStartDates = (m1, m2) => {
   const m1NetWorth = m1.initCash + m1.initEquity;
   const m2NetWorth = m2.initCash + m2.initEquity;
-  const unixTimeMs = m2.payments[0].date.clone().subtract(1, 'month').valueOf();
+  const date = m2.payments[0].date.clone().subtract(1, 'month');
+  const unixTimeMs = date.valueOf();
   m1.netWorth = [];
   m2.netWorth = [];
   m1.netWorth.push({
+    date,
     unixTimeMs,
     cash: m1.initCash,
     equity: m1.initEquity,
     netWorth: m1NetWorth,
   });
   m2.netWorth.push({
+    date,
     unixTimeMs,
     cash: m2.initCash,
     equity: m2.initEquity,
     netWorth: m2NetWorth,
-  });
-  netWorthDifferences.push({
-    unixTimeMs,
-    difference: m2NetWorth - m1NetWorth,
   });
 };
 
@@ -315,9 +341,7 @@ const compareMortgages = ({
   monthlyRoi,
   firstSharedM1Index,
 }) => {
-  const netWorthDifferences = [];
-
-  insertInitialPointBeforeStartDates(m1, m2, netWorthDifferences);
+  insertInitialPointBeforeStartDates(m1, m2);
 
   const calcNetWorthData = (m, initNdx) => {
     let { monthlyPayment } = m;
@@ -340,6 +364,7 @@ const compareMortgages = ({
       const netWorth = roundToTwo(cash + equity);
       cash = roundToTwo(cash);
       m.netWorth.push({
+        date: payment.date,
         unixTimeMs: payment.unixTimeMs,
         cash,
         equity,
@@ -352,8 +377,10 @@ const compareMortgages = ({
   calcNetWorthData(m1, firstSharedM1Index);
   calcNetWorthData(m2, 0);
 
-  for (let i = 0; i < m1.netWorth.length; i++) {
+  const netWorthDifferences = [];
+  for (let i = 0; i < Math.min(m1.netWorth.length, m2.netWorth.length); i++) {
     netWorthDifferences.push({
+      date: m1.netWorth[i].date,
       unixTimeMs: m1.netWorth[i].unixTimeMs,
       difference: m2.netWorth[i].netWorth - m1.netWorth[i].netWorth,
     });
@@ -470,12 +497,14 @@ function Report({ reportState }) {
   calcInitialCashEquityAndDebt(data);
   calcMortgageInterestByYear(data);
   data.netWorthDifferences = compareMortgages(data);
+
   setCommonOptions(data);
+  data.performanceRanges = calcPerformanceRanges(data.netWorthDifferences);
 
   const tableCellStyle = {
     border: 0,
     fontSize: 'initial',
-    padding: 1,
+    padding: 0,
   };
 
   return (
@@ -484,64 +513,71 @@ function Report({ reportState }) {
       <br />
       <br />
       <Table sx={{ width: 'fit-content', margin: 'auto !important' }}>
-        {data.mortgages.map(m => (
-          <Fragment key={m.id}>
-            <TableBody>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    ...tableCellStyle,
-                    verticalAlign: 'top',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  Mortgage {m.id}:
-                </TableCell>
-                <TableCell sx={tableCellStyle}>
-                  ${m.loanAmount.toLocaleString(locale)} at{' '}
-                  {displayInterestRate(m.interestRate)}% for
-                  {m.type === MortgageType.FixedRate
-                    ? ` ${MortgageTerm.props[m.term].name}.`
-                    : ` the first ${m.rateAdjust.adjustDate.diff(
-                        m.startDate,
-                        'years'
-                      )} years, then ${displayInterestRate(
-                        m.rateAdjust.interestRate
-                      )}% for the remaining duration of the loan.`}
-                  <br />
-                  Monthly payment
-                  {m.type === MortgageType.FixedRate
-                    ? ` is $${m.monthlyPayment.toLocaleString(locale)}.`
-                    : ` starts at $${m.monthlyPayment.toLocaleString(
-                        locale
-                      )}, and then changes to $${m.rateAdjust.monthlyPayment.toLocaleString(
-                        locale
-                      )} on ${m.rateAdjust.adjustDate.format('MM-DD-YYYY')}.`}
-                  <br />
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Fragment>
-        ))}
+        <TableBody>
+          <TableRow>
+            <TableCell
+              sx={{
+                ...tableCellStyle,
+                verticalAlign: 'top',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Scenario 1:
+            </TableCell>
+            <TableCell sx={tableCellStyle}>
+              &nbsp;
+              {data.isRefinance
+                ? `You keep Mortgage 1 instead of refinancing.`
+                : `You purchase a home with Mortgage 1.`}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell
+              sx={{
+                ...tableCellStyle,
+                verticalAlign: 'top',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Scenario 2:
+            </TableCell>
+            <TableCell sx={tableCellStyle}>
+              &nbsp;
+              {data.isRefinance
+                ? `You refinance Mortgage 1 with Mortgage 2.`
+                : `You purchase a home with Mortgage 2.`}
+            </TableCell>
+          </TableRow>
+        </TableBody>
       </Table>
       <br />
-      The difference in net worths is the bottom-line takeaway for this tool.
-      Note that you can zoom in on graphs by clicking and dragging. You also can
-      show/hide lines by clicking on their legend entries.
+      The comparison graph below shows the following:
       <br />
+      <br />
+      {data.performanceRanges.map((range, n) => (
+        <Fragment key={n}>
+          From {range.startDate.format('MM-YYYY')} to{' '}
+          {range.endDate.format('MM-YYYY')}, Scenario {range.isPositive ? 2 : 1}{' '}
+          outperforms Scenario {range.isPositive ? 1 : 2}.
+          <br />
+        </Fragment>
+      ))}
       <br />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createNetWorthChartOptions(
-          data.netWorthDifferences,
-          data.mortgages
-        )}
+        options={createComparisonChartOptions(data.netWorthDifferences)}
       />
       <p>
-        The Net Worth graph shows how Mortgage 1 and Mortgage 2 compare in value
-        over time. Net Worth is defined here as Cash plus Equity. See below. The
-        Difference graph line values are simply &quot;Mortgage 2 Net Worth&quot;
-        minus &quot;Mortgage 1 Net Worth.&quot;
+        The Comparison graph shows how Scenario 1 and Scenario 2 compare in
+        value over time in terms of Net Worth. Net Worth is defined here as Cash
+        plus Equity -- see below. The graph line values above are &quot;Scenario
+        2 Net Worth&quot; minus &quot;Scenario 1 Net Worth.&quot; So, if a
+        point&apos;s value is greater than $0, then Scenario 2 is outperforming
+        Scenario 1 at that time (taking into account past performance).
+        <br />
+        <br />
+        Note that you can zoom in on graphs by clicking and dragging. You also
+        can show/hide lines by clicking on their legend entries.
       </p>
       <br />
       <HighchartsReact

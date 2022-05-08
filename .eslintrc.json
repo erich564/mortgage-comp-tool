@@ -21,6 +21,7 @@
     "react/jsx-filename-extension": [0],
     "react/jsx-props-no-spreading": "off",
     "react/prop-types": "off",
+    "react/no-array-index-key": "off",
     "no-plusplus": "off",
     "no-template-curly-in-string": "off",
     "react/react-in-jsx-scope": "off",
