@@ -327,7 +327,7 @@ const compareMortgages = ({
     for (let i = initNdx; i < m.payments.length; i++) {
       const payment = m.payments[i];
       if (m.rateAdjust && payment.date.isSame(m.rateAdjust.adjustDate))
-        monthlyPayment = m1.rateAdjust.monthlyPayment;
+        monthlyPayment = m.rateAdjust.monthlyPayment;
       const accruedInt = prevCash * monthlyRoi;
       cash = cash - monthlyPayment + accruedInt;
       if (doItemize) {
