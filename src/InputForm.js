@@ -13,7 +13,6 @@ import {
   MenuItem,
   Radio,
   RadioGroup,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -25,24 +24,24 @@ import MortgageForm from './MortgageForm';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 
 const inputWidth = '124px';
+const fieldMargin = 'dense';
 
 const TableCellField = styled(TableCell)({
   border: 0,
   paddingLeft: 0,
   paddingTop: 9,
   paddingBottom: 9,
-  paddingRight: 40,
+  paddingRight: 25,
   fontSize: 'inherit',
   lineHeight: 'inherit',
   letterSpacing: 'inherit',
   width: '100%',
+  textAlign: 'right',
 });
 
 const TableCellValue = styled(TableCell)({
   border: 0,
   padding: 0,
-  paddingTop: 12,
-  paddingBottom: 12,
   fontSize: 'inherit',
 });
 
@@ -173,7 +172,7 @@ export default function InputForm({
                 <TableCellValue>
                   <TextField
                     required
-                    margin="none"
+                    margin={fieldMargin}
                     name="marginalTaxRate"
                     value={state.marginalTaxRate}
                     onChange={handleChange}
@@ -194,8 +193,10 @@ export default function InputForm({
                   What is your IRS tax filing status?
                 </TableCellField>
                 <TableCellValue>
-                  <Select
+                  <TextField
                     required
+                    select
+                    margin={fieldMargin}
                     disabled={!state.doItemize}
                     sx={{ minWidth: inputWidth }}
                     value={state.irsFilingStatus}
@@ -207,7 +208,7 @@ export default function InputForm({
                         {IRSFilingStatus.props[n].name}
                       </MenuItem>
                     ))}
-                  </Select>
+                  </TextField>
                 </TableCellValue>
               </TableRow>
               <TableRow>
@@ -218,7 +219,7 @@ export default function InputForm({
                   <TextField
                     required
                     disabled={!state.doItemize}
-                    margin="none"
+                    margin={fieldMargin}
                     name="otherItemizedDeductions"
                     value={state.otherItemizedDeductions}
                     sx={{ input: { textAlign: 'right' }, width: inputWidth }}
@@ -234,13 +235,14 @@ export default function InputForm({
               </TableRow>
               <TableRow>
                 <TableCellField>
-                  For post-TCJA cash-out refinances, enter new home acquisition
-                  debt, if any:
+                  For post-TCJA cash-out refinances,
+                  <br />
+                  enter new home acquisition debt, if any:
                 </TableCellField>
                 <TableCellValue>
                   <TextField
                     disabled={!(state.doItemize && state.isRefinance)}
-                    margin="none"
+                    margin={fieldMargin}
                     name="refiNewAcquisitionDebt"
                     value={state.refiNewAcquisitionDebt}
                     sx={{ input: { textAlign: 'right' }, width: inputWidth }}
@@ -256,13 +258,14 @@ export default function InputForm({
               </TableRow>
               <TableRow>
                 <TableCellField>
-                  For refinances with a post-TCJA Mortgage 1, enter its home
-                  acquisition debt if less than its loan amount:
+                  For refinances with a post-TCJA Mortgage 1, enter
+                  <br />
+                  its home acquisition debt if less than its loan amount:
                 </TableCellField>
                 <TableCellValue>
                   <TextField
                     disabled={!(state.doItemize && state.isRefinance)}
-                    margin="none"
+                    margin={fieldMargin}
                     name="m1HomeAcquisitionDebt"
                     value={state.m1HomeAcquisitionDebt}
                     sx={{ input: { textAlign: 'right' }, width: inputWidth }}

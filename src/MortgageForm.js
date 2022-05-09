@@ -1,11 +1,11 @@
 import {
-  Box,
-  FormControl,
   InputAdornment,
-  InputLabel,
   MenuItem,
   Paper,
-  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
   TextField,
   Typography,
   styled,
@@ -21,7 +21,10 @@ const Item = styled(Paper)(({ theme }) => ({
   display: 'inline-block',
   padding: '30px',
   margin: '30px',
-  color: theme.palette.text.secondary,
+  // color: theme.palette.text.secondary,
+  fontSize: 'inherit',
+  lineHeight: 'inherit',
+  letterSpacing: 'inherit',
 }));
 
 export default function MortgageForm({
@@ -38,145 +41,199 @@ export default function MortgageForm({
 
   const skinnyWidth = '150px';
   const gutterWidth = '24px';
+  const fieldMargin = 'dense';
+
+  const TableCellField = styled(TableCell)({
+    border: 0,
+    paddingLeft: 0,
+    paddingTop: 9,
+    paddingBottom: 9,
+    paddingRight: 25,
+    fontSize: 'inherit',
+    lineHeight: 'inherit',
+    letterSpacing: 'inherit',
+    width: 'auto',
+    textAlign: 'right',
+  });
+
+  const TableCellValue = styled(TableCell)({
+    border: 0,
+    padding: 0,
+    fontSize: 'inherit',
+  });
 
   return (
     <Item>
-      <Box sx={{ display: 'inline-block' }}>
-        <Typography
-          variant="h5"
-          component="div"
-          gutterBottom
-          sx={{ textAlign: 'center' }}
-        >
-          Mortgage {state.id}{' '}
-          {isRefinance ? `(${state.id === 1 ? 'Old' : 'New'})` : ''}
-        </Typography>
-        <LocalizationProvider dateAdapter={AdapterMoment}>
-          <DatePicker
-            label="Start Date"
-            value={state.startDate}
-            views={['year', 'month']}
-            onChange={m => {
-              m.set('date', 1);
-              handleDateChange(m, 'startDate');
-            }}
-            inputFormat="MM-DD-YYYY"
-            // allowSameDateSelection
-            renderInput={params => (
+      <Typography
+        variant="h5"
+        component="div"
+        sx={{ textAlign: 'center', mb: '20px', color: 'rgba(0,0,0,.75)' }}
+      >
+        Mortgage {state.id}{' '}
+        {isRefinance ? `(${state.id === 1 ? 'Old' : 'New'})` : ''}
+      </Typography>
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCellField>Start Date:</TableCellField>
+            <TableCellValue>
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                <DatePicker
+                  value={state.startDate}
+                  views={['year', 'month']}
+                  onChange={m => {
+                    m.set('date', 1);
+                    handleDateChange(m, 'startDate');
+                  }}
+                  inputFormat="MM-DD-YYYY"
+                  // allowSameDateSelection
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      margin={fieldMargin}
+                      required
+                      inputProps={{
+                        ...params.inputProps,
+                        placeholder: 'mm-dd-yyyy',
+                      }}
+                      sx={{ width: skinnyWidth, mr: gutterWidth }}
+                      InputLabelProps={{ required: false }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+            </TableCellValue>
+          </TableRow>
+          <TableRow>
+            <TableCellField>Loan Amount:</TableCellField>
+            <TableCellValue>
               <TextField
-                {...params}
-                margin="normal"
+                margin={fieldMargin}
                 required
-                inputProps={{
-                  ...params.inputProps,
-                  placeholder: 'mm-dd-yyyy',
+                value={state.loanAmount}
+                name="loanAmount"
+                onChange={handleChange}
+                fullWidth
+                placeholder="600000"
+                sx={{ width: skinnyWidth }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  ),
                 }}
-                sx={{ width: skinnyWidth, mr: gutterWidth }}
                 InputLabelProps={{ required: false }}
               />
-            )}
-          />
-        </LocalizationProvider>
-        <TextField
-          margin="normal"
-          required
-          value={state.loanAmount}
-          name="loanAmount"
-          onChange={handleChange}
-          label="Loan Amount"
-          fullWidth
-          placeholder="600000"
-          sx={{ width: skinnyWidth }}
-          InputProps={{
-            startAdornment: <InputAdornment position="start">$</InputAdornment>,
-          }}
-          InputLabelProps={{ required: false }}
-        />
-        <br />
-        <TextField
-          margin="normal"
-          required
-          value={state.interestRate}
-          name="interestRate"
-          onChange={handleChange}
-          label="Interest Rate"
-          fullWidth
-          sx={{
-            input: { textAlign: 'right' },
-            width: skinnyWidth,
-            mr: gutterWidth,
-          }}
-          placeholder="4.25"
-          InputProps={{
-            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-          }}
-          InputLabelProps={{ required: false }}
-        />
-        <FormControl sx={{ minWidth: 150 }} margin="normal">
-          <InputLabel>Term</InputLabel>
-          <Select
-            label="Term"
-            value={state.term}
-            name="term"
-            sx={{ width: skinnyWidth }}
-            onChange={handleChange}
-          >
-            {Object.keys(MortgageTerm.props).map(n => (
-              <MenuItem key={n} value={n}>
-                {MortgageTerm.props[n].name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <br />
-        <FormControl sx={{ minWidth: 150 }} margin="normal">
-          <InputLabel>Type</InputLabel>
-          <Select
-            value={state.type}
-            label="Type"
-            name="type"
-            required
-            sx={{ width: skinnyWidth, mr: gutterWidth }}
-            onChange={handleChange}
-          >
-            {Object.keys(MortgageType.props).map(n => (
-              <MenuItem key={n} value={n}>
-                {MortgageType.props[n].name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <TextField
-          margin="normal"
-          label="Adj. Int. Rate"
-          name="interestRateAdjusted"
-          value={state.interestRateAdjusted}
-          onChange={handleChange}
-          disabled={state.type === MortgageType.FixedRate || state.type === ''}
-          required
-          sx={{ input: { textAlign: 'right' }, width: skinnyWidth }}
-          placeholder="6.75"
-          InputProps={{
-            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-          }}
-          InputLabelProps={{ required: false }}
-        />
-        <br />
-        <TextField
-          margin="normal"
-          label="Closing Costs"
-          name="closingCosts"
-          value={state.closingCosts}
-          onChange={handleChange}
-          fullWidth
-          placeholder="2000"
-          sx={{ width: skinnyWidth }}
-          InputProps={{
-            startAdornment: <InputAdornment position="start">$</InputAdornment>,
-          }}
-          InputLabelProps={{ required: false }}
-        />
-      </Box>
+            </TableCellValue>
+          </TableRow>
+          <TableRow>
+            <TableCellField>Interest Rate:</TableCellField>
+            <TableCellValue>
+              <TextField
+                margin={fieldMargin}
+                required
+                value={state.interestRate}
+                name="interestRate"
+                onChange={handleChange}
+                fullWidth
+                sx={{
+                  input: { textAlign: 'right' },
+                  width: skinnyWidth,
+                  mr: gutterWidth,
+                }}
+                placeholder="4.25"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ required: false }}
+              />
+            </TableCellValue>
+          </TableRow>
+          <TableRow>
+            <TableCellField>Term:</TableCellField>
+            <TableCellValue>
+              <TextField
+                value={state.term}
+                name="term"
+                select
+                margin={fieldMargin}
+                sx={{ width: skinnyWidth }}
+                onChange={handleChange}
+              >
+                {Object.keys(MortgageTerm.props).map(n => (
+                  <MenuItem key={n} value={n}>
+                    {MortgageTerm.props[n].name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </TableCellValue>
+          </TableRow>
+          <TableRow>
+            <TableCellField>Type:</TableCellField>
+            <TableCellValue>
+              <TextField
+                value={state.type}
+                name="type"
+                margin={fieldMargin}
+                select
+                required
+                sx={{ width: skinnyWidth, mr: gutterWidth }}
+                onChange={handleChange}
+              >
+                {Object.keys(MortgageType.props).map(n => (
+                  <MenuItem key={n} value={n}>
+                    {MortgageType.props[n].name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </TableCellValue>
+          </TableRow>
+          <TableRow>
+            <TableCellField>Adj. Int. Rate:</TableCellField>
+            <TableCellValue>
+              <TextField
+                margin={fieldMargin}
+                name="interestRateAdjusted"
+                value={state.interestRateAdjusted}
+                onChange={handleChange}
+                disabled={
+                  state.type === MortgageType.FixedRate || state.type === ''
+                }
+                required
+                sx={{ input: { textAlign: 'right' }, width: skinnyWidth }}
+                placeholder="6.75"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ required: false }}
+              />
+            </TableCellValue>
+          </TableRow>
+          <TableRow>
+            <TableCellField>Closing Costs:</TableCellField>
+            <TableCellValue>
+              <TextField
+                margin={fieldMargin}
+                name="closingCosts"
+                value={state.closingCosts}
+                onChange={handleChange}
+                fullWidth
+                placeholder="2000"
+                sx={{ width: skinnyWidth }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ required: false }}
+              />
+            </TableCellValue>
+          </TableRow>
+        </TableBody>
+      </Table>
     </Item>
   );
 }
