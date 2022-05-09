@@ -10,8 +10,6 @@ import {
   Typography,
   styled,
 } from '@mui/material';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
 
@@ -26,6 +24,24 @@ const Item = styled(Paper)(({ theme }) => ({
   lineHeight: 'inherit',
   letterSpacing: 'inherit',
 }));
+const TableCellField = styled(TableCell)({
+  border: 0,
+  paddingLeft: 0,
+  paddingTop: 9,
+  paddingBottom: 9,
+  paddingRight: 25,
+  fontSize: 'inherit',
+  lineHeight: 'inherit',
+  letterSpacing: 'inherit',
+  width: 'auto',
+  textAlign: 'right',
+});
+
+const TableCellValue = styled(TableCell)({
+  border: 0,
+  padding: 0,
+  fontSize: 'inherit',
+});
 
 export default function MortgageForm({
   state,
@@ -54,25 +70,6 @@ export default function MortgageForm({
     'December',
   ];
 
-  const TableCellField = styled(TableCell)({
-    border: 0,
-    paddingLeft: 0,
-    paddingTop: 9,
-    paddingBottom: 9,
-    paddingRight: 25,
-    fontSize: 'inherit',
-    lineHeight: 'inherit',
-    letterSpacing: 'inherit',
-    width: 'auto',
-    textAlign: 'right',
-  });
-
-  const TableCellValue = styled(TableCell)({
-    border: 0,
-    padding: 0,
-    fontSize: 'inherit',
-  });
-  console.log('rendering MortgageForm', state);
   return (
     <Item>
       <Typography
