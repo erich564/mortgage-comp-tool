@@ -1,9 +1,8 @@
 import clone from 'clone';
 import flat, { unflatten } from 'flat';
-import moment from 'moment';
 import queryString from 'query-string';
-import { MOMENT_FORMAT } from './FormData';
 import merge from './Merge';
+import { setStartDate } from './MortgageForm';
 
 const { url: baseUrl } = queryString.parseUrl(window.location.href);
 
@@ -56,9 +55,8 @@ export const queryStringToState = formDefaults => {
   );
   newState = merge(newState, qsState);
   for (const m of newState.mortgages) {
-    m.isStartDateChanged = m.startDate !== null;
-    m.startDate = moment(m.startDate, MOMENT_FORMAT);
     m.id = +m.id;
+    setStartDate(m);
   }
   newState.mortgages = newState.mortgages.sort((a, b) => a.id - b.id);
   return newState;
@@ -67,10 +65,7 @@ export const queryStringToState = formDefaults => {
 export const stateToQueryStringUrl = pState => {
   const state = clone(pState);
   for (const m of state.mortgages) {
-    if (m.startDate) {
-      m.startDate = m.startDate.format(MOMENT_FORMAT);
-    }
-    delete m.isStartDateChanged;
+    delete m.startDate;
   }
   const flatState = flat(state);
   const qs = queryString.stringify(flatState, {

@@ -3,6 +3,7 @@ import clone from 'clone';
 import { Suspense, lazy, useState } from 'react';
 import { formDefaults, sampleData } from './FormData';
 import InputForm from './InputForm';
+import { setStartDate } from './MortgageForm';
 import { queryStringToState } from './QueryStringUtil';
 import Header from './header/Header';
 
@@ -19,7 +20,11 @@ export default function App() {
   const [showReport, setShowReport] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
 
-  const handleSampleData = ndx => setFormState(sampleData[ndx]);
+  const handleSampleData = ndx => {
+    const state = sampleData[ndx];
+    for (const m of state.mortgages) setStartDate(m);
+    setFormState(sampleData[ndx]);
+  };
 
   const handleCloseSnackbar = () => setShowSnackbar(false);
 
@@ -51,44 +56,22 @@ export default function App() {
   };
 
   /**
-   *
-   * @param mortgageId
    * @param data This could be an input event or a moment.
    * @param key Key in state object.
    */
   const handleMortgageChange = (mortgageId, data, key) => {
     const name = key ?? data.target.name;
-    let value;
-    // if true, then is start date field and data is a moment
-    if (key) {
-      value = data;
-    } else if (data.target.type === 'checkbox') {
-      value = data.target.checked;
-    } else {
-      value =
-        typeof data.target.value === 'string'
-          ? stripIllegalCharacters(data.target.value)
-          : data.target.value;
-    }
-
+    const value =
+      typeof data.target.value === 'string'
+        ? stripIllegalCharacters(data.target.value)
+        : data.target.value;
     const newState = clone(formState);
 
     if (mortgageId !== undefined) {
       const mortgage = newState.mortgages.find(m => m.id === mortgageId);
       mortgage[name] = value;
-
-      // if key, data is a moment
-      if (key) {
-        mortgage.isStartDateChanged = true;
-        if (newState.isRefinance !== true) {
-          for (const m of newState.mortgages) {
-            // set start date of other mortgage to same value if not refinance and
-            // user has not changed it already
-            if (!m.isStartDateChanged) {
-              m[name] = value;
-            }
-          }
-        }
+      if (name === 'startDateMonth' || name === 'startDateYear') {
+        setStartDate(mortgage);
       }
     } else {
       newState[name] = stripIllegalCharacters(value);

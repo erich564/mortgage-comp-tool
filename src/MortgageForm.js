@@ -10,8 +10,15 @@ import {
   Typography,
   styled,
 } from '@mui/material';
+import moment from 'moment';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
+
+export const setStartDate = m => {
+  if (m.startDateMonth !== '' && m.startDateYear !== '') {
+    m.startDate = moment(`${m.startDateMonth}/${m.startDateYear}`, 'MM/YYYY');
+  }
+};
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
