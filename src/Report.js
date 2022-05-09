@@ -19,7 +19,6 @@ import MortgageType from './enum/MortgageType';
 const monthsPerYear = 12;
 // TCJA = Tax Cuts & Jobs Act of 2017
 const tcjaBreakpoint = moment('2018-02-15', 'YYYY-MM-DD');
-const locale = 'en-US';
 
 /**
  * Convert annual rate to monthly rate (with monthly compounding).
@@ -29,7 +28,6 @@ const calcMonthlyRoi = n => (1 + n) ** (1 / monthsPerYear) - 1;
 /** Round to n decimal places */
 const roundTo = (n, num) => +`${Math.round(+`${num}e+${n}`)}e-${n}`;
 const roundToTwo = num => roundTo(2, num);
-const displayInterestRate = pct => roundTo(3, pct * 100);
 
 /**
  * Calculate monthly loan payment amount
