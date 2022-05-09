@@ -8,6 +8,8 @@ const mortgageTemplate = {
   term: MortgageTerm._30_years,
   type: '',
   interestRate: '',
+  startDateMonth: '',
+  startDateYear: '',
   startDate: null,
   isStartDateChanged: false,
   interestRateAdjusted: '',

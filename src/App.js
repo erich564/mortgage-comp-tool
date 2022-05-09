@@ -65,7 +65,10 @@ export default function App() {
     } else if (data.target.type === 'checkbox') {
       value = data.target.checked;
     } else {
-      value = stripIllegalCharacters(data.target.value);
+      value =
+        typeof data.target.value === 'string'
+          ? stripIllegalCharacters(data.target.value)
+          : data.target.value;
     }
 
     const newState = clone(formState);

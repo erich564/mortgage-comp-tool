@@ -35,13 +35,24 @@ export default function MortgageForm({
   const handleChange = e => {
     handleMortgageChange(state.id, e);
   };
-  const handleDateChange = (e, key) => {
-    handleMortgageChange(state.id, e, key);
-  };
 
   const skinnyWidth = '150px';
   const gutterWidth = '24px';
   const fieldMargin = 'dense';
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
 
   const TableCellField = styled(TableCell)({
     border: 0,
@@ -61,7 +72,7 @@ export default function MortgageForm({
     padding: 0,
     fontSize: 'inherit',
   });
-
+  console.log('rendering MortgageForm', state);
   return (
     <Item>
       <Typography
@@ -77,31 +88,33 @@ export default function MortgageForm({
           <TableRow>
             <TableCellField>Start Date:</TableCellField>
             <TableCellValue>
-              <LocalizationProvider dateAdapter={AdapterMoment}>
-                <DatePicker
-                  value={state.startDate}
-                  views={['year', 'month']}
-                  onChange={m => {
-                    m.set('date', 1);
-                    handleDateChange(m, 'startDate');
-                  }}
-                  inputFormat="MM-DD-YYYY"
-                  // allowSameDateSelection
-                  renderInput={params => (
-                    <TextField
-                      {...params}
-                      margin={fieldMargin}
-                      required
-                      inputProps={{
-                        ...params.inputProps,
-                        placeholder: 'mm-dd-yyyy',
-                      }}
-                      sx={{ width: skinnyWidth, mr: gutterWidth }}
-                      InputLabelProps={{ required: false }}
-                    />
-                  )}
-                />
-              </LocalizationProvider>
+              <TextField
+                value={state.startDateMonth}
+                name="startDateMonth"
+                select
+                label="Month"
+                margin={fieldMargin}
+                sx={{ width: 125, mr: 2 }}
+                onChange={handleChange}
+              >
+                {months.map((m, n) => (
+                  <MenuItem key={n + 1} value={n + 1}>
+                    {m}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                margin={fieldMargin}
+                required
+                value={state.startDateYear}
+                name="startDateYear"
+                onChange={handleChange}
+                fullWidth
+                label="Year"
+                placeholder="2022"
+                sx={{ width: 65 }}
+                InputLabelProps={{ required: false }}
+              />
             </TableCellValue>
           </TableRow>
           <TableRow>
