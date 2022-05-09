@@ -111,6 +111,7 @@ export default function MortgageForm({
                 placeholder="2022"
                 sx={{ width: 65 }}
                 InputLabelProps={{ required: false }}
+                inputProps={{ maxLength: 4 }}
               />
             </TableCellValue>
           </TableRow>
