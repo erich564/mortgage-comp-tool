@@ -25,7 +25,6 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'left',
   display: 'inline-block',
   padding: '30px',
-  margin: '30px',
   // color: theme.palette.text.secondary,
   fontSize: 'inherit',
   lineHeight: 'inherit',
@@ -133,7 +132,7 @@ export default function MortgageForm({
                 onChange={handleChange}
                 fullWidth
                 placeholder="600000"
-                sx={{ width: skinnyWidth }}
+                sx={{ width: 125 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">$</InputAdornment>
@@ -155,7 +154,7 @@ export default function MortgageForm({
                 fullWidth
                 sx={{
                   input: { textAlign: 'right' },
-                  width: skinnyWidth,
+                  width: 100,
                   mr: gutterWidth,
                 }}
                 placeholder="4.25"
@@ -176,7 +175,7 @@ export default function MortgageForm({
                 name="term"
                 select
                 margin={fieldMargin}
-                sx={{ width: skinnyWidth }}
+                sx={{ width: 125 }}
                 onChange={handleChange}
               >
                 {Object.keys(MortgageTerm.props).map(n => (
@@ -196,7 +195,7 @@ export default function MortgageForm({
                 margin={fieldMargin}
                 select
                 required
-                sx={{ width: skinnyWidth, mr: gutterWidth }}
+                sx={{ width: 125, mr: gutterWidth }}
                 onChange={handleChange}
               >
                 {Object.keys(MortgageType.props).map(n => (
@@ -219,7 +218,7 @@ export default function MortgageForm({
                   state.type === MortgageType.FixedRate || state.type === ''
                 }
                 required
-                sx={{ input: { textAlign: 'right' }, width: skinnyWidth }}
+                sx={{ input: { textAlign: 'right' }, width: 100 }}
                 placeholder="6.75"
                 InputProps={{
                   endAdornment: (
@@ -240,7 +239,7 @@ export default function MortgageForm({
                 onChange={handleChange}
                 fullWidth
                 placeholder="2000"
-                sx={{ width: skinnyWidth }}
+                sx={{ width: 100 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">$</InputAdornment>

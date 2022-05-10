@@ -93,14 +93,25 @@ export default function InputForm({
         </RadioGroup>
       </FormControl>
       <br />
-      {state.mortgages.map(m => (
-        <MortgageForm
-          key={m.id}
-          handleMortgageChange={handleMortgageChange}
-          state={m}
-          isRefinance={state.isRefinance}
-        />
-      ))}
+      <Box
+        sx={{
+          display: 'flex',
+          textAlign: 'center',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: '45px',
+          my: 3,
+        }}
+      >
+        {state.mortgages.map(m => (
+          <MortgageForm
+            key={m.id}
+            handleMortgageChange={handleMortgageChange}
+            state={m}
+            isRefinance={state.isRefinance}
+          />
+        ))}
+      </Box>
       <br />
       <Table sx={{ margin: 'auto', width: 'auto' }}>
         <TableBody>
@@ -115,7 +126,7 @@ export default function InputForm({
                 name="roi"
                 value={state.roi}
                 placeholder="9"
-                sx={{ input: { textAlign: 'right' }, width: inputWidth }}
+                sx={{ input: { textAlign: 'right' }, width: 100 }}
                 onChange={handleChange}
                 InputProps={{
                   endAdornment: (
@@ -134,7 +145,7 @@ export default function InputForm({
         expanded={state.doItemize}
         onChange={handleAccordianChange}
         sx={{
-          maxWidth: 600,
+          maxWidth: 700,
           margin: 'auto',
           '&.Mui-expanded': {
             margin: 'auto',
@@ -158,6 +169,7 @@ export default function InputForm({
                       />
                     }
                     label="Itemize"
+                    sx={{ mr: '123px' }}
                   />
                 </TableCellValue>
               </TableRow>
@@ -176,7 +188,7 @@ export default function InputForm({
                     name="marginalTaxRate"
                     value={state.marginalTaxRate}
                     onChange={handleChange}
-                    sx={{ input: { textAlign: 'right' }, width: inputWidth }}
+                    sx={{ input: { textAlign: 'right' }, width: 100 }}
                     placeholder="40"
                     disabled={!state.doItemize}
                     InputProps={{
@@ -198,7 +210,7 @@ export default function InputForm({
                     select
                     margin={fieldMargin}
                     disabled={!state.doItemize}
-                    sx={{ minWidth: inputWidth }}
+                    sx={{ minWidth: 230 }}
                     value={state.irsFilingStatus}
                     name="irsFilingStatus"
                     onChange={handleChange}
@@ -222,7 +234,7 @@ export default function InputForm({
                     margin={fieldMargin}
                     name="otherItemizedDeductions"
                     value={state.otherItemizedDeductions}
-                    sx={{ input: { textAlign: 'right' }, width: inputWidth }}
+                    sx={{ input: { textAlign: 'right' }, width: 100 }}
                     onChange={handleChange}
                     InputProps={{
                       startAdornment: (
@@ -235,9 +247,8 @@ export default function InputForm({
               </TableRow>
               <TableRow>
                 <TableCellField>
-                  For post-TCJA cash-out refinances,
-                  <br />
-                  enter new home acquisition debt, if any:
+                  For post-TCJA cash-out refinances, enter new home acquisition
+                  debt, if any:
                 </TableCellField>
                 <TableCellValue>
                   <TextField
@@ -245,7 +256,7 @@ export default function InputForm({
                     margin={fieldMargin}
                     name="refiNewAcquisitionDebt"
                     value={state.refiNewAcquisitionDebt}
-                    sx={{ input: { textAlign: 'right' }, width: inputWidth }}
+                    sx={{ input: { textAlign: 'right' }, width: 100 }}
                     onChange={handleChange}
                     InputProps={{
                       startAdornment: (
@@ -258,9 +269,8 @@ export default function InputForm({
               </TableRow>
               <TableRow>
                 <TableCellField>
-                  For refinances with a post-TCJA Mortgage 1, enter
-                  <br />
-                  its home acquisition debt if less than its loan amount:
+                  For refinances with a post-TCJA Mortgage 1, enter its home
+                  acquisition debt if less than its loan amount:
                 </TableCellField>
                 <TableCellValue>
                   <TextField
