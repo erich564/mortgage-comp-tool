@@ -549,9 +549,6 @@ function Report({ reportState }) {
         </TableBody>
       </Table>
       <br />
-      The comparison graph below shows the following:
-      <br />
-      <br />
       {data.performanceRanges.map((range, n) => (
         <Fragment key={n}>
           From {range.startDate.format('MM-YYYY')} to{' '}
