@@ -15,36 +15,14 @@ import {
   RadioGroup,
   Table,
   TableBody,
-  TableCell,
   TableRow,
   TextField,
-  styled,
 } from '@mui/material';
 import MortgageForm from './MortgageForm';
 import TooltipFormField from './TooltipFormField';
-import { fieldMargin, fieldWidth } from './common/constants';
+import { fieldWidth } from './common/constants';
+import { TableCellLabel, TableCellValue } from './common/styled';
 import IRSFilingStatus from './enum/IRSFilingStatus';
-
-const inputWidth = '124px';
-
-const TableCellLabel = styled(TableCell)({
-  border: 0,
-  paddingLeft: 0,
-  paddingTop: 9,
-  paddingBottom: 9,
-  paddingRight: 25,
-  fontSize: 'inherit',
-  lineHeight: 'inherit',
-  letterSpacing: 'inherit',
-  width: '100%',
-  textAlign: 'right',
-});
-
-const TableCellValue = styled(TableCell)({
-  border: 0,
-  padding: 0,
-  fontSize: 'inherit',
-});
 
 export default function InputForm({
   state,
@@ -127,7 +105,6 @@ export default function InputForm({
               >
                 <TextField
                   required
-                  margin={fieldMargin}
                   name="roi"
                   value={state.roi}
                   placeholder="9"
@@ -158,11 +135,23 @@ export default function InputForm({
           },
         }}
       >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <AccordionSummary
+          sx={{
+            '.MuiAccordionSummary-content': {
+              my: '6px',
+              '&.Mui-expanded': {
+                my: '14px',
+              },
+            },
+          }}
+          expandIcon={<ExpandMoreIcon sx={{}} />}
+        >
           <Table sx={{ margin: 'auto', width: 1 }}>
             <TableBody>
               <TableRow>
-                <TableCellLabel>Itemize mortgage interest:</TableCellLabel>
+                <TableCellLabel sx={{ width: 1 }}>
+                  Itemize mortgage interest:
+                </TableCellLabel>
                 <TableCellValue sx={{ pr: '121px' }}>
                   <TooltipFormField
                     tooltip="Is the mortgage interest deductable
@@ -198,7 +187,6 @@ export default function InputForm({
                   >
                     <TextField
                       required
-                      margin={fieldMargin}
                       name="marginalTaxRate"
                       value={state.marginalTaxRate}
                       onChange={handleChange}
@@ -224,7 +212,6 @@ export default function InputForm({
                   <TextField
                     required
                     select
-                    margin={fieldMargin}
                     disabled={!state.doItemize}
                     sx={{ minWidth: fieldWidth.xl }}
                     value={state.irsFilingStatus}
@@ -250,7 +237,6 @@ export default function InputForm({
                     <TextField
                       required
                       disabled={!state.doItemize}
-                      margin={fieldMargin}
                       name="otherItemizedDeductions"
                       value={state.otherItemizedDeductions}
                       sx={{
@@ -282,7 +268,6 @@ export default function InputForm({
                   >
                     <TextField
                       disabled={!(state.doItemize && state.isRefinance)}
-                      margin={fieldMargin}
                       name="refiNewAcquisitionDebt"
                       value={state.refiNewAcquisitionDebt}
                       sx={{
@@ -315,10 +300,12 @@ export default function InputForm({
                   >
                     <TextField
                       disabled={!(state.doItemize && state.isRefinance)}
-                      margin={fieldMargin}
                       name="m1HomeAcquisitionDebt"
                       value={state.m1HomeAcquisitionDebt}
-                      sx={{ input: { textAlign: 'right' }, width: inputWidth }}
+                      sx={{
+                        input: { textAlign: 'right' },
+                        width: fieldWidth.m,
+                      }}
                       onChange={handleChange}
                       placeholder="0"
                       InputProps={{

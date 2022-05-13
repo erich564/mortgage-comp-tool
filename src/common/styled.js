@@ -15,6 +15,6 @@ export const TableCellLabel = styled(TableCell)({
 
 export const TableCellValue = styled(TableCell)({
   border: 0,
-  padding: 0,
+  padding: '6px 0',
   fontSize: 'inherit',
 });

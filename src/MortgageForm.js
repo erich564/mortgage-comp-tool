@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import TooltipFormField from './TooltipFormField';
-import { fieldMargin, fieldWidth } from './common/constants';
+import { fieldWidth } from './common/constants';
 import { TableCellLabel, TableCellValue } from './common/styled';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
@@ -78,7 +78,6 @@ export default function MortgageForm({
                   name="startDateMonth"
                   select
                   label="Month"
-                  margin={fieldMargin}
                   sx={{ width: fieldWidth.m }}
                   onChange={handleChange}
                 >
@@ -89,7 +88,6 @@ export default function MortgageForm({
                   ))}
                 </TextField>
                 <TextField
-                  margin={fieldMargin}
                   required
                   value={state.startDateYear}
                   name="startDateYear"
@@ -108,7 +106,6 @@ export default function MortgageForm({
             <TableCellLabel>Loan amount:</TableCellLabel>
             <TableCellValue>
               <TextField
-                margin={fieldMargin}
                 required
                 value={state.loanAmount}
                 name="loanAmount"
@@ -129,7 +126,6 @@ export default function MortgageForm({
             <TableCellLabel>Interest rate:</TableCellLabel>
             <TableCellValue>
               <TextField
-                margin={fieldMargin}
                 required
                 value={state.interestRate}
                 name="interestRate"
@@ -156,7 +152,6 @@ export default function MortgageForm({
                 value={state.term}
                 name="term"
                 select
-                margin={fieldMargin}
                 sx={{ width: fieldWidth.m }}
                 onChange={handleChange}
               >
@@ -174,7 +169,6 @@ export default function MortgageForm({
               <TextField
                 value={state.type}
                 name="type"
-                margin={fieldMargin}
                 select
                 required
                 sx={{ width: fieldWidth.m }}
@@ -197,7 +191,6 @@ export default function MortgageForm({
             <TableCellValue>
               <TooltipFormField tooltip="The interest rate after the initial fixed period for adjustable rate mortgages (ARMs).">
                 <TextField
-                  margin={fieldMargin}
                   name="interestRateAdjusted"
                   value={state.interestRateAdjusted}
                   onChange={handleChange}
@@ -226,7 +219,6 @@ export default function MortgageForm({
             include per-diem mortgage interest."
               >
                 <TextField
-                  margin={fieldMargin}
                   name="closingCosts"
                   value={state.closingCosts}
                   onChange={handleChange}

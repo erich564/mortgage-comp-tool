@@ -5,7 +5,6 @@ import { useState } from 'react';
 const FormValueTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} componentsProps={{ tooltip: { className } }} />
 ))(`
-    top: 10px;
     font-size: 14px;
 `);
 
@@ -34,6 +33,7 @@ export default function TooltipFormField({ tooltip, children }) {
           sx={{
             display: 'inline-flex',
             ml: '-4px',
+            mt: '-2px',
             color: '#AAA',
             '&:hover': { color: '#666' },
             p: '2px',
