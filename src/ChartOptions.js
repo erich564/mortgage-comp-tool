@@ -143,7 +143,7 @@ export const createComparisonChartOptions = netWorthDifferences =>
           x: c.unixTimeMs,
           y: c.difference,
         })),
-        color: colors.grey,
+        color: colors.blue,
       },
       // ...mortgages.map((m, n) => ({
       //   name: `${m.name} Net Worth`,
