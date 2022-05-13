@@ -222,14 +222,17 @@ const findFirstSharedPaymentDateIndex = ({ m1, m2 }) => {
 const calcProRatedInterestForRefi = ({ m1, m2, firstSharedM1Index }) => {
   const priorMonthNdx = firstSharedM1Index - 1;
   const priorMonthPayment = m1.payments[priorMonthNdx];
-  const refiClosingDate = priorMonthPayment.date.clone().date(15); // arbirarily chosen
-  const refiClosingDay = refiClosingDate.date();
+  const refiClosingDayOfMonth = 15; // arbirarily chosen
+  const refiClosingDate = priorMonthPayment.date
+    .clone()
+    .date(refiClosingDayOfMonth);
   const daysInMonth = refiClosingDate.daysInMonth();
   m1.proRatedInterest = roundToTwo(
-    priorMonthPayment.interest * ((refiClosingDay - 1) / daysInMonth)
+    priorMonthPayment.interest * ((refiClosingDayOfMonth - 1) / daysInMonth)
   );
   m2.proRatedInterest = roundToTwo(
-    m2.payments[0].interest * ((daysInMonth - refiClosingDay + 1) / daysInMonth)
+    m2.payments[0].interest *
+      ((daysInMonth - refiClosingDayOfMonth + 1) / daysInMonth)
   );
 };
 
