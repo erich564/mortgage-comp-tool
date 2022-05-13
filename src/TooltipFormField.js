@@ -21,6 +21,8 @@ export default function TooltipFormField({ tooltip, children }) {
         onOpen={() => setIsOpen(true)}
         onClose={() => setIsOpen(false)}
         title="no text"
+        enterTouchDelay={100}
+        leaveTouchDelay={3000}
         componentsProps={{
           tooltip: {
             sx: {
