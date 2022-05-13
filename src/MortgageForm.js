@@ -42,8 +42,6 @@ export default function MortgageForm({
     handleMortgageChange(state.id, e);
   };
 
-  const gutterWidth = '24px';
-
   const months = [
     'January',
     'February',
@@ -140,7 +138,6 @@ export default function MortgageForm({
                 sx={{
                   input: { textAlign: 'right' },
                   width: fieldWidth.s,
-                  mr: gutterWidth,
                 }}
                 placeholder="4.25"
                 InputProps={{
