@@ -48,7 +48,7 @@ export const sampleData = [
         startDateMonth: 12,
         startDateYear: '2016',
         interestRateAdjusted: '5',
-        closingCosts: '2773',
+        closingCosts: '3208',
       },
       {
         id: 2,
@@ -59,7 +59,7 @@ export const sampleData = [
         startDateMonth: nextViableStartDate.month(),
         startDateYear: `${nextViableStartDate.year()}`,
         interestRateAdjusted: '',
-        closingCosts: '3500',
+        closingCosts: '3000',
       },
     ],
     doItemize: true,
