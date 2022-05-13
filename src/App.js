@@ -10,20 +10,27 @@ import Header from './header/Header';
 const reportPromise = import('./Report');
 const Report = lazy(() => reportPromise);
 
-export default function App() {
-  const isQueryString = window.location.search !== '';
-  const initialFormState = isQueryString
+const isQueryString = () => window.location.search !== '';
+const getInitialFormState = () =>
+  isQueryString()
     ? queryStringToState(clone(formDefaults))
     : clone(formDefaults);
-  const [formState, setFormState] = useState(initialFormState);
-  const [reportState, setReportState] = useState(clone(formDefaults));
-  const [showReport, setShowReport] = useState(false);
+
+export default function App() {
+  const [formState, setFormState] = useState(getInitialFormState());
+  const [reportState, setReportState] = useState(clone(formState));
+  const [showReport, setShowReport] = useState(isQueryString());
   const [showSnackbar, setShowSnackbar] = useState(false);
 
   const handleSampleData = ndx => {
     const state = sampleData[ndx];
     for (const m of state.mortgages) setStartDate(m);
-    setFormState(sampleData[ndx]);
+    setFormState(state);
+    setShowSnackbar(true);
+    setTimeout(() => {
+      setReportState(clone(state));
+      setShowReport(true);
+    }, 0);
   };
 
   const handleCloseSnackbar = () => setShowSnackbar(false);
