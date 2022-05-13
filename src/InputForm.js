@@ -113,18 +113,21 @@ export default function InputForm({
           />
         ))}
       </Box>
-      <br />
+
       <Table sx={{ margin: 'auto', width: 'auto' }}>
         <TableBody>
           <TableRow>
             <TableCellLabel sx={{ width: 'auto' }}>
               Return on investment (ROI):
             </TableCellLabel>
-            <TableCellValue sx={{ padding: 0 }}>
-              <TooltipFormField tooltip="How much you expect investments to make per year, on average.">
+            <TableCellValue>
+              <TooltipFormField
+                tooltip="How much you expect investments to make
+              per year, on average."
+              >
                 <TextField
                   required
-                  margin="none"
+                  margin={fieldMargin}
                   name="roi"
                   value={state.roi}
                   placeholder="9"
@@ -142,7 +145,7 @@ export default function InputForm({
           </TableRow>
         </TableBody>
       </Table>
-      <br />
+
       <br />
       <Accordion
         expanded={state.doItemize}
