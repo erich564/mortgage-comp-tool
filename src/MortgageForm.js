@@ -4,13 +4,15 @@ import {
   Paper,
   Table,
   TableBody,
-  TableCell,
   TableRow,
   TextField,
   Typography,
   styled,
 } from '@mui/material';
 import moment from 'moment';
+import TooltipFormField from './TooltipFormField';
+import { fieldMargin, fieldWidth } from './common/constants';
+import { TableCellLabel, TableCellValue } from './common/styled';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
 
@@ -30,24 +32,6 @@ const Item = styled(Paper)(({ theme }) => ({
   lineHeight: 'inherit',
   letterSpacing: 'inherit',
 }));
-const TableCellField = styled(TableCell)({
-  border: 0,
-  paddingLeft: 0,
-  paddingTop: 9,
-  paddingBottom: 9,
-  paddingRight: 25,
-  fontSize: 'inherit',
-  lineHeight: 'inherit',
-  letterSpacing: 'inherit',
-  width: 'auto',
-  textAlign: 'right',
-});
-
-const TableCellValue = styled(TableCell)({
-  border: 0,
-  padding: 0,
-  fontSize: 'inherit',
-});
 
 export default function MortgageForm({
   state,
@@ -58,9 +42,8 @@ export default function MortgageForm({
     handleMortgageChange(state.id, e);
   };
 
-  const skinnyWidth = '150px';
   const gutterWidth = '24px';
-  const fieldMargin = 'dense';
+
   const months = [
     'January',
     'February',
@@ -89,40 +72,42 @@ export default function MortgageForm({
       <Table>
         <TableBody>
           <TableRow>
-            <TableCellField>Start Date:</TableCellField>
+            <TableCellLabel>Start date:</TableCellLabel>
             <TableCellValue>
-              <TextField
-                value={state.startDateMonth}
-                name="startDateMonth"
-                select
-                label="Month"
-                margin={fieldMargin}
-                sx={{ width: 125, mr: 2 }}
-                onChange={handleChange}
-              >
-                {months.map((m, n) => (
-                  <MenuItem key={n + 1} value={n + 1}>
-                    {m}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                margin={fieldMargin}
-                required
-                value={state.startDateYear}
-                name="startDateYear"
-                onChange={handleChange}
-                fullWidth
-                label="Year"
-                placeholder="2022"
-                sx={{ width: 65 }}
-                InputLabelProps={{ required: false }}
-                inputProps={{ maxLength: 4 }}
-              />
+              <TooltipFormField tooltip="First mortgage payment date.">
+                <TextField
+                  value={state.startDateMonth}
+                  name="startDateMonth"
+                  select
+                  label="Month"
+                  margin={fieldMargin}
+                  sx={{ width: fieldWidth.m }}
+                  onChange={handleChange}
+                >
+                  {months.map((m, n) => (
+                    <MenuItem key={n + 1} value={n + 1}>
+                      {m}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  margin={fieldMargin}
+                  required
+                  value={state.startDateYear}
+                  name="startDateYear"
+                  onChange={handleChange}
+                  fullWidth
+                  label="Year"
+                  placeholder="2022"
+                  sx={{ width: fieldWidth.xs }}
+                  InputLabelProps={{ required: false }}
+                  inputProps={{ maxLength: 4 }}
+                />
+              </TooltipFormField>
             </TableCellValue>
           </TableRow>
           <TableRow>
-            <TableCellField>Loan Amount:</TableCellField>
+            <TableCellLabel>Loan amount:</TableCellLabel>
             <TableCellValue>
               <TextField
                 margin={fieldMargin}
@@ -132,7 +117,7 @@ export default function MortgageForm({
                 onChange={handleChange}
                 fullWidth
                 placeholder="600000"
-                sx={{ width: 125 }}
+                sx={{ width: fieldWidth.m }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">$</InputAdornment>
@@ -143,7 +128,7 @@ export default function MortgageForm({
             </TableCellValue>
           </TableRow>
           <TableRow>
-            <TableCellField>Interest Rate:</TableCellField>
+            <TableCellLabel>Interest rate:</TableCellLabel>
             <TableCellValue>
               <TextField
                 margin={fieldMargin}
@@ -154,7 +139,7 @@ export default function MortgageForm({
                 fullWidth
                 sx={{
                   input: { textAlign: 'right' },
-                  width: 100,
+                  width: fieldWidth.s,
                   mr: gutterWidth,
                 }}
                 placeholder="4.25"
@@ -168,14 +153,14 @@ export default function MortgageForm({
             </TableCellValue>
           </TableRow>
           <TableRow>
-            <TableCellField>Term:</TableCellField>
+            <TableCellLabel>Term:</TableCellLabel>
             <TableCellValue>
               <TextField
                 value={state.term}
                 name="term"
                 select
                 margin={fieldMargin}
-                sx={{ width: 125 }}
+                sx={{ width: fieldWidth.m }}
                 onChange={handleChange}
               >
                 {Object.keys(MortgageTerm.props).map(n => (
@@ -187,7 +172,7 @@ export default function MortgageForm({
             </TableCellValue>
           </TableRow>
           <TableRow>
-            <TableCellField>Type:</TableCellField>
+            <TableCellLabel>Type:</TableCellLabel>
             <TableCellValue>
               <TextField
                 value={state.type}
@@ -195,7 +180,7 @@ export default function MortgageForm({
                 margin={fieldMargin}
                 select
                 required
-                sx={{ width: 125, mr: gutterWidth }}
+                sx={{ width: fieldWidth.m }}
                 onChange={handleChange}
               >
                 {Object.keys(MortgageType.props).map(n => (
@@ -207,46 +192,58 @@ export default function MortgageForm({
             </TableCellValue>
           </TableRow>
           <TableRow>
-            <TableCellField>Adj. Int. Rate:</TableCellField>
+            <TableCellLabel>
+              Adjusted
+              <br />
+              interest rate:
+            </TableCellLabel>
             <TableCellValue>
-              <TextField
-                margin={fieldMargin}
-                name="interestRateAdjusted"
-                value={state.interestRateAdjusted}
-                onChange={handleChange}
-                disabled={
-                  state.type === MortgageType.FixedRate || state.type === ''
-                }
-                required
-                sx={{ input: { textAlign: 'right' }, width: 100 }}
-                placeholder="6.75"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-                InputLabelProps={{ required: false }}
-              />
+              <TooltipFormField tooltip="The interest rate after the initial fixed period for adjustable rate mortgages (ARMs).">
+                <TextField
+                  margin={fieldMargin}
+                  name="interestRateAdjusted"
+                  value={state.interestRateAdjusted}
+                  onChange={handleChange}
+                  disabled={
+                    state.type === MortgageType.FixedRate || state.type === ''
+                  }
+                  required
+                  sx={{ input: { textAlign: 'right' }, width: fieldWidth.s }}
+                  placeholder="6.75"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                  InputLabelProps={{ required: false }}
+                />
+              </TooltipFormField>
             </TableCellValue>
           </TableRow>
           <TableRow>
-            <TableCellField>Closing Costs:</TableCellField>
+            <TableCellLabel>Closing costs:</TableCellLabel>
             <TableCellValue>
-              <TextField
-                margin={fieldMargin}
-                name="closingCosts"
-                value={state.closingCosts}
-                onChange={handleChange}
-                fullWidth
-                placeholder="2000"
-                sx={{ width: 100 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ),
-                }}
-                InputLabelProps={{ required: false }}
-              />
+              <TooltipFormField
+                tooltip="Do not include prepaid or partially prepaid (initial escrow)
+            homeowner's insurance, mortgage insurance, and property taxes. Also, don't
+            include per-diem mortgage interest."
+              >
+                <TextField
+                  margin={fieldMargin}
+                  name="closingCosts"
+                  value={state.closingCosts}
+                  onChange={handleChange}
+                  fullWidth
+                  placeholder="2000"
+                  sx={{ width: fieldWidth.s }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">$</InputAdornment>
+                    ),
+                  }}
+                  InputLabelProps={{ required: false }}
+                />
+              </TooltipFormField>
             </TableCellValue>
           </TableRow>
         </TableBody>

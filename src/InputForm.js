@@ -21,12 +21,13 @@ import {
   styled,
 } from '@mui/material';
 import MortgageForm from './MortgageForm';
+import TooltipFormField from './TooltipFormField';
+import { fieldMargin, fieldWidth } from './common/constants';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 
 const inputWidth = '124px';
-const fieldMargin = 'dense';
 
-const TableCellField = styled(TableCell)({
+const TableCellLabel = styled(TableCell)({
   border: 0,
   paddingLeft: 0,
   paddingTop: 9,
@@ -116,25 +117,27 @@ export default function InputForm({
       <Table sx={{ margin: 'auto', width: 'auto' }}>
         <TableBody>
           <TableRow>
-            <TableCellField sx={{ width: 'auto' }}>
-              How much do you expect investments to make per year?
-            </TableCellField>
+            <TableCellLabel sx={{ width: 'auto' }}>
+              Return on investment (ROI):
+            </TableCellLabel>
             <TableCellValue sx={{ padding: 0 }}>
-              <TextField
-                required
-                margin="none"
-                name="roi"
-                value={state.roi}
-                placeholder="9"
-                sx={{ input: { textAlign: 'right' }, width: 100 }}
-                onChange={handleChange}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
-                }}
-                InputLabelProps={{ required: false }}
-              />
+              <TooltipFormField tooltip="How much you expect investments to make per year, on average.">
+                <TextField
+                  required
+                  margin="none"
+                  name="roi"
+                  value={state.roi}
+                  placeholder="9"
+                  sx={{ input: { textAlign: 'right' }, width: fieldWidth.s }}
+                  onChange={handleChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                  InputLabelProps={{ required: false }}
+                />
+              </TooltipFormField>
             </TableCellValue>
           </TableRow>
         </TableBody>
@@ -145,7 +148,7 @@ export default function InputForm({
         expanded={state.doItemize}
         onChange={handleAccordianChange}
         sx={{
-          maxWidth: 700,
+          maxWidth: 601,
           margin: 'auto',
           '&.Mui-expanded': {
             margin: 'auto',
@@ -156,61 +159,71 @@ export default function InputForm({
           <Table sx={{ margin: 'auto', width: 1 }}>
             <TableBody>
               <TableRow>
-                <TableCellField>
-                  Is the mortgage interest deductable on income taxes?
-                </TableCellField>
-                <TableCellValue sx={{ padding: 0 }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={state.doItemize}
-                        onChange={handleChange}
-                        name="doItemize"
-                      />
-                    }
-                    label="Itemize"
-                    sx={{ mr: '123px' }}
-                  />
+                <TableCellLabel>Itemize mortgage interest:</TableCellLabel>
+                <TableCellValue sx={{ pr: '121px' }}>
+                  <TooltipFormField
+                    tooltip="Is the mortgage interest deductable
+                  on income taxes?"
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={state.doItemize}
+                          onChange={handleChange}
+                          name="doItemize"
+                        />
+                      }
+                      label="Yes"
+                      sx={{ mr: 0 }}
+                    />
+                  </TooltipFormField>
                 </TableCellValue>
               </TableRow>
             </TableBody>
           </Table>
         </AccordionSummary>
-        <AccordionDetails sx={{ paddingTop: 0 }}>
+        <AccordionDetails sx={{ p: '30px', pt: 0 }}>
           <Table sx={{ margin: 'auto', width: 1 }}>
             <TableBody>
               <TableRow>
-                <TableCellField>Marginal Tax Rate:</TableCellField>
+                <TableCellLabel>Marginal tax rate:</TableCellLabel>
                 <TableCellValue>
-                  <TextField
-                    required
-                    margin={fieldMargin}
-                    name="marginalTaxRate"
-                    value={state.marginalTaxRate}
-                    onChange={handleChange}
-                    sx={{ input: { textAlign: 'right' }, width: 100 }}
-                    placeholder="40"
-                    disabled={!state.doItemize}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">%</InputAdornment>
-                      ),
-                    }}
-                    InputLabelProps={{ required: false }}
-                  />
+                  <TooltipFormField
+                    tooltip="Enter your combined state and federal marginal tax rate
+                    on your adjusted gross income (AGI). Your marginal tax rate is
+                    the top tax bracket that you're in."
+                  >
+                    <TextField
+                      required
+                      margin={fieldMargin}
+                      name="marginalTaxRate"
+                      value={state.marginalTaxRate}
+                      onChange={handleChange}
+                      sx={{
+                        input: { textAlign: 'right' },
+                        width: fieldWidth.s,
+                      }}
+                      placeholder="40"
+                      disabled={!state.doItemize}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">%</InputAdornment>
+                        ),
+                      }}
+                      InputLabelProps={{ required: false }}
+                    />
+                  </TooltipFormField>
                 </TableCellValue>
               </TableRow>
               <TableRow>
-                <TableCellField>
-                  What is your IRS tax filing status?
-                </TableCellField>
+                <TableCellLabel>Tax filing status:</TableCellLabel>
                 <TableCellValue>
                   <TextField
                     required
                     select
                     margin={fieldMargin}
                     disabled={!state.doItemize}
-                    sx={{ minWidth: 230 }}
+                    sx={{ minWidth: fieldWidth.xl }}
                     value={state.irsFilingStatus}
                     name="irsFilingStatus"
                     onChange={handleChange}
@@ -224,69 +237,95 @@ export default function InputForm({
                 </TableCellValue>
               </TableRow>
               <TableRow>
-                <TableCellField>
-                  Other itemized deductions (e.g. salt, donations):
-                </TableCellField>
+                <TableCellLabel>Other itemized deductions:</TableCellLabel>
                 <TableCellValue>
-                  <TextField
-                    required
-                    disabled={!state.doItemize}
-                    margin={fieldMargin}
-                    name="otherItemizedDeductions"
-                    value={state.otherItemizedDeductions}
-                    sx={{ input: { textAlign: 'right' }, width: 100 }}
-                    onChange={handleChange}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">$</InputAdornment>
-                      ),
-                    }}
-                    InputLabelProps={{ required: false }}
-                  />
+                  <TooltipFormField
+                    tooltip="For example, state and local taxes
+                  (SALT: currently capped at $10k for most people), other mortgage interest,
+                  and charitable donations."
+                  >
+                    <TextField
+                      required
+                      disabled={!state.doItemize}
+                      margin={fieldMargin}
+                      name="otherItemizedDeductions"
+                      value={state.otherItemizedDeductions}
+                      sx={{
+                        input: { textAlign: 'right' },
+                        width: fieldWidth.s,
+                      }}
+                      onChange={handleChange}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">$</InputAdornment>
+                        ),
+                      }}
+                      InputLabelProps={{ required: false }}
+                    />
+                  </TooltipFormField>
                 </TableCellValue>
               </TableRow>
               <TableRow>
-                <TableCellField>
-                  For post-TCJA cash-out refinances, enter new home acquisition
-                  debt, if any:
-                </TableCellField>
+                <TableCellLabel>Qualified home improvements:</TableCellLabel>
                 <TableCellValue>
-                  <TextField
-                    disabled={!(state.doItemize && state.isRefinance)}
-                    margin={fieldMargin}
-                    name="refiNewAcquisitionDebt"
-                    value={state.refiNewAcquisitionDebt}
-                    sx={{ input: { textAlign: 'right' }, width: 100 }}
-                    onChange={handleChange}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">$</InputAdornment>
-                      ),
-                    }}
-                    InputLabelProps={{ required: false }}
-                  />
+                  <TooltipFormField
+                    tooltip="For cash-out refinances that occur after the Tax Cuts and
+                    Jobs Act (TCJA) of 2017, home acquisition debt is limited to the
+                    remaining amount on the existing mortgage. However, any qualified
+                    amount used to substantially improve your home is treated as home
+                    acquisition debt. Enter that amount here, if any. Only interest on
+                    home acquisition debt can be itemized.
+                    "
+                  >
+                    <TextField
+                      disabled={!(state.doItemize && state.isRefinance)}
+                      margin={fieldMargin}
+                      name="refiNewAcquisitionDebt"
+                      value={state.refiNewAcquisitionDebt}
+                      sx={{
+                        input: { textAlign: 'right' },
+                        width: fieldWidth.s,
+                      }}
+                      onChange={handleChange}
+                      placeholder="0"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">$</InputAdornment>
+                        ),
+                      }}
+                      InputLabelProps={{ required: false }}
+                    />
+                  </TooltipFormField>
                 </TableCellValue>
               </TableRow>
               <TableRow>
-                <TableCellField>
-                  For refinances with a post-TCJA Mortgage 1, enter its home
-                  acquisition debt if less than its loan amount:
-                </TableCellField>
+                <TableCellLabel>
+                  Custom pre-refi home acquisition debt:
+                </TableCellLabel>
                 <TableCellValue>
-                  <TextField
-                    disabled={!(state.doItemize && state.isRefinance)}
-                    margin={fieldMargin}
-                    name="m1HomeAcquisitionDebt"
-                    value={state.m1HomeAcquisitionDebt}
-                    sx={{ input: { textAlign: 'right' }, width: inputWidth }}
-                    onChange={handleChange}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">$</InputAdornment>
-                      ),
-                    }}
-                    InputLabelProps={{ required: false }}
-                  />
+                  <TooltipFormField
+                    tooltip="In rare circumstances, the refinanced home acquisition debt
+                    may be less than the remaining loan amount of Mortgage 1. That is the
+                    case if Mortgage 1 was a cash-out refinance that occurred after the Tax
+                    Cuts and Jobs Act (TCJA) of 2017. If that is applicable, enter the remaining
+                    home acquisition debt at time of that previous refinance."
+                  >
+                    <TextField
+                      disabled={!(state.doItemize && state.isRefinance)}
+                      margin={fieldMargin}
+                      name="m1HomeAcquisitionDebt"
+                      value={state.m1HomeAcquisitionDebt}
+                      sx={{ input: { textAlign: 'right' }, width: inputWidth }}
+                      onChange={handleChange}
+                      placeholder="0"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">$</InputAdornment>
+                        ),
+                      }}
+                      InputLabelProps={{ required: false }}
+                    />
+                  </TooltipFormField>
                 </TableCellValue>
               </TableRow>
             </TableBody>
