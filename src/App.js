@@ -1,8 +1,8 @@
 import { Alert, Snackbar, Stack, Typography } from '@mui/material';
 import clone from 'clone';
 import { Suspense, lazy, useState } from 'react';
+import Form from './Form';
 import { formDefaults, sampleData } from './FormData';
-import InputForm from './InputForm';
 import { setStartDate } from './MortgageForm';
 import { queryStringToState } from './QueryStringUtil';
 import Header from './header/Header';
@@ -100,7 +100,7 @@ export default function App() {
         <a href=".">Mortgage Comparison Tool</a>
       </Typography>
       <Header handleSampleData={handleSampleData} state={formState} />
-      <InputForm
+      <Form
         state={formState}
         handleChange={handleChange}
         handleMortgageChange={handleMortgageChange}

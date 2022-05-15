@@ -18,7 +18,7 @@ import TooltipFormField from './TooltipFormField';
 import { fieldWidth } from './common/constants';
 import { TableCellLabel, TableCellValue } from './common/styled';
 
-export default function InputForm({
+export default function Form({
   state,
   handleChange,
   handleMortgageChange,
