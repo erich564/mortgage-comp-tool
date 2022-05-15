@@ -12,11 +12,11 @@ import {
   createInterestChartOptions,
   setCommonOptions,
 } from './ChartOptions';
+import { monthsPerYear } from './common/constants';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
 
-const monthsPerYear = 12;
 // TCJA = Tax Cuts & Jobs Act of 2017
 const tcjaBreakpoint = moment('2018-02-15', 'YYYY-MM-DD');
 

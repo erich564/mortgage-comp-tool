@@ -31,7 +31,6 @@ export const formDefaults = {
 };
 
 const nextViableStartDate = moment().startOf('month').add(2, 'months');
-export const MOMENT_FORMAT = 'YYYY-MM-DD';
 
 export const sampleData = [
   {

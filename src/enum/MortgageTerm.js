@@ -1,4 +1,4 @@
-const monthsPerYear = 12;
+import { monthsPerYear } from '../common/constants';
 
 const MortgageTerm = {
   _40_years: '1',
