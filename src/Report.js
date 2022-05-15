@@ -275,9 +275,10 @@ const calcInitialCashEquityAndDebt = ({
         refiNewAcquisitionDebt;
     m2.homeAcquisitionDebt = Math.min(roundToTwo(debt), m2.loanAmount);
   } else {
+    const loanAmountDiff = m2.loanAmount - m1.loanAmount;
     m1.initCash = -m1.closingCosts;
-    m2.initCash = -m2.closingCosts;
-    m2.initEquity = 0;
+    m2.initCash = loanAmountDiff - m2.closingCosts;
+    m2.initEquity = -loanAmountDiff;
     m2.homeAcquisitionDebt = m2.loanAmount;
   }
 
