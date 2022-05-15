@@ -607,7 +607,7 @@ function Report({ reportState }) {
       <br />
       <HighchartsReact
         highcharts={Highcharts}
-        options={createComparisonChartOptions(data.netWorthDifferences)}
+        options={createComparisonChartOptions(data)}
       />
       <p>
         The Comparison graph shows how Scenario 1 and Scenario 2 compare in

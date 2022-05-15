@@ -35,6 +35,7 @@ Highcharts.setOptions({
   },
 });
 
+let plotLines;
 let commonOptions;
 
 /**
@@ -75,7 +76,7 @@ const makePlotLines = (minDate, maxDate) => {
 
 export const setCommonOptions = ({ m1, m2 }) => {
   const { minDate, maxDate } = calcMinMaxDates(m1, m2);
-  const plotLines = makePlotLines(minDate, maxDate);
+  plotLines = makePlotLines(minDate, maxDate);
 
   commonOptions = {
     chart: {
@@ -132,8 +133,23 @@ export const setCommonOptions = ({ m1, m2 }) => {
   };
 };
 
-export const createComparisonChartOptions = netWorthDifferences =>
-  merge(commonOptions, {
+export const createComparisonChartOptions = ({
+  netWorthDifferences,
+  performanceRanges,
+}) => {
+  const breakpointPlotLines = [];
+  const ranges = performanceRanges;
+  ranges.shift();
+  for (const range of ranges) {
+    breakpointPlotLines.push({
+      color: '#f99',
+      width: 1,
+      value: range.startDate.valueOf(),
+      zIndex: 2,
+      dashStyle: 'ShortDot',
+    });
+  }
+  return merge(commonOptions, {
     title: {
       text: 'Comparison',
     },
@@ -155,10 +171,14 @@ export const createComparisonChartOptions = netWorthDifferences =>
       //   color: colors.blues[n],
       // })),
     ],
+    // xAxis: {
+    //   plotLines: plotLines.concat(breakpointPlotLines),
+    // },
     tooltip: {
       valueDecimals: 0,
     },
   });
+};
 
 export const createCashEquityChartOptions = mortgages =>
   merge(commonOptions, {
