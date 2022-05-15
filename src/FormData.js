@@ -56,7 +56,7 @@ export const sampleData = [
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
         interestRate: '5.5',
-        startDateMonth: nextViableStartDate.month() + 1,
+        startDateMonth: nextViableStartDate.month() + 1, // 0-based month
         startDateYear: `${nextViableStartDate.year()}`,
         interestRateAdjusted: '',
         closingCosts: '3000',
@@ -100,14 +100,14 @@ export const sampleData = [
   {
     ...formDefaults,
     isRefinance: false,
-    roi: '7.5',
+    roi: '6',
     mortgages: [
       {
         id: 1,
-        loanAmount: '650000',
+        loanAmount: '800000',
         term: MortgageTerm._30_years,
-        type: MortgageType._7_1_Arm,
-        interestRate: '4.5',
+        type: MortgageType.FixedRate,
+        interestRate: '5.25',
         startDateMonth: nextViableStartDate.month() + 1,
         startDateYear: `${nextViableStartDate.year()}`,
         interestRateAdjusted: '6.75',
@@ -115,10 +115,10 @@ export const sampleData = [
       },
       {
         id: 2,
-        loanAmount: '500000',
+        loanAmount: '600000',
         term: MortgageTerm._30_years,
         type: MortgageType.FixedRate,
-        interestRate: '5',
+        interestRate: '5.25',
         startDateMonth: nextViableStartDate.month() + 1,
         startDateYear: `${nextViableStartDate.year()}`,
         interestRateAdjusted: '',
@@ -126,7 +126,7 @@ export const sampleData = [
       },
     ],
     doItemize: true,
-    marginalTaxRate: '40',
+    marginalTaxRate: '30',
   },
   {
     ...formDefaults,
