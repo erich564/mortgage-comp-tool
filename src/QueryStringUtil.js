@@ -1,8 +1,8 @@
 import clone from 'clone';
 import flat, { unflatten } from 'flat';
 import queryString from 'query-string';
-import merge from './Merge';
 import { setStartDate } from './MortgageForm';
+import merge from './common/Merge';
 
 const { url: baseUrl } = queryString.parseUrl(window.location.href);
 
