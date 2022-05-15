@@ -3,7 +3,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import { Button, ButtonGroup, Menu } from '@mui/material';
 import { useState } from 'react';
 import { sampleData } from '../FormData';
-import { stateToQueryStringUrl } from '../QueryStringUtil';
+import { stateToQueryStringUrl } from '../common/QueryStringUtil';
 import InfoDialog from './InfoDialog';
 import ShareDialog from './ShareDialog';
 

@@ -4,7 +4,7 @@ import { Suspense, lazy, useState } from 'react';
 import Form from './Form';
 import { formDefaults, sampleData } from './FormData';
 import { setStartDate } from './MortgageForm';
-import { queryStringToState } from './QueryStringUtil';
+import { queryStringToState } from './common/QueryStringUtil';
 import Header from './header/Header';
 
 const reportPromise = import('./Report');
