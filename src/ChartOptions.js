@@ -1,7 +1,8 @@
 import Color from 'color';
 import Highcharts from 'highcharts';
-import moment from 'moment';
 import merge from './common/Merge';
+
+const moment = require('moment');
 
 const yAxisLabelFormat = '${value:,.0f}';
 

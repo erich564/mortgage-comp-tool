@@ -2,7 +2,6 @@ import { Divider, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import clone from 'clone';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import moment from 'moment';
 import { Fragment, memo } from 'react';
 import {
   createAmortizationChartOptions,
@@ -16,6 +15,8 @@ import { monthsPerYear } from './common/constants';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
+
+const moment = require('moment');
 
 // TCJA = Tax Cuts & Jobs Act of 2017
 const tcjaBreakpoint = moment('2018-02-15', 'YYYY-MM-DD');

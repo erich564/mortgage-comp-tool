@@ -1,7 +1,8 @@
-import moment from 'moment';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
+
+const moment = require('moment');
 
 const mortgageTemplate = {
   loanAmount: '',
