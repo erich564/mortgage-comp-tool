@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import ItemizeForm from './ItemizeForm';
 import MortgageForm from './MortgageForm';
-import TooltipFormField from './TooltipFormField';
+import TooltipFormField from './common/TooltipFormField';
 import { fieldWidth } from './common/constants';
 import { TableCellLabel, TableCellValue } from './common/styled';
 

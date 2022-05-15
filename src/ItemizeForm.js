@@ -12,7 +12,7 @@ import {
   TableRow,
   TextField,
 } from '@mui/material';
-import TooltipFormField from './TooltipFormField';
+import TooltipFormField from './common/TooltipFormField';
 import { fieldWidth } from './common/constants';
 import { TableCellLabel, TableCellValue } from './common/styled';
 import IRSFilingStatus from './enum/IRSFilingStatus';

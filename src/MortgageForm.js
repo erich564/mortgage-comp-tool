@@ -10,7 +10,7 @@ import {
   styled,
 } from '@mui/material';
 import moment from 'moment';
-import TooltipFormField from './TooltipFormField';
+import TooltipFormField from './common/TooltipFormField';
 import { fieldWidth } from './common/constants';
 import { TableCellLabel, TableCellValue } from './common/styled';
 import MortgageTerm from './enum/MortgageTerm';
