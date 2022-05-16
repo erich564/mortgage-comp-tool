@@ -91,7 +91,7 @@ export default function Form({
             <TableCellValue>
               <TooltipFormField
                 tooltip="How much you expect investments to make
-              per year, on average."
+                on average per year."
               >
                 <TextField
                   required
