@@ -8,3 +8,7 @@ export const fieldWidth = {
   m: 125,
   xl: 230,
 };
+
+export const formPaddingXs = 18;
+
+export const formPadding = 30;

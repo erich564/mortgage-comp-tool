@@ -10,7 +10,7 @@ import {
   styled,
 } from '@mui/material';
 import TooltipFormField from './common/TooltipFormField';
-import { fieldWidth } from './common/constants';
+import { fieldWidth, formPadding, formPaddingXs } from './common/constants';
 import { TableCellLabel, TableCellValue } from './common/styled';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
@@ -27,7 +27,10 @@ const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   textAlign: 'left',
   display: 'inline-block',
-  padding: '30px',
+  padding: formPadding,
+  [theme.breakpoints.down('sm')]: {
+    padding: formPaddingXs,
+  },
   // color: theme.palette.text.secondary,
   fontSize: 'inherit',
   lineHeight: 'inherit',

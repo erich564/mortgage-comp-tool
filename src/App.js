@@ -5,6 +5,7 @@ import Form from './Form';
 import { formDefaults, sampleData } from './FormData';
 import { setStartDate } from './MortgageForm';
 import { queryStringToState } from './common/QueryStringUtil';
+import { formPadding } from './common/constants';
 import Header from './header/Header';
 
 const reportPromise = import('./Report');
@@ -95,7 +96,16 @@ export default function App() {
   };
 
   return (
-    <Stack spacing={2} style={{ margin: 25, textAlign: 'center' }}>
+    <Stack
+      spacing={2}
+      sx={{
+        m: {
+          xs: '10px',
+          sm: `${formPadding}px`,
+        },
+        textAlign: 'center',
+      }}
+    >
       <Typography variant="h4" component="div">
         <a href=".">Mortgage Comparison Tool</a>
       </Typography>

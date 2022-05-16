@@ -13,7 +13,7 @@ import {
   TextField,
 } from '@mui/material';
 import TooltipFormField from './common/TooltipFormField';
-import { fieldWidth } from './common/constants';
+import { fieldWidth, formPadding, formPaddingXs } from './common/constants';
 import { TableCellLabel, TableCellValue } from './common/styled';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 
@@ -36,6 +36,10 @@ export default function ItemizeForm({
     >
       <AccordionSummary
         sx={{
+          pl: {
+            xs: `${formPaddingXs}px`,
+            sm: `${formPadding}px`,
+          },
           '.MuiAccordionSummary-content': {
             my: '6px',
             '&.Mui-expanded': {
@@ -51,7 +55,14 @@ export default function ItemizeForm({
               <TableCellLabel sx={{ width: 1 }}>
                 Itemize mortgage interest:
               </TableCellLabel>
-              <TableCellValue sx={{ pr: '121px' }}>
+              <TableCellValue
+                sx={{
+                  pr: {
+                    xs: '109px',
+                    sm: '121px',
+                  },
+                }}
+              >
                 <TooltipFormField
                   tooltip="Is the mortgage interest deductable
                   on income taxes?"
@@ -73,7 +84,15 @@ export default function ItemizeForm({
           </TableBody>
         </Table>
       </AccordionSummary>
-      <AccordionDetails sx={{ p: '30px', pt: 0 }}>
+      <AccordionDetails
+        sx={{
+          p: {
+            xs: `${formPaddingXs}px`,
+            sm: `${formPadding}px`,
+          },
+          pt: 0,
+        }}
+      >
         <Table sx={{ margin: 'auto', width: 1 }}>
           <TableBody>
             <TableRow>

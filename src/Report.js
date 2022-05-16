@@ -667,6 +667,7 @@ function Report({ reportState }) {
           <p>Amortization schedule for Mortgage {m.id}.</p>
         </Fragment>
       ))}
+      <br />
     </>
   );
 }
