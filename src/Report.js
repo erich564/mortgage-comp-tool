@@ -557,7 +557,12 @@ function Report({ reportState }) {
       <Divider variant="middle" />
       <br />
       <br />
-      <Table sx={{ width: 'fit-content', margin: 'auto !important' }}>
+      <Table
+        sx={{
+          width: 'fit-content',
+          '&.MuiTable-root': { m: 'auto' },
+        }}
+      >
         <TableBody>
           <TableRow>
             <TableCell
