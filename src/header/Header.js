@@ -4,11 +4,9 @@ import { Button, ButtonGroup, Menu } from '@mui/material';
 import { useState } from 'react';
 import { sampleData } from '../FormData';
 import { stateToQueryStringUrl } from '../common/QueryStringUtil';
-import InfoDialog from './InfoDialog';
 import ShareDialog from './ShareDialog';
 
 export default function Header({ state, handleSampleData }) {
-  const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const handleMenuClose = () => setMenuAnchorEl(null);
@@ -24,9 +22,6 @@ export default function Header({ state, handleSampleData }) {
   return (
     <>
       <ButtonGroup variant="text" sx={{ justifyContent: 'center' }}>
-        <Button onClick={() => setIsInfoDialogOpen(true)} sx={buttonStyle}>
-          Information
-        </Button>
         <Button
           onClick={e => setMenuAnchorEl(e.currentTarget)}
           endIcon={<KeyboardArrowDownIcon />}
@@ -59,11 +54,6 @@ export default function Header({ state, handleSampleData }) {
           </Button>
         ))}
       </Menu>
-
-      <InfoDialog
-        isInfoDialogOpen={isInfoDialogOpen}
-        setIsInfoDialogOpen={setIsInfoDialogOpen}
-      />
 
       <ShareDialog
         link={link}

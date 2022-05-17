@@ -617,10 +617,11 @@ function Report({ reportState }) {
       <p>
         The Comparison graph shows how Scenario 1 and Scenario 2 compare in
         value over time in terms of Net Worth. Net Worth is defined here as Cash
-        plus Equity -- see below. The graph line values above are &quot;Scenario
-        2 Net Worth&quot; minus &quot;Scenario 1 Net Worth.&quot; So, if a
-        point&apos;s value is greater than $0, then Scenario 2 is outperforming
-        Scenario 1 at that time (taking into account past performance).
+        plus Equity -- see below. Each point on the line above is equal to
+        &quot;Scenario 2 Net Worth&quot; minus &quot;Scenario 1 Net Worth.&quot;
+        Therefore, if a point&apos;s value is greater than $0, then Scenario 2
+        is outperforming Scenario 1 at that time (taking into account past
+        performance).
         <br />
         <br />
         Note that you can zoom in on graphs by clicking and dragging. You also
@@ -641,9 +642,28 @@ function Report({ reportState }) {
         then this value is an opportunity cost that gets subtracted from Cash.
         <br />
         <br />
-        If this scenario is a refinance, then the starting cash starts off
-        increased by the cash-out amount and equity starts off decreased by the
-        cash-out amount.
+        The tool assumes that each mortgage closing date is two months before
+        the starting date supplied above. If this comparison is for a refinance,
+        then the starting cash starts off increased by the cash-out amount and
+        equity starts off decreased by the cash-out amount.
+        <br />
+        <br />
+        If mortgage interest itemization is enabled, then Cash is increased each
+        month by some amount. First, the total itemizable mortgage interest for
+        that year is determined. This amount is reduced by N, where N is the
+        standard deduction minus other itemized deductions. (This accounts for
+        years where your standard deduction is greater than your itemizable
+        mortgage interest, in which case you would end up not itemizing.
+        However, other itemized deductions also help to offset the standard
+        deduction which is why they are subtracted.) That amount is then
+        multiplied by your marginal tax rate. Then it is divided by the number
+        of months a payment is made that year, which is twelve except for
+        potentially the first and last months of the mortgage.
+        <br />
+        <br />
+        This tool takes into account the tax implications of the Tax Cuts and
+        Jobs Act of 2017. It assumes that all relevant provisions will be
+        renewed indefinitely.
         <br />
       </p>
       <br />

@@ -215,9 +215,9 @@ export default function ItemizeForm({
                 <TooltipFormField
                   tooltip="In rare circumstances, the refinanced home acquisition debt
                     may be less than the remaining loan amount of Mortgage 1. That is the
-                    case if Mortgage 1 was a cash-out refinance that occurred after the Tax
-                    Cuts and Jobs Act (TCJA) of 2017. If that is applicable, enter the remaining
-                    home acquisition debt at time of that previous refinance."
+                    case if Mortgage 1 was a cash-out refinance that closed after the Tax
+                    Cuts and Jobs Act (TCJA) of 2017 went into effect. If that is
+                    the case, enter the initial home acquisition debt for Mortgage 1."
                 >
                   <TextField
                     disabled={!(state.doItemize && state.isRefinance)}

@@ -110,6 +110,11 @@ export default function App() {
         <a href=".">Mortgage Comparison Tool</a>
       </Typography>
       <Header handleSampleData={handleSampleData} state={formState} />
+      <br />
+      This tool enables you to compare the overall value between two mortgages.
+      It takes into account the time value of money and itemization of mortgage
+      interest. Look at an example to better understand how this tool works.
+      Each graph an explanation below it.
       <Form
         state={formState}
         handleChange={handleChange}
