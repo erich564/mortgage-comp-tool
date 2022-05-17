@@ -55,7 +55,7 @@ export default function Header({ state, handleSampleData }) {
             onClick={() => selectMenuItem(n)}
             sx={{ display: 'flex', flexDirection: 'column' }}
           >
-            Sample Data {n + 1}
+            Example {n + 1}
           </Button>
         ))}
       </Menu>
