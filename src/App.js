@@ -20,7 +20,7 @@ const getInitialFormState = () =>
 export default function App() {
   const [formState, setFormState] = useState(getInitialFormState());
   const [reportState, setReportState] = useState(clone(formState));
-  const [showReport, setShowReport] = useState(isQueryString());
+  const [showReport, setShowReport] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
 
   const handleSampleData = ndx => {
