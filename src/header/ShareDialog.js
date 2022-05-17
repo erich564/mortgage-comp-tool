@@ -17,19 +17,21 @@ export default function ShareDialog({
   isShareDialogOpen,
   setIsShareDialogOpen,
 }) {
-  const initialText = 'Click to copy';
-  const clickedText = 'Copied!';
-  const [tooltip, setTooltip] = useState(initialText);
+  const clickToCopyText = 'Click to copy';
+  const copiedText = 'Copied!';
+  const [isOpen, setIsOpen] = useState(false);
+  const [tooltip, setTooltip] = useState(clickToCopyText);
   const handleClose = () => setIsShareDialogOpen(false);
   const textField = createRef();
 
   const handleClick = () => {
     textField.current.select();
-
     copy(link, {
       format: 'text/plain',
-      onCopy: () => setTooltip(clickedText),
+      onCopy: () => setTooltip(copiedText),
     });
+    // setTimeout so that the copy() doesn't close the tooltip on mobile
+    setTimeout(() => setIsOpen(true), 0);
   };
 
   return (
@@ -42,9 +44,15 @@ export default function ShareDialog({
       <DialogTitle>Share</DialogTitle>
       <DialogContent>
         <Tooltip
+          open={isOpen}
+          onMouseOver={() => setTooltip(clickToCopyText)}
+          onOpen={() => setIsOpen(true)}
+          onClose={() => setIsOpen(false)}
           title={tooltip}
-          onOpen={() => setTooltip(initialText)}
           disableInteractive
+          arrow
+          enterTouchDelay={0}
+          leaveTouchDelay={10000}
         >
           <Box onClick={handleClick}>
             <TextField
