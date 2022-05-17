@@ -90,7 +90,10 @@ export default function ItemizeForm({
             xs: `${formPaddingXs}px`,
             sm: `${formPadding}px`,
           },
-          pt: 0,
+          pt: {
+            xs: 0,
+            sm: 0,
+          },
         }}
       >
         <Table sx={{ margin: 'auto', width: 1 }}>
