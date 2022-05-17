@@ -25,21 +25,24 @@ a {
   color: inherit;
   position: relative;
 }
-a::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  bottom: 5px;
-  left: 50%;
-  display: block;
-  background: none repeat scroll 0 0 transparent;
-  height: 2px;
-  width: 0;
-  background: #444;
-  transition: width 0.3s ease 0s, left 0.3s ease 0s;
-}
 
-a:hover::after {
-  width: 100%;
-  left: 0;
+@media (hover: hover) and (pointer: fine) {
+  a::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    bottom: 5px;
+    left: 50%;
+    display: block;
+    background: none repeat scroll 0 0 transparent;
+    height: 2px;
+    width: 0;
+    background: #444;
+    transition: width 0.3s ease 0s, left 0.3s ease 0s;
+  }
+
+  a:hover::after {
+    width: 100%;
+    left: 0;
+  }
 }
