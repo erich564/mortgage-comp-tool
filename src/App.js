@@ -107,7 +107,9 @@ export default function App() {
       }}
     >
       <Typography variant="h4" component="div">
-        <a href=".">Mortgage Comparison Tool</a>
+        <a href="." target="_blank">
+          Mortgage Comparison Tool
+        </a>
       </Typography>
       <Header handleSampleData={handleSampleData} state={formState} />
       <br />
