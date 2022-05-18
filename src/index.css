@@ -21,13 +21,17 @@ code {
 }
 
 a {
+  color: #1976d2;
+}
+
+a.animated-hover {
   text-decoration: none;
   color: inherit;
   position: relative;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  a::after {
+  a.animated-hover::after {
     content: '';
     position: absolute;
     z-index: -1;
@@ -41,7 +45,7 @@ a {
     transition: width 0.3s ease 0s, left 0.3s ease 0s;
   }
 
-  a:hover::after {
+  a.animated-hover:hover::after {
     width: 100%;
     left: 0;
   }

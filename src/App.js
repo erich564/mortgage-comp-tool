@@ -107,7 +107,7 @@ export default function App() {
       }}
     >
       <Typography variant="h4" component="div">
-        <a href="." target="_blank">
+        <a href="." target="_blank" className="animated-hover">
           Mortgage Comparison Tool
         </a>
       </Typography>

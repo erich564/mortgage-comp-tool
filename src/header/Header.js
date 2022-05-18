@@ -4,10 +4,12 @@ import { Button, ButtonGroup, Menu } from '@mui/material';
 import { useState } from 'react';
 import { sampleData } from '../FormData';
 import { stateToQueryStringUrl } from '../common/QueryStringUtil';
+import LegalDialog from './LegalDialog';
 import ShareDialog from './ShareDialog';
 
 export default function Header({ state, handleSampleData }) {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isLegalDialogOpen, setIsLegalDialogOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const handleMenuClose = () => setMenuAnchorEl(null);
   const sampleDataLen = sampleData.length;
@@ -36,6 +38,9 @@ export default function Header({ state, handleSampleData }) {
         >
           Share
         </Button>
+        <Button onClick={() => setIsLegalDialogOpen(true)} sx={buttonStyle}>
+          Legal
+        </Button>
       </ButtonGroup>
 
       <Menu
@@ -59,6 +64,11 @@ export default function Header({ state, handleSampleData }) {
         link={link}
         isShareDialogOpen={isShareDialogOpen}
         setIsShareDialogOpen={setIsShareDialogOpen}
+      />
+
+      <LegalDialog
+        isLegalDialogOpen={isLegalDialogOpen}
+        setIsLegalDialogOpen={setIsLegalDialogOpen}
       />
     </>
   );
