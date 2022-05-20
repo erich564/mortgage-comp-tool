@@ -143,7 +143,7 @@ export default function App() {
       </ErrorBoundary>
       <Snackbar
         open={showSuccessSnackbar}
-        autoHideDuration={2500}
+        autoHideDuration={3000}
         onClose={() => setShowSuccessSnackbar(false)}
       >
         <Alert
@@ -156,7 +156,7 @@ export default function App() {
       </Snackbar>
       <Snackbar
         open={showErrorSnackbar}
-        autoHideDuration={8000}
+        autoHideDuration={4000}
         onClose={() => setShowErrorSnackbar(false)}
       >
         <Alert
