@@ -1,6 +1,7 @@
 import { Alert, Snackbar, Stack, Typography } from '@mui/material';
 import clone from 'clone';
 import { Suspense, lazy, useState } from 'react';
+import ErrorBoundary from './ErrorBoundary';
 import Form from './Form';
 import { formDefaults, sampleData } from './FormData';
 import { setStartDate } from './MortgageForm';
@@ -21,20 +22,9 @@ export default function App() {
   const [formState, setFormState] = useState(getInitialFormState());
   const [reportState, setReportState] = useState(clone(formState));
   const [showReport, setShowReport] = useState(false);
-  const [showSnackbar, setShowSnackbar] = useState(false);
-
-  const handleSampleData = ndx => {
-    const state = sampleData[ndx];
-    for (const m of state.mortgages) setStartDate(m);
-    setFormState(state);
-    setShowSnackbar(true);
-    setTimeout(() => {
-      setReportState(clone(state));
-      setShowReport(true);
-    }, 0);
-  };
-
-  const handleCloseSnackbar = () => setShowSnackbar(false);
+  const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
+  const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
+  const [reportCount, setReportCount] = useState(0);
 
   /**
    * Crude constraint validation. Converts true/false strings to booleans,
@@ -88,11 +78,31 @@ export default function App() {
     setFormState(newState);
   };
 
+  const handleSampleData = ndx => {
+    const state = sampleData[ndx];
+    for (const m of state.mortgages) setStartDate(m);
+    setFormState(state);
+    setShowReport(false);
+    setReportCount(reportCount + 1);
+    setReportState(clone(state));
+    // setTimeout to allow UI to catch up before showing report
+    setTimeout(() => {
+      setShowSuccessSnackbar(true);
+      setShowReport(true);
+    }, 0);
+  };
+
   const handleSubmit = e => {
     e.preventDefault();
-    setShowSnackbar(true);
-    setShowReport(true);
+    setReportCount(reportCount + 1);
     setReportState(clone(formState));
+    setShowSuccessSnackbar(true);
+    setShowReport(true);
+  };
+
+  const handleError = () => {
+    setShowSuccessSnackbar(false);
+    setShowErrorSnackbar(true);
   };
 
   return (
@@ -124,18 +134,37 @@ export default function App() {
         handleExplicitChange={handleExplicitChange}
         handleSubmit={handleSubmit}
       />
-      {showReport && (
-        <Suspense fallback={<p>Loading...</p>}>
-          <Report reportState={reportState} />
-        </Suspense>
-      )}
+      <ErrorBoundary key={reportCount} handleError={handleError}>
+        {showReport && (
+          <Suspense fallback={<p>Loading...</p>}>
+            <Report reportState={reportState} />
+          </Suspense>
+        )}
+      </ErrorBoundary>
       <Snackbar
-        open={showSnackbar}
+        open={showSuccessSnackbar}
         autoHideDuration={2500}
-        onClose={handleCloseSnackbar}
+        onClose={() => setShowSuccessSnackbar(false)}
       >
-        <Alert elevation={6} onClose={handleCloseSnackbar} severity="success">
+        <Alert
+          elevation={6}
+          onClose={() => setShowSuccessSnackbar(false)}
+          severity="success"
+        >
           Created report!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={showErrorSnackbar}
+        autoHideDuration={8000}
+        onClose={() => setShowErrorSnackbar(false)}
+      >
+        <Alert
+          elevation={6}
+          onClose={() => setShowErrorSnackbar(false)}
+          severity="error"
+        >
+          An error occurred.
         </Alert>
       </Snackbar>
     </Stack>
