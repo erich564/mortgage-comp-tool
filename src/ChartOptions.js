@@ -1,6 +1,6 @@
 import Color from 'color';
 import Highcharts from 'highcharts';
-import merge from './common/Merge';
+import merge from './common/utility';
 
 const moment = require('moment');
 

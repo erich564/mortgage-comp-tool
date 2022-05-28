@@ -1,13 +1,13 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ShareIcon from '@mui/icons-material/Share';
-import { Button, ButtonGroup, Menu } from '@mui/material';
+import { Button, ButtonGroup, Menu, Typography } from '@mui/material';
 import { useState } from 'react';
 import { sampleData } from '../FormData';
 import { stateToQueryStringUrl } from '../common/QueryStringUtil';
 import LegalDialog from './LegalDialog';
 import ShareDialog from './ShareDialog';
 
-export default function Header({ state, handleSampleData }) {
+export default function Header({ formState, handleSampleData }) {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isLegalDialogOpen, setIsLegalDialogOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -19,10 +19,15 @@ export default function Header({ state, handleSampleData }) {
     handleMenuClose();
   };
   const buttonStyle = { px: 2 };
-  const link = stateToQueryStringUrl(state);
+  const link = stateToQueryStringUrl(formState);
 
   return (
     <>
+      <Typography variant="h4" component="div">
+        <a href="." target="_blank" className="animated-hover">
+          Mortgage Comparison Tool
+        </a>
+      </Typography>
       <ButtonGroup variant="text" sx={{ justifyContent: 'center' }}>
         <Button
           onClick={e => setMenuAnchorEl(e.currentTarget)}
@@ -42,7 +47,11 @@ export default function Header({ state, handleSampleData }) {
           Legal
         </Button>
       </ButtonGroup>
-
+      <br />
+      This tool enables you to compare the overall value between two mortgages.
+      It takes into account the time value of money and itemization of mortgage
+      interest. Look at an example to better understand how this tool works.
+      Each graph an explanation below it.
       <Menu
         keepMounted
         anchorEl={menuAnchorEl}
@@ -59,13 +68,11 @@ export default function Header({ state, handleSampleData }) {
           </Button>
         ))}
       </Menu>
-
       <ShareDialog
         link={link}
         isShareDialogOpen={isShareDialogOpen}
         setIsShareDialogOpen={setIsShareDialogOpen}
       />
-
       <LegalDialog
         isLegalDialogOpen={isLegalDialogOpen}
         setIsLegalDialogOpen={setIsLegalDialogOpen}

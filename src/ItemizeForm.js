@@ -13,19 +13,31 @@ import {
   TextField,
 } from '@mui/material';
 import TooltipFormField from './common/TooltipFormField';
-import { fieldWidth, formPadding, formPaddingXs } from './common/constants';
-import { TableCellLabel, TableCellValue } from './common/styled';
+import {
+  fieldWidth,
+  formPadding,
+  formPaddingXs,
+  tcjaBreakpoint,
+} from './common/constants';
+import { FieldError, TableCellLabel, TableCellValue } from './common/styled';
 import IRSFilingStatus from './enum/IRSFilingStatus';
+import {
+  enableM1HomeAcquisitionDebt,
+  enableRefiNewAcquisitionDebt,
+} from './validation';
 
 export default function ItemizeForm({
-  state,
+  formik,
   handleChange,
-  handleExplicitChange,
+  hasError,
+  getError,
 }) {
+  const { values } = formik;
+
   return (
     <Accordion
-      expanded={state.doItemize}
-      onChange={() => handleExplicitChange('doItemize', !state.doItemize)}
+      expanded={values.doItemize}
+      onChange={() => formik.setFieldValue('doItemize', !values.doItemize)}
       sx={{
         maxWidth: 601,
         margin: 'auto',
@@ -52,7 +64,9 @@ export default function ItemizeForm({
         <Table sx={{ margin: 'auto', width: 1 }}>
           <TableBody>
             <TableRow>
-              <TableCellLabel sx={{ width: 1 }}>
+              <TableCellLabel
+                sx={{ width: 1, paddingTop: 0, paddingBottom: 0 }}
+              >
                 Itemize mortgage interest:
               </TableCellLabel>
               <TableCellValue
@@ -70,7 +84,7 @@ export default function ItemizeForm({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={state.doItemize}
+                        checked={values.doItemize}
                         onChange={handleChange}
                         name="doItemize"
                       />
@@ -107,37 +121,39 @@ export default function ItemizeForm({
                     the top tax bracket that you're in."
                 >
                   <TextField
-                    required
                     name="marginalTaxRate"
-                    value={state.marginalTaxRate}
+                    value={values.marginalTaxRate}
                     onChange={handleChange}
                     sx={{
                       input: { textAlign: 'right' },
                       width: fieldWidth.s,
                     }}
                     placeholder="40"
-                    disabled={!state.doItemize}
+                    disabled={!values.doItemize}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">%</InputAdornment>
                       ),
                     }}
-                    InputLabelProps={{ required: false }}
+                    error={hasError('marginalTaxRate')}
                   />
                 </TooltipFormField>
+                <FieldError display={hasError('marginalTaxRate')}>
+                  {getError('marginalTaxRate')}
+                </FieldError>
               </TableCellValue>
             </TableRow>
             <TableRow>
-              <TableCellLabel>Tax filing status:</TableCellLabel>
+              <TableCellLabel>IRS filing status:</TableCellLabel>
               <TableCellValue>
                 <TextField
-                  required
                   select
-                  disabled={!state.doItemize}
+                  disabled={!values.doItemize}
                   sx={{ minWidth: fieldWidth.xl }}
-                  value={state.irsFilingStatus}
+                  value={values.irsFilingStatus}
                   name="irsFilingStatus"
                   onChange={handleChange}
+                  error={hasError('irsFilingStatus')}
                 >
                   {Object.keys(IRSFilingStatus.props).map(n => (
                     <MenuItem key={n} value={n}>
@@ -145,6 +161,9 @@ export default function ItemizeForm({
                     </MenuItem>
                   ))}
                 </TextField>
+                <FieldError display={hasError('irsFilingStatus')}>
+                  {getError('irsFilingStatus')}
+                </FieldError>
               </TableCellValue>
             </TableRow>
             <TableRow>
@@ -156,10 +175,9 @@ export default function ItemizeForm({
                   and charitable donations."
                 >
                   <TextField
-                    required
-                    disabled={!state.doItemize}
+                    disabled={!values.doItemize}
                     name="otherItemizedDeductions"
-                    value={state.otherItemizedDeductions}
+                    value={values.otherItemizedDeductions}
                     sx={{
                       input: { textAlign: 'right' },
                       width: fieldWidth.s,
@@ -170,9 +188,12 @@ export default function ItemizeForm({
                         <InputAdornment position="start">$</InputAdornment>
                       ),
                     }}
-                    InputLabelProps={{ required: false }}
+                    error={hasError('otherItemizedDeductions')}
                   />
                 </TooltipFormField>
+                <FieldError display={hasError('otherItemizedDeductions')}>
+                  {getError('otherItemizedDeductions')}
+                </FieldError>
               </TableCellValue>
             </TableRow>
             <TableRow>
@@ -188,29 +209,35 @@ export default function ItemizeForm({
                     "
                 >
                   <TextField
-                    disabled={!(state.doItemize && state.isRefinance)}
+                    disabled={
+                      !enableRefiNewAcquisitionDebt(
+                        values.doItemize,
+                        values.isRefinance,
+                        values.mortgage2.startDate
+                      )
+                    }
                     name="refiNewAcquisitionDebt"
-                    value={state.refiNewAcquisitionDebt}
+                    value={values.refiNewAcquisitionDebt}
                     sx={{
                       input: { textAlign: 'right' },
                       width: fieldWidth.s,
                     }}
                     onChange={handleChange}
-                    placeholder="0"
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">$</InputAdornment>
                       ),
                     }}
-                    InputLabelProps={{ required: false }}
+                    error={hasError('refiNewAcquisitionDebt')}
                   />
                 </TooltipFormField>
+                <FieldError display={hasError('refiNewAcquisitionDebt')}>
+                  {getError('refiNewAcquisitionDebt')}
+                </FieldError>
               </TableCellValue>
             </TableRow>
             <TableRow>
-              <TableCellLabel>
-                Custom pre-refi home acquisition debt:
-              </TableCellLabel>
+              <TableCellLabel>Custom old home acquisition debt:</TableCellLabel>
               <TableCellValue>
                 <TooltipFormField
                   tooltip="In rare circumstances, the refinanced home acquisition debt
@@ -220,23 +247,31 @@ export default function ItemizeForm({
                     the case, enter the initial home acquisition debt for Mortgage 1."
                 >
                   <TextField
-                    disabled={!(state.doItemize && state.isRefinance)}
+                    disabled={
+                      !enableM1HomeAcquisitionDebt(
+                        values.doItemize,
+                        values.isRefinance,
+                        values.mortgage1.startDate
+                      )
+                    }
                     name="m1HomeAcquisitionDebt"
-                    value={state.m1HomeAcquisitionDebt}
+                    value={values.m1HomeAcquisitionDebt}
                     sx={{
                       input: { textAlign: 'right' },
                       width: fieldWidth.m,
                     }}
                     onChange={handleChange}
-                    placeholder="0"
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">$</InputAdornment>
                       ),
                     }}
-                    InputLabelProps={{ required: false }}
+                    error={hasError('m1HomeAcquisitionDebt')}
                   />
                 </TooltipFormField>
+                <FieldError display={hasError('m1HomeAcquisitionDebt')}>
+                  {getError('m1HomeAcquisitionDebt')}
+                </FieldError>
               </TableCellValue>
             </TableRow>
           </TableBody>

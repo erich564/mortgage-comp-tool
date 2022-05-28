@@ -1,17 +1,17 @@
-import { monthsPerYear } from '../common/constants';
-
 const MortgageTerm = {
-  _40_years: '1',
-  _30_years: '2',
-  _20_years: '3',
-  _15_years: '4',
-  _10_years: '5',
+  _50_years: '1',
+  _40_years: '2',
+  _30_years: '3',
+  _20_years: '4',
+  _15_years: '5',
+  _10_years: '6',
   props: {
-    1: { name: '40 years', months: 40 * monthsPerYear },
-    2: { name: '30 years', months: 30 * monthsPerYear },
-    3: { name: '20 years', months: 20 * monthsPerYear },
-    4: { name: '15 years', months: 15 * monthsPerYear },
-    5: { name: '10 years', months: 10 * monthsPerYear },
+    1: { name: '50 years', years: 50 },
+    2: { name: '40 years', years: 40 },
+    3: { name: '30 years', years: 30 },
+    4: { name: '20 years', years: 20 },
+    5: { name: '15 years', years: 15 },
+    6: { name: '10 years', years: 10 },
   },
 };
 

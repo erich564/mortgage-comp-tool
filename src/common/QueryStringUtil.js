@@ -1,8 +1,7 @@
 import clone from 'clone';
 import flat, { unflatten } from 'flat';
 import queryString from 'query-string';
-import { setStartDate } from '../MortgageForm';
-import merge from './Merge';
+import merge, { getStartDate } from './utility';
 
 const { url: baseUrl } = queryString.parseUrl(window.location.href);
 
@@ -20,7 +19,6 @@ const mappings = [
   ['term', 't'],
   ['type', 'y'],
   ['interestRate', 'ir'],
-  ['startDate', 'sd'],
   ['interestRateAdjusted', 'ira'],
   ['closingCosts', 'cc'],
 ];
@@ -54,17 +52,16 @@ export const queryStringToState = formDefaults => {
     queryString.parse(window.location.search, { parseBooleans: true })
   );
   newState = merge(newState, qsState);
-  for (const m of newState.mortgages) {
+  for (const m of [newState.mortgage1, newState.mortgage2]) {
     m.id = +m.id;
-    setStartDate(m);
+    m.startDate = getStartDate(m.startDateMonth, m.startDateYear);
   }
-  newState.mortgages = newState.mortgages.sort((a, b) => a.id - b.id);
   return newState;
 };
 
 export const stateToQueryStringUrl = pState => {
   const state = clone(pState);
-  for (const m of state.mortgages) {
+  for (const m of [state.mortgage1, state.mortgage2]) {
     delete m.startDate;
   }
   const flatState = flat(state);

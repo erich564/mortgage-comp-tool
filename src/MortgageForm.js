@@ -11,17 +11,9 @@ import {
 } from '@mui/material';
 import TooltipFormField from './common/TooltipFormField';
 import { fieldWidth, formPadding, formPaddingXs } from './common/constants';
-import { TableCellLabel, TableCellValue } from './common/styled';
+import { FieldError, TableCellLabel, TableCellValue } from './common/styled';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
-
-const moment = require('moment');
-
-export const setStartDate = m => {
-  if (m.startDateMonth !== '' && m.startDateYear !== '') {
-    m.startDate = moment(`${m.startDateMonth}/${m.startDateYear}`, 'MM/YYYY');
-  }
-};
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -37,14 +29,15 @@ const Item = styled(Paper)(({ theme }) => ({
   letterSpacing: 'inherit',
 }));
 
-export default function MortgageForm({
-  state,
-  handleMortgageChange,
-  isRefinance,
-}) {
-  const handleChange = e => {
-    handleMortgageChange(state.id, e);
-  };
+export default function MortgageForm({ formik, id, handleChange }) {
+  const mortgageName = `mortgage${id}`;
+  let { values } = formik;
+  const { isRefinance } = values;
+  values = values[mortgageName];
+  const hasError = name =>
+    formik.touched[mortgageName]?.[name] &&
+    !!formik.errors[mortgageName]?.[name];
+  const getError = name => formik.errors[mortgageName]?.[name];
 
   const months = [
     'January',
@@ -68,8 +61,7 @@ export default function MortgageForm({
         component="div"
         sx={{ textAlign: 'center', mb: '20px', color: 'rgba(0,0,0,.75)' }}
       >
-        Mortgage {state.id}{' '}
-        {isRefinance ? `(${state.id === 1 ? 'Old' : 'New'})` : ''}
+        Mortgage {id} {isRefinance ? `(${id === 1 ? 'Old' : 'New'})` : ''}
       </Typography>
       <Table>
         <TableBody>
@@ -78,12 +70,13 @@ export default function MortgageForm({
             <TableCellValue>
               <TooltipFormField tooltip="First mortgage payment date.">
                 <TextField
-                  value={state.startDateMonth}
-                  name="startDateMonth"
+                  value={values.startDateMonth}
+                  name={`${mortgageName}.startDateMonth`}
                   select
                   label="Month"
                   sx={{ width: fieldWidth.m }}
                   onChange={handleChange}
+                  error={hasError('startDate')}
                 >
                   {months.map((m, n) => (
                     <MenuItem key={n + 1} value={n + 1}>
@@ -92,27 +85,28 @@ export default function MortgageForm({
                   ))}
                 </TextField>
                 <TextField
-                  required
-                  value={state.startDateYear}
-                  name="startDateYear"
+                  value={values.startDateYear}
+                  name={`${mortgageName}.startDateYear`}
                   onChange={handleChange}
                   fullWidth
                   label="Year"
                   placeholder="2022"
                   sx={{ width: fieldWidth.xs }}
-                  InputLabelProps={{ required: false }}
                   inputProps={{ maxLength: 4 }}
+                  error={hasError('startDate')}
                 />
               </TooltipFormField>
+              <FieldError display={hasError('startDate')}>
+                {getError('startDate')}
+              </FieldError>
             </TableCellValue>
           </TableRow>
           <TableRow>
             <TableCellLabel>Loan amount:</TableCellLabel>
             <TableCellValue>
               <TextField
-                required
-                value={state.loanAmount}
-                name="loanAmount"
+                value={values.loanAmount}
+                name={`${mortgageName}.loanAmount`}
                 onChange={handleChange}
                 fullWidth
                 placeholder="600000"
@@ -122,17 +116,19 @@ export default function MortgageForm({
                     <InputAdornment position="start">$</InputAdornment>
                   ),
                 }}
-                InputLabelProps={{ required: false }}
+                error={hasError('loanAmount')}
               />
+              <FieldError display={hasError('loanAmount')}>
+                {getError('loanAmount')}
+              </FieldError>
             </TableCellValue>
           </TableRow>
           <TableRow>
             <TableCellLabel>Interest rate:</TableCellLabel>
             <TableCellValue>
               <TextField
-                required
-                value={state.interestRate}
-                name="interestRate"
+                value={values.interestRate}
+                name={`${mortgageName}.interestRate`}
                 onChange={handleChange}
                 fullWidth
                 sx={{
@@ -145,19 +141,23 @@ export default function MortgageForm({
                     <InputAdornment position="end">%</InputAdornment>
                   ),
                 }}
-                InputLabelProps={{ required: false }}
+                error={hasError('interestRate')}
               />
+              <FieldError display={hasError('interestRate')}>
+                {getError('interestRate')}
+              </FieldError>
             </TableCellValue>
           </TableRow>
           <TableRow>
             <TableCellLabel>Term:</TableCellLabel>
             <TableCellValue>
               <TextField
-                value={state.term}
-                name="term"
+                value={values.term}
+                name={`${mortgageName}.term`}
                 select
                 sx={{ width: fieldWidth.m }}
                 onChange={handleChange}
+                error={hasError('term')}
               >
                 {Object.keys(MortgageTerm.props).map(n => (
                   <MenuItem key={n} value={n}>
@@ -165,18 +165,21 @@ export default function MortgageForm({
                   </MenuItem>
                 ))}
               </TextField>
+              <FieldError display={hasError('term')}>
+                {getError('term')}
+              </FieldError>
             </TableCellValue>
           </TableRow>
           <TableRow>
             <TableCellLabel>Type:</TableCellLabel>
             <TableCellValue>
               <TextField
-                value={state.type}
-                name="type"
+                value={values.type}
+                name={`${mortgageName}.type`}
                 select
-                required
                 sx={{ width: fieldWidth.m }}
                 onChange={handleChange}
+                error={hasError('type')}
               >
                 {Object.keys(MortgageType.props).map(n => (
                   <MenuItem key={n} value={n}>
@@ -184,6 +187,9 @@ export default function MortgageForm({
                   </MenuItem>
                 ))}
               </TextField>
+              <FieldError display={hasError('type')}>
+                {getError('type')}
+              </FieldError>
             </TableCellValue>
           </TableRow>
           <TableRow>
@@ -195,13 +201,12 @@ export default function MortgageForm({
             <TableCellValue>
               <TooltipFormField tooltip="The interest rate after the initial fixed period for adjustable rate mortgages (ARMs).">
                 <TextField
-                  name="interestRateAdjusted"
-                  value={state.interestRateAdjusted}
+                  name={`${mortgageName}.interestRateAdjusted`}
+                  value={values.interestRateAdjusted}
                   onChange={handleChange}
                   disabled={
-                    state.type === MortgageType.FixedRate || state.type === ''
+                    values.type === MortgageType.FixedRate || values.type === ''
                   }
-                  required
                   sx={{ input: { textAlign: 'right' }, width: fieldWidth.s }}
                   placeholder="6.75"
                   InputProps={{
@@ -209,9 +214,12 @@ export default function MortgageForm({
                       <InputAdornment position="end">%</InputAdornment>
                     ),
                   }}
-                  InputLabelProps={{ required: false }}
+                  error={hasError('interestRateAdjusted')}
                 />
               </TooltipFormField>
+              <FieldError display={hasError('interestRateAdjusted')}>
+                {getError('interestRateAdjusted')}
+              </FieldError>
             </TableCellValue>
           </TableRow>
           <TableRow>
@@ -223,8 +231,8 @@ export default function MortgageForm({
             include per-diem mortgage interest."
               >
                 <TextField
-                  name="closingCosts"
-                  value={state.closingCosts}
+                  name={`${mortgageName}.closingCosts`}
+                  value={values.closingCosts}
                   onChange={handleChange}
                   fullWidth
                   placeholder="2000"
@@ -234,9 +242,12 @@ export default function MortgageForm({
                       <InputAdornment position="start">$</InputAdornment>
                     ),
                   }}
-                  InputLabelProps={{ required: false }}
+                  error={hasError('closingCosts')}
                 />
               </TooltipFormField>
+              <FieldError display={hasError('closingCosts')}>
+                {getError('closingCosts')}
+              </FieldError>
             </TableCellValue>
           </TableRow>
         </TableBody>

@@ -1,5 +1,7 @@
 import deepmerge from 'deepmerge';
 
+const moment = require('moment');
+
 /**
  * Array merging strategy do deepmerge mergable objects at each index.
  */
@@ -21,3 +23,15 @@ const combineMerge = (target, source, options) => {
 export default function merge(x, y) {
   return deepmerge(x, y, { arrayMerge: combineMerge });
 }
+
+export const getStartDate = (month, year) => {
+  if (
+    month !== undefined &&
+    year !== undefined &&
+    month !== '' &&
+    year !== ''
+  ) {
+    return moment(`${month}/${year}`, 'MM/YYYY');
+  }
+  return undefined;
+};

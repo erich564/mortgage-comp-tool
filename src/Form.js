@@ -16,19 +16,17 @@ import ItemizeForm from './ItemizeForm';
 import MortgageForm from './MortgageForm';
 import TooltipFormField from './common/TooltipFormField';
 import { fieldWidth } from './common/constants';
-import { TableCellLabel, TableCellValue } from './common/styled';
+import { FieldError, TableCellLabel, TableCellValue } from './common/styled';
 
-export default function Form({
-  state,
-  handleChange,
-  handleMortgageChange,
-  handleExplicitChange,
-  handleSubmit,
-}) {
+export default function Form({ formik, handleChange }) {
+  const { values, touched, errors } = formik;
+  const hasError = name => touched[name] && !!errors[name];
+  const getError = name => errors[name];
+
   return (
     <Box
       component="form"
-      onSubmit={handleSubmit}
+      onSubmit={formik.handleSubmit}
       sx={{ display: 'inline-block', textAlign: 'center' }}
     >
       <br />
@@ -45,20 +43,23 @@ export default function Form({
         <RadioGroup
           row
           name="isRefinance"
-          value={String(state.isRefinance)}
+          value={String(values.isRefinance)}
           onChange={handleChange}
         >
           <FormControlLabel
             value="false"
-            control={<Radio required />}
+            control={<Radio />}
             label="Purchasing"
           />
           <FormControlLabel
             value="true"
-            control={<Radio required />}
+            control={<Radio />}
             label="Refinancing"
           />
         </RadioGroup>
+        <FieldError display={hasError('isRefinance')}>
+          {getError('isRefinance')}
+        </FieldError>
       </FormControl>
 
       <br />
@@ -72,12 +73,12 @@ export default function Form({
           my: 3,
         }}
       >
-        {state.mortgages.map(m => (
+        {[1, 2].map(m => (
           <MortgageForm
-            key={m.id}
-            handleMortgageChange={handleMortgageChange}
-            state={m}
-            isRefinance={state.isRefinance}
+            formik={formik}
+            key={m}
+            id={m}
+            handleChange={handleChange}
           />
         ))}
       </Box>
@@ -94,9 +95,8 @@ export default function Form({
                 on average per year."
               >
                 <TextField
-                  required
                   name="roi"
-                  value={state.roi}
+                  value={values.roi}
                   placeholder="9"
                   sx={{ input: { textAlign: 'right' }, width: fieldWidth.s }}
                   onChange={handleChange}
@@ -105,9 +105,12 @@ export default function Form({
                       <InputAdornment position="end">%</InputAdornment>
                     ),
                   }}
-                  InputLabelProps={{ required: false }}
+                  error={hasError('roi')}
                 />
               </TooltipFormField>
+              <FieldError display={hasError('roi')}>
+                {getError('roi')}
+              </FieldError>
             </TableCellValue>
           </TableRow>
         </TableBody>
@@ -115,9 +118,10 @@ export default function Form({
 
       <br />
       <ItemizeForm
-        state={state}
+        formik={formik}
         handleChange={handleChange}
-        handleExplicitChange={handleExplicitChange}
+        hasError={hasError}
+        getError={getError}
       />
 
       <br />

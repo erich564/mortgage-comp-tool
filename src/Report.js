@@ -11,15 +11,16 @@ import {
   createInterestChartOptions,
   setCommonOptions,
 } from './ChartOptions';
-import { monthsPerYear } from './common/constants';
+import { tcjaBreakpoint } from './common/constants';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
+import {
+  enableM1HomeAcquisitionDebt,
+  enableRefiNewAcquisitionDebt,
+} from './validation';
 
-const moment = require('moment');
-
-// TCJA = Tax Cuts & Jobs Act of 2017
-const tcjaBreakpoint = moment('2018-02-15', 'YYYY-MM-DD');
+const monthsPerYear = 12;
 
 /**
  * Convert annual rate to monthly rate (with monthly compounding).
@@ -76,11 +77,16 @@ const transformState = reportState => {
   data.otherItemizedDeductions = +data.otherItemizedDeductions;
   data.m1HomeAcquisitionDebt = +data.m1HomeAcquisitionDebt;
   data.refiNewAcquisitionDebt = +data.refiNewAcquisitionDebt;
+  data.m1 = data.mortgage1;
+  data.m2 = data.mortgage2;
+  data.mortgages = [data.m1, data.m2];
+  delete data.mortgage1;
+  delete data.mortgage2;
   for (const m of data.mortgages) {
     m.name = `Mortgage ${m.id}`;
     m.interestRate /= 100;
     m.loanAmount = +m.loanAmount;
-    m.termMonths = MortgageTerm.props[m.term].months;
+    m.termMonths = MortgageTerm.props[m.term].years * monthsPerYear;
     m.endDate = m.startDate.clone().add(m.termMonths - 1, 'months');
     if (m.type !== MortgageType.FixedRate) {
       const years = MortgageType.props[m.type].yearsFixed;
@@ -241,6 +247,7 @@ const calcProRatedInterestForRefi = ({ m1, m2, firstSharedM1Index }) => {
  * Determine starting values for cash, equity, and home acquisition debt.
  */
 const calcInitialCashEquityAndDebt = ({
+  doItemize,
   isRefinance,
   refiNewAcquisitionDebt,
   irsFilingStatus,
@@ -268,12 +275,20 @@ const calcInitialCashEquityAndDebt = ({
     } else {
       m1.homeAcquisitionDebt = m1.loanAmount;
     }
-    let debt = m2.loanAmount;
-    if (m2.startDate.isAfter(tcjaBreakpoint))
-      debt =
-        Math.min(m1.homeAcquisitionDebt, priorMonthStartingBalance, debt) +
-        refiNewAcquisitionDebt;
-    m2.homeAcquisitionDebt = Math.min(roundToTwo(debt), m2.loanAmount);
+
+    let m2HomeAcquisitionDebt;
+    if (m2.startDate.isAfter(tcjaBreakpoint)) {
+      m2HomeAcquisitionDebt = Math.min(
+        m1.homeAcquisitionDebt,
+        priorMonthStartingBalance,
+        m2.loanAmount
+      );
+      m2HomeAcquisitionDebt += refiNewAcquisitionDebt;
+      m2HomeAcquisitionDebt = roundToTwo(m2HomeAcquisitionDebt);
+    } else {
+      m2HomeAcquisitionDebt = m2.loanAmount;
+    }
+    m2.homeAcquisitionDebt = m2HomeAcquisitionDebt;
   } else {
     const loanAmountDiff = m2.loanAmount - m1.loanAmount;
     m1.initCash = -m1.closingCosts;
@@ -534,7 +549,6 @@ const calcMortgageInterestByYear = ({
 
 function Report({ reportState }) {
   const data = transformState(reportState);
-  [data.m1, data.m2] = data.mortgages;
   extendStandardDeductions(data);
   createAmortizationSchedules(data.mortgages);
   data.firstSharedM1Index = findFirstSharedPaymentDateIndex(data);
