@@ -500,7 +500,11 @@ const calcMortgageInterestByYear = ({
     const refiYear = m1.payments[m1n].date.year();
     let m1Interest = 0;
     let m1ItemizableInterest = 0;
-    for (m1n -= 2; m1.payments[m1n].date.year() === refiYear; m1n--) {
+    for (
+      m1n -= 2;
+      m1n > 0 && m1.payments[m1n].date.year() === refiYear;
+      m1n--
+    ) {
       m1Interest += m1.payments[m1n].interest;
       m1ItemizableInterest += m1.payments[m1n].itemizableInterest;
     }
