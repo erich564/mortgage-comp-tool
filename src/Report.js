@@ -15,10 +15,6 @@ import { tcjaBreakpoint } from './common/constants';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 import MortgageTerm from './enum/MortgageTerm';
 import MortgageType from './enum/MortgageType';
-import {
-  enableM1HomeAcquisitionDebt,
-  enableRefiNewAcquisitionDebt,
-} from './validation';
 
 const monthsPerYear = 12;
 
@@ -247,7 +243,6 @@ const calcProRatedInterestForRefi = ({ m1, m2, firstSharedM1Index }) => {
  * Determine starting values for cash, equity, and home acquisition debt.
  */
 const calcInitialCashEquityAndDebt = ({
-  doItemize,
   isRefinance,
   refiNewAcquisitionDebt,
   irsFilingStatus,

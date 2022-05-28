@@ -13,12 +13,7 @@ import {
   TextField,
 } from '@mui/material';
 import TooltipFormField from './common/TooltipFormField';
-import {
-  fieldWidth,
-  formPadding,
-  formPaddingXs,
-  tcjaBreakpoint,
-} from './common/constants';
+import { fieldWidth, formPadding, formPaddingXs } from './common/constants';
 import { FieldError, TableCellLabel, TableCellValue } from './common/styled';
 import IRSFilingStatus from './enum/IRSFilingStatus';
 import {
