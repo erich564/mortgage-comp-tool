@@ -1,7 +1,19 @@
-import { Divider, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Button,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from '@mui/material';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import { Fragment, memo } from 'react';
+import { Fragment, memo, useState } from 'react';
 import {
   createAmortizationChartOptions,
   createBalanceChartOptions,
@@ -40,6 +52,8 @@ const calcPerformanceRanges = netWorthDifferences => {
 };
 
 function Report({ reportState }) {
+  const [showDetails, setShowDetails] = useState(false);
+
   const data = createReportData(reportState);
   setCommonOptions(data);
   data.performanceRanges = calcPerformanceRanges(data.netWorthDifferences);
@@ -120,76 +134,119 @@ function Report({ reportState }) {
         Therefore, if a point&apos;s value is greater than $0, then Scenario 2
         is outperforming Scenario 1 at that time (taking into account past
         performance).
-        <br />
-        <br />
-        Note that you can zoom in on graphs by clicking and dragging. You also
-        can show/hide lines by clicking on their legend entries.
       </p>
-      <br />
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={createCashEquityChartOptions(data.mortgages)}
-      />
-      <p>
-        For each monthly mortgage payment made, Cash goes down by that amount.
-        Equity goes up by the principal portion of the payment. Cash has
-        additional value over time, as it can be invested. To account for the
-        time value of money, each month Cash is multiplied by a monthly ROI
-        value (which is derived from the yearly ROI value supplied above). If
-        Cash is positive, then this value is added to Cash. If Cash is negative,
-        then this value is an opportunity cost that gets subtracted from Cash.
-        <br />
-        <br />
-        The tool assumes that each mortgage closing date is two months before
-        the starting date supplied above. If this comparison is for a refinance,
-        then the starting cash starts off increased by the cash-out amount and
-        equity starts off decreased by the cash-out amount.
-        <br />
-        <br />
-        If mortgage interest itemization is enabled, then Cash is increased each
-        month by some amount. First, the total itemizable mortgage interest for
-        that year is determined. This amount is reduced by N, where N is the
-        standard deduction minus other itemized deductions. (This accounts for
-        years where your standard deduction is greater than your itemizable
-        mortgage interest, in which case you would end up not itemizing.
-        However, other itemized deductions also help to offset the standard
-        deduction which is why they are subtracted.) That amount is then
-        multiplied by your marginal tax rate. Then it is divided by the number
-        of months a payment is made that year, which is twelve except for
-        potentially the first and last months of the mortgage.
-        <br />
-        <br />
-        This tool takes into account the tax implications of the Tax Cuts and
-        Jobs Act of 2017. It assumes that all relevant provisions will be
-        renewed indefinitely.
-        <br />
-      </p>
-      <br />
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={createInterestChartOptions(data.mortgages)}
-      />
-      <p>
-        This graph shows the total mortgage interest paid in each calendar year.
-      </p>
-      <br />
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={createBalanceChartOptions(data.mortgages)}
-      />
-      <p>
-        This graph shows the outstanding mortgage balances decreasing over time.
-      </p>
-      {data.mortgages.map(m => (
-        <Fragment key={m.id}>
+      <Button
+        variant="outlined"
+        onClick={() => {
+          setShowDetails(!showDetails);
+        }}
+        sx={{
+          width: {
+            xs: '60%',
+            sm: 'fit-content',
+          },
+          alignSelf: 'center',
+          p: '10px 56px',
+          '&.MuiButtonBase-root': { mt: '35px' },
+        }}
+      >
+        {showDetails ? (
+          <>
+            Hide details <ExpandLessIcon />
+          </>
+        ) : (
+          <>
+            Show details <ExpandMoreIcon />
+          </>
+        )}
+      </Button>
+      <Accordion
+        expanded={showDetails}
+        sx={{
+          m: 0,
+          boxShadow: 'none',
+          '&::before': {
+            display: 'none',
+          },
+        }}
+      >
+        <AccordionSummary sx={{ display: 'none' }} />
+        <AccordionDetails sx={{ p: 0 }}>
           <br />
           <HighchartsReact
             highcharts={Highcharts}
-            options={createAmortizationChartOptions(m)}
+            options={createCashEquityChartOptions(data.mortgages)}
           />
-          <p>Amortization schedule for Mortgage {m.id}.</p>
-        </Fragment>
-      ))}
+          <p>
+            For each monthly mortgage payment made, Cash goes down by that
+            amount. Equity goes up by the principal portion of the payment. Cash
+            has additional value over time, as it can be invested. To account
+            for the time value of money, each month Cash is multiplied by a
+            monthly ROI value (which is derived from the yearly ROI value
+            supplied above). If Cash is positive, then this value is added to
+            Cash. If Cash is negative, then this value is an opportunity cost
+            that gets subtracted from Cash.
+            <br />
+            <br />
+            The tool assumes that each mortgage closing date is two months
+            before the starting date supplied above. If this comparison is for a
+            refinance, then the starting cash starts off increased by the
+            cash-out amount and equity starts off decreased by the cash-out
+            amount.
+            <br />
+            <br />
+            If mortgage interest itemization is enabled, then Cash is increased
+            each month by some amount. First, the total itemizable mortgage
+            interest for that year is determined. This amount is reduced by N,
+            where N is the standard deduction minus other itemized deductions.
+            (This accounts for years where your standard deduction is greater
+            than your itemizable mortgage interest, in which case you would end
+            up not itemizing. However, other itemized deductions also help to
+            offset the standard deduction which is why they are subtracted.)
+            That amount is then multiplied by your marginal tax rate. Then it is
+            divided by the number of months a payment is made that year, which
+            is twelve except for potentially the first and last months of the
+            mortgage.
+            <br />
+            <br />
+            This tool takes into account the tax implications of the Tax Cuts
+            and Jobs Act of 2017. It assumes that all relevant provisions will
+            be renewed indefinitely.
+            <br />
+            <br />
+            Note that you can zoom in on graphs by clicking and dragging. You
+            also can show/hide lines by clicking on their legend entries.
+          </p>
+          <br />
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={createInterestChartOptions(data.mortgages)}
+          />
+          <p>
+            This graph shows the total mortgage interest paid in each calendar
+            year.
+          </p>
+          <br />
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={createBalanceChartOptions(data.mortgages)}
+          />
+          <p>
+            This graph shows the outstanding mortgage balances decreasing over
+            time.
+          </p>
+          {data.mortgages.map(m => (
+            <Fragment key={m.id}>
+              <br />
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={createAmortizationChartOptions(m)}
+              />
+              <p>Amortization schedule for Mortgage {m.id}.</p>
+            </Fragment>
+          ))}
+        </AccordionDetails>
+      </Accordion>
       <br />
     </>
   );
