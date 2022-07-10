@@ -126,7 +126,18 @@ export default function Form({ formik, handleChange }) {
 
       <br />
       <br />
-      <Button variant="contained" type="submit">
+      <Button
+        variant="contained"
+        type="submit"
+        sx={{
+          width: {
+            xs: '60%',
+            sm: 'fit-content',
+          },
+          alignSelf: 'center',
+          p: '10px 56px',
+        }}
+      >
         Compare
       </Button>
       <br />
