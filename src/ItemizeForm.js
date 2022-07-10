@@ -68,7 +68,7 @@ export default function ItemizeForm({
                 sx={{
                   pr: {
                     xs: '109px',
-                    sm: '121px',
+                    sm: '136px',
                   },
                 }}
               >
