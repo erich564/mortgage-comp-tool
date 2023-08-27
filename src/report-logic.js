@@ -129,17 +129,17 @@ const extendStandardDeductions = ({ m1, m2, irsFilingStatus }) => {
   } else {
     endYear = m2.endDate.year();
   }
-  const stdDev = IRSFilingStatus.props[irsFilingStatus].standardDeduction;
-  const keys = Object.keys(stdDev);
+  const stdDed = IRSFilingStatus.props[irsFilingStatus].standardDeduction;
+  const keys = Object.keys(stdDed);
 
   const first = +keys[0];
   // @ts-ignore
   const last = +keys.pop();
   for (let i = first - 1; i >= startYear; i--) {
-    stdDev[i] = roundToTwo(stdDev[i + 1] / (1 + percentChange));
+    stdDed[i] = roundToTwo(stdDed[i + 1] / (1 + percentChange));
   }
   for (let i = last + 1; i <= endYear; i++) {
-    stdDev[i] = stdDev[i - 1];
+    stdDed[i] = stdDed[i - 1];
   }
 };
 
